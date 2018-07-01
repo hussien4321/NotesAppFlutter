@@ -1,5 +1,5 @@
-name: note_app
-description: A new Flutter project.
+name: 24h_reminders
+description: An app to track reminders over a 24 hour period.
 
 dependencies:
   flutter:

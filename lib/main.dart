@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Notes 2.0',
+      title: 'Reminders',
       debugShowCheckedModeBanner: false, 
       theme: new ThemeData(
         primarySwatch: Colors.orange,
@@ -20,45 +19,91 @@ class MyApp extends StatelessWidget {
 class NotesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text("Notes"),
+        title: Text("24h Reminders ⏳"),
+        centerTitle: true,
         actions: <Widget>[
           IconButton(
-            onPressed: () => print("added"),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) => AddNotePage()),
+              );
+            },
             icon: Icon(Icons.add),
           )
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: new LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter, // 10% of the width, so there are ten blinds.
-            colors: [Colors.grey, Colors.white], // whitish to gray
-            tileMode: TileMode.repeated, // repeats the gradient over the canvas
+      body: fadedBackground(
+        child: noItemWidget(),
+      ), 
+    );
+  }
+
+  Widget noItemWidget() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            'You currently have no reminders on the app 😟',
+            style: TextStyle(fontSize: 15.0),
           ),
-        ),
-        child: Center(
+          Padding(padding: EdgeInsets.only(top:10.0),),
+          Text(
+            'click the + button above to add a new note',
+            style: TextStyle(fontSize: 13.0, color: Colors.grey, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget notesListView(){
+    return null;
+  }
+}
+
+
+class AddNotePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Add a reminder 📝"),
+        centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: Icon(Icons.close),
+          )
+        ],
+      ),
+      body: fadedBackground(
+        child: Container(
+          padding: EdgeInsets.all(10.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text(
-                'You currently have no notes on the app 😟',
-                style: TextStyle(fontSize: 15.0),
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Please enter a search term'
+                  ),
+                ),
               ),
-              Padding(padding: EdgeInsets.only(top:10.0),),
-              Text(
-                'click the + button above to add a new note',
-                style: TextStyle(fontSize: 13.0, color: Colors.grey, fontWeight: FontWeight.bold),
+              Container(
+                padding: EdgeInsets.all(10.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: RaisedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text('Add Activity'),
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
               ),
             ],
           ),
@@ -66,4 +111,18 @@ class NotesPage extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget fadedBackground({Widget child}) {
+  return Container(
+    decoration: BoxDecoration(
+      gradient: new LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Colors.grey, Colors.white], 
+        tileMode: TileMode.repeated,
+      ),
+    ),
+    child: child, 
+  );
 }
