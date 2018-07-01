@@ -1,4 +1,4 @@
-name: 24h_reminders
+name: reminders
 description: An app to track reminders over a 24 hour period.
 
 dependencies:
