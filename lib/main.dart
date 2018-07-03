@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import './db/database.dart';
+import './model/todo.dart';
 
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -16,12 +19,34 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class NotesPage extends StatelessWidget {
+class NotesPage extends StatefulWidget {
+    @override
+    State createState() => new NotesPageState();
+}
+
+
+class NotesPageState extends State<NotesPage> {
+  DBHelper dbHelper = new DBHelper();
+
+  List<ToDo> todos = [];
+
+  @override
+  void initState() {
+      super.initState();
+      dbSetUp();
+  }
+
+  dbSetUp() async {
+    await dbHelper.initDb();  
+    dbHelper.getToDos().then((res) => this.setState(() {todos = res;}));
+  }
+  
   @override
   Widget build(BuildContext context) {
+    dbSetUp();
     return Scaffold(
       appBar: AppBar(
-        title: Text("24h Reminders ⏳"),
+        title: Text("24h ToDos ⏳"),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
@@ -35,7 +60,7 @@ class NotesPage extends StatelessWidget {
         ],
       ),
       body: fadedBackground(
-        child: noItemWidget(),
+        child: todos.isEmpty ? noItemWidget() : notesListView(todos, dbHelper),
       ), 
     );
   }
@@ -46,12 +71,12 @@ class NotesPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            'You currently have no reminders on the app 😟',
+            'You currently have no task to do at the moment 👍',
             style: TextStyle(fontSize: 15.0),
           ),
           Padding(padding: EdgeInsets.only(top:10.0),),
           Text(
-            'click the + button above to add a new note',
+            'press + button above to add a new task',
             style: TextStyle(fontSize: 13.0, color: Colors.grey, fontWeight: FontWeight.bold),
           ),
         ],
@@ -59,19 +84,65 @@ class NotesPage extends StatelessWidget {
     );
   }
 
-  Widget notesListView(){
-    return null;
+  Widget notesListView(List<ToDo> todos, DBHelper dbHelper){
+    
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int i) => todoBuilder(todos[i], dbHelper),
+      itemCount: todos.length,
+    );
   }
+
+  Widget todoBuilder(ToDo todo, DBHelper dbHelper){
+    return Container(
+      padding: EdgeInsets.all(10.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    todo.name,
+                    style: TextStyle(fontSize: 20.0,),
+                  ),
+                  Text(
+                    todo.deadline.toString().substring(0,19),
+                    style: TextStyle(fontSize: 14.0, color: Colors.grey[700]),
+                  ),
+                ],          
+              ),
+            ),
+            Checkbox(
+              value: todo.status,
+              onChanged: (newStatus) {
+                dbHelper.completeToDo(todo);
+                //UPDATE TODOS CODE
+              },
+            ),
+          ],
+        ),
+    );
+  }
+
 }
 
 
-class AddNotePage extends StatelessWidget {
+class AddNotePage extends StatefulWidget {
+    @override
+    State createState() => new AddNotePageState();
+}
+
+class AddNotePageState extends State<AddNotePage> {
+
+  DBHelper dbHelper = new DBHelper();
+  String task;
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add a reminder 📝"),
+        title: Text("Create a new task 📝"),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
@@ -92,6 +163,7 @@ class AddNotePage extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: 'Please enter a search term'
                   ),
+                  onChanged: (term) {task = term;},
                 ),
               ),
               Container(
@@ -99,8 +171,11 @@ class AddNotePage extends StatelessWidget {
                 child: SizedBox(
                   width: double.infinity,
                   child: RaisedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text('Add Activity'),
+                    onPressed: () {
+                      dbHelper.addToDoItem(new ToDo(task));
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Add Task'),
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
