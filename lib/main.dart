@@ -63,7 +63,7 @@ class NotesPageState extends State<NotesPage> {
         child: todos.isEmpty ? noItemWidget() : notesListView(todos, dbHelper),
       ), 
     );
-  }
+  }  
 
   Widget noItemWidget() {
     return Center(
@@ -103,11 +103,11 @@ class NotesPageState extends State<NotesPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    todo.name,
+                    'TODO NAME',
                     style: TextStyle(fontSize: 20.0,),
                   ),
                   Text(
-                    todo.deadline.toString().substring(0,19),
+                    'todo.deadline.toString().substring(0,19)',
                     style: TextStyle(fontSize: 14.0, color: Colors.grey[700]),
                   ),
                 ],          
@@ -172,7 +172,7 @@ class AddNotePageState extends State<AddNotePage> {
                   width: double.infinity,
                   child: RaisedButton(
                     onPressed: () {
-                      dbHelper.addToDoItem(new ToDo(task));
+                      dbHelper.addToDoItem(null);
                       Navigator.of(context).pop();
                     },
                     child: Text('Add Task'),

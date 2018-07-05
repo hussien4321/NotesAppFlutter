@@ -1,29 +1,33 @@
+import './task.dart';
+
 class ToDo{
 
-  String _name;
+  int _id;
+  Task _task;
   DateTime _startDate;
   bool _status;
+  int _timeToCompletion;
   
-  String get name => _name;
+  int get id => _id;
+  Task get task => _task;
   DateTime get startDate => _startDate;
   bool get status => _status;
-  DateTime get deadline => _startDate.add(Duration(days: 1));
+  int get timeToCompletion => _timeToCompletion;
 
-  ToDo(String name){
-    _name = name;
+  ToDo(int id, Task task){
+    _id = id;
+    _task = task;
     _startDate = DateTime.now();
     _status = false;
+    _timeToCompletion = 0;
   }
   
   ToDo.fromJson(Map<String, dynamic> json)
-      : _name = json['name'],
+      : _id = json['todo_id'],
+        _task = Task.fromJson(json),
         _startDate = DateTime.parse(json['start_date']),
-        _status = json['status'] == 'true';
+        _status = json['status'] == 'true',
+        _timeToCompletion = json['time_to_completion'];
 
-  Map<String, dynamic> toJson() =>
-    {
-      'name': _name,
-      'start_date': _startDate.toIso8601String(),
-      'status' : _status.toString()
-    };
+
 }
