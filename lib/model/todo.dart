@@ -6,20 +6,23 @@ class ToDo{
   Task _task;
   DateTime _startDate;
   bool _status;
-  int _timeToCompletion;
-  
+  DateTime _completionDate;
+  bool _forfeit;
+
   int get id => _id;
   Task get task => _task;
   DateTime get startDate => _startDate;
   bool get status => _status;
-  int get timeToCompletion => _timeToCompletion;
+  DateTime get completionDate => _completionDate;
+  bool get forfeit => _forfeit;
 
   ToDo(int id, Task task){
     _id = id;
     _task = task;
     _startDate = DateTime.now();
     _status = false;
-    _timeToCompletion = 0;
+    _completionDate = DateTime.now();
+    _forfeit = false;
   }
   
   ToDo.fromJson(Map<String, dynamic> json)
@@ -27,7 +30,9 @@ class ToDo{
         _task = Task.fromJson(json),
         _startDate = DateTime.parse(json['start_date']),
         _status = json['status'] == 'true',
-        _timeToCompletion = json['time_to_completion'];
+        _completionDate = json['completion_date'],
+        _forfeit = json['forfeit'];
 
 
 }
+
