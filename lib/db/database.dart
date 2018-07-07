@@ -130,21 +130,11 @@ class DBHelper{
     return todos;
   }
 
-  Future<List<Task>> getRecentTasks() async {
+  //TODO: UPDATE QUERY TO ORDER TASKS IN TERMS OF MOST RECENTLY USED
+  Future<List<Task>> getAllTasks() async {
     var dbClient = await db;
 
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM task WHERE recommended = "false" ORDER BY date(creation_date) DESC');
-    List<Task> tasks = new List();
-    for (int i = 0; i < list.length; i++) {
-      tasks.add(new Task.fromJson(list[i]));
-    }
-    return tasks; 
-  }
-
-  Future<List<Task>> getRecommendedTasks() async {
-    var dbClient = await db;
-
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM task WHERE recommended = "true"');
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM task ORDER BY date(creation_date) DESC');
     List<Task> tasks = new List();
     for (int i = 0; i < list.length; i++) {
       tasks.add(new Task.fromJson(list[i]));

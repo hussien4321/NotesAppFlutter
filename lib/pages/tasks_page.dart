@@ -13,14 +13,17 @@ class TasksPage extends StatefulWidget {
 }
 
 class TasksPageState extends State<TasksPage> {
+
+  bool _isEditMode = false;
   DBHelper _dbHelper = new DBHelper();
 
   bool _loadingPage = true;
-  List<Task> _recommendedTasks = [];
+  List<Task> _tasks = [];
 
   @override
   void initState() {
       super.initState();
+      _isEditMode = false;
       dbSetUp();
   }
 
@@ -30,8 +33,8 @@ class TasksPageState extends State<TasksPage> {
   }
 
   updateTodos(){
-    _dbHelper.getRecommendedTasks().then((res) => this.setState(() {
-      _recommendedTasks = res; 
+    _dbHelper.getAllTasks().then((res) => this.setState(() {
+      _tasks = res; 
       _loadingPage = false;
     }));
   }
@@ -45,9 +48,11 @@ class TasksPageState extends State<TasksPage> {
         actions: <Widget>[
           IconButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              setState(() {
+               _isEditMode = _isEditMode == false;               
+              });
             },
-            icon: Icon(Icons.edit),
+            icon: Icon(_isEditMode ? Icons.check : Icons.edit),
           )
         ],
       ),
@@ -59,8 +64,8 @@ class TasksPageState extends State<TasksPage> {
 
   Widget _recommendedTasksView(){
     return ListView.builder(
-      itemBuilder: (BuildContext context, int i) => TaskView(_recommendedTasks[i]),
-      itemCount: _recommendedTasks.length,
+      itemBuilder: (BuildContext context, int i) => TaskView(_tasks[i], _isEditMode),
+      itemCount: _tasks.length,
     );
 
   }

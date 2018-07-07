@@ -4,8 +4,9 @@ import '../../model/task.dart';
 class TaskView extends StatelessWidget{
   
   final Task _task;
+  bool _isEditMode;
 
-  TaskView(this._task);
+  TaskView(this._task, this._isEditMode);
 
   @override
   Widget build(BuildContext context){
@@ -36,11 +37,12 @@ class TaskView extends StatelessWidget{
                   padding: EdgeInsets.all(5.0),
                   child: RaisedButton(
                     onPressed: () {
-                      print('task with id '+_task.id.toString()+' is started!'); 
-                      Navigator.of(context).pop();
+                      print('task with id '+_task.id.toString()+' is '+(_isEditMode ? 'edited!' : 'started!')); 
+                      if(!_isEditMode)
+                        Navigator.of(context).pop();
                     },
-                    child: Text('Start'),
-                    color: Theme.of(context).primaryColor,
+                    child: Text(_isEditMode  ? 'Edit' : 'Start'),
+                    color: _isEditMode  ? Colors.greenAccent : Theme.of(context).primaryColor,
                   ),
                 ),
               ],
