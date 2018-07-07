@@ -47,7 +47,7 @@ class DBHelper{
   void _onCreate(Database db, int version) async {
 
     //creates our 2 tables
-    await db.execute("CREATE TABLE todo( todo_id integer primary key, task_fid integer REFERENCES task(task_id) ON UPDATE CASCADE ON DELETE CASCADE, start_date text, status boolean, completion_date text, forfeit boolean)");
+    await db.execute("CREATE TABLE todo( todo_id integer primary key, task_fid integer REFERENCES task(task_id) ON UPDATE CASCADE ON DELETE CASCADE, start_date text, success boolean, completion_date text, forfeit boolean)");
     await db.execute("CREATE TABLE task (task_id integer primary key, name text, icon text, recommend boolean, creation_date text)");
 
     //adds in recommended tasks for people getting started
@@ -65,7 +65,7 @@ class DBHelper{
   
     await database.transaction((txn) async {
       await txn.rawInsert(
-          'INSERT INTO todo(task_fid, start_date, status, completion_date, forfeit) VALUES('+todo.task.id.toString()+', "'+todo.startDate.toIso8601String()+'", "'+todo.status.toString()+'", "'+todo.completionDate.toIso8601String()+'", '+todo.forfeit.toString()+')');
+          'INSERT INTO todo(task_fid, start_date, success, completion_date, forfeit) VALUES('+todo.task.id.toString()+', "'+todo.startDate.toIso8601String()+'", "'+todo.success.toString()+'", "'+todo.completionDate.toIso8601String()+'", '+todo.forfeit.toString()+')');
     });
   }
 
@@ -100,7 +100,7 @@ class DBHelper{
 
     await database.transaction((txn) async {
       await txn.rawUpdate(
-          'UPDATE ToDo SET status = "true", completion_date= "'+DateTime.now().toIso8601String()+'" WHERE todo_id = '+todo.id.toString());
+          'UPDATE Todo SET success = "true", completion_date= "'+DateTime.now().toIso8601String()+'" WHERE todo_id = '+todo.id.toString());
     });
   }
   
@@ -119,7 +119,7 @@ class DBHelper{
 
     String dateRange = DateTime.now().subtract(Duration(days: 1)).toIso8601String();
 
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE task.task_id = todo.task_fid AND forfeit = "false" AND status = "false" AND start_date > date("'+dateRange+'")');
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE task.task_id = todo.task_fid AND forfeit = "false" AND success = "false" AND start_date > date("'+dateRange+'")');
     List<ToDo> todos = new List();
     for (int i = 0; i < list.length; i++) {
       todos.add(new ToDo.fromJson(list[i]));
@@ -149,6 +149,26 @@ class DBHelper{
     return tasks; 
   }
 
+
+  Future<List<Task>> getNumberOfSuccess() async {
+    var dbClient = await db;
+
+    List<Map> list = await dbClient.rawQuery('SELECT COUNT(*) AS "successes" FROM todo WHERE success = "true"');
+    Map answer = list[0];
+    
+    return answer['successes']; 
+  }
+
+  Future<List<Task>> getNumberOfFailures() async {
+    var dbClient = await db;
+
+    //TODO : (date < yesterday AND success = "false") OR forfeit = "true"
+    List<Map> list = await dbClient.rawQuery('SELECT COUNT(*) AS "failures" FROM todo WHERE forfeit = "true"');
+    Map answer = list[0];
+    
+    return answer['failures']; 
+  }
+
   Future<List<ToDo>> getToDos() async {
     var dbClient = await db;
     List<Map> list = await dbClient.rawQuery('SELECT * FROM todo');
@@ -169,14 +189,14 @@ class DBHelper{
   // completeToDo(ToDo todo);         DONEZO
   // giveUpToDo(ToDo todo);           DONEZO
 
-  // getActiveToDos();                DONEZO  
+  // getActiveToDos();                DONEZO? 
 
   // getRecentTasks();                DONEZO
   // getRecommendedTasks();           DONEZO
 
   // //analytics
-  // getNumberOfSuccess();
-  // getNumberOfFailures();
+  // getNumberOfSuccess();            DONEZO
+  // getNumberOfFailures();           DONEZO
   // getNumberOfSuccessPerDay();
   // getNumberOfFailuresPerDay();
 

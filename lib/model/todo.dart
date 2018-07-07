@@ -5,14 +5,14 @@ class ToDo{
   int _id;
   Task _task;
   DateTime _startDate;
-  bool _status;
+  bool _success;
   DateTime _completionDate;
   bool _forfeit;
 
   int get id => _id;
   Task get task => _task;
   DateTime get startDate => _startDate;
-  bool get status => _status;
+  bool get success => _success;
   DateTime get completionDate => _completionDate;
   bool get forfeit => _forfeit;
 
@@ -20,7 +20,7 @@ class ToDo{
     _id = id;
     _task = task;
     _startDate = DateTime.now();
-    _status = false;
+    _success = false;
     _completionDate = DateTime.now();
     _forfeit = false;
   }
@@ -29,7 +29,7 @@ class ToDo{
       : _id = json['todo_id'],
         _task = Task.fromJson(json),
         _startDate = DateTime.parse(json['start_date']),
-        _status = json['status'] == 'true',
+        _success = json['success'] == 'true',
         _completionDate = json['completion_date'],
         _forfeit = json['forfeit'];
 
