@@ -1,63 +1,67 @@
 import 'package:flutter/material.dart';
 import '../db/database.dart';
-
+import '../model/task.dart';
+import '../model/todo.dart';
+import '../utils/views/loading_screen.dart';
+import '../utils/views/faded_background.dart';
+import '../utils/views/task_view.dart';
 
 class TasksPage extends StatefulWidget {
     @override
     State createState() => new TasksPageState();
+
 }
 
-
 class TasksPageState extends State<TasksPage> {
+  DBHelper _dbHelper = new DBHelper();
 
-  DBHelper dbHelper = new DBHelper();
-  String task;
+  bool _loadingPage = true;
+  List<Task> _recommendedTasks = [];
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+      super.initState();
+      dbSetUp();
+  }
+
+  dbSetUp() async {
+    await _dbHelper.initDb();  
+    updateTodos();
+  }
+
+  updateTodos(){
+    _dbHelper.getRecommendedTasks().then((res) => this.setState(() {
+      _recommendedTasks = res; 
+      _loadingPage = false;
+    }));
+  }
+
+  @override
+    Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Create a new task 📝"),
+        title: Text("Select a task"),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            icon: Icon(Icons.close),
+            icon: Icon(Icons.edit),
           )
         ],
       ),
-      body: Container(
-        child: Container(
-          padding: EdgeInsets.all(10.0),
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Please enter a search term'
-                  ),
-                  onChanged: (term) {task = term;},
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(10.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: RaisedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('Add Task'),
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      body: fadedBackground(
+        child: _loadingPage ? LoadingScreen() : _recommendedTasksView(),
+      ), 
     );
+  }  
+
+  Widget _recommendedTasksView(){
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int i) => TaskView(_recommendedTasks[i]),
+      itemCount: _recommendedTasks.length,
+    );
+
   }
 }

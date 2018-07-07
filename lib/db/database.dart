@@ -12,7 +12,7 @@ class DBHelper{
   static List<Task> _recommendedTasks = [
       new Task(1,'Exercise', '🏋️', true),
       new Task(2,'Finish homework', '📝', true),
-      new Task(3,'Go Grocery shopping', '🛒', true),
+      new Task(3,'Go grocery shopping', '🛒', true),
       new Task(4,'Cook dinner', '🍽️', true),
     ];
   static Database _db;
@@ -38,9 +38,10 @@ class DBHelper{
     String result = '';
     for(int i = 0; i < _recommendedTasks.length; i++){
       Task temp = _recommendedTasks[i];
-      result+='("'+temp.name+'","'+temp.icon+'",'+temp.recommended.toString()+',"'+temp.creationDate.toIso8601String()+'")';
+      result+='("'+temp.name+'","'+temp.icon+'","'+temp.recommended.toString()+'","'+temp.creationDate.toIso8601String()+'")';
       result+= i == (_recommendedTasks.length - 1) ? '' : ', ';
     }
+
     return result;
   }
 
@@ -48,12 +49,14 @@ class DBHelper{
 
     //creates our 2 tables
     await db.execute("CREATE TABLE todo( todo_id integer primary key, task_fid integer REFERENCES task(task_id) ON UPDATE CASCADE ON DELETE CASCADE, start_date text, success boolean, completion_date text, forfeit boolean)");
-    await db.execute("CREATE TABLE task (task_id integer primary key, name text, icon text, recommend boolean, creation_date text)");
+
+
+    await db.execute("CREATE TABLE task (task_id integer primary key, name text, icon text, recommended boolean, creation_date text)");
 
     //adds in recommended tasks for people getting started
     await db.transaction((txn) async {
-      await txn.rawInsert(
-          'INSERT INTO task(name, icon, recomended, creation_date) VALUES '+_generateRecommnendedTasksScript());
+        await txn.rawInsert(
+          'INSERT INTO task(name, icon, recommended, creation_date) VALUES '+_generateRecommnendedTasksScript());
     });
 
     print("Created tables");
@@ -75,7 +78,7 @@ class DBHelper{
   
     await database.transaction((txn) async {
       await txn.rawInsert(
-          'INSERT INTO task(name, icon, recomended, creation_date) VALUES("'+task.name+'","'+task.icon+'",'+task.recommended.toString()+',"'+task.creationDate.toIso8601String()+'")');
+          'INSERT INTO task(name, icon, recommended, creation_date) VALUES("'+task.name+'","'+task.icon+'",'+task.recommended.toString()+',"'+task.creationDate.toIso8601String()+'")');
     });
   }
 
@@ -146,6 +149,7 @@ class DBHelper{
     for (int i = 0; i < list.length; i++) {
       tasks.add(new Task.fromJson(list[i]));
     }
+    
     return tasks; 
   }
 

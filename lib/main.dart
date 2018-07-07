@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import './db/database.dart';
-import './model/todo.dart';
 import './pages/home_page.dart';
 
 void main() => runApp(new MyApp());

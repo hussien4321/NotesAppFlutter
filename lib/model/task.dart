@@ -11,7 +11,7 @@ class Task{
   bool get recommended => _recommended;
   DateTime get creationDate => _creationDate;
 
-  Task(int id, String name, String emoji, [bool recommended = false]){
+  Task(int id, String name, String icon, [bool recommended = false]){
     _id = id;
     _name = name;
     _icon = icon;
@@ -20,7 +20,7 @@ class Task{
   }
   
   Task.fromJson(Map<String, dynamic> json)
-      : _id = json['todo_id'],
+      : _id = json['task_id'],
         _name = json['name'],
         _icon = json['icon'],
         _recommended = json['recommended'] == 'true',

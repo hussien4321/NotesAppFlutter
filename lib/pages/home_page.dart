@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import '../db/database.dart';
+import '../model/task.dart';
 import '../model/todo.dart';
 import '../utils/views/faded_background.dart';
+import '../utils/helpers/time_functions.dart';
+import './new_task_page.dart';
 import './tasks_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,7 +16,10 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   DBHelper dbHelper = new DBHelper();
 
-  List<ToDo> todos = [];
+  static Task demoTask = new Task(1,'Get Haircut', '💇🏻', false);
+  static ToDo demoTodo = new ToDo(1, demoTask);
+
+  List<ToDo> todos = [demoTodo];
 
   @override
   void initState() {
@@ -27,7 +33,7 @@ class HomePageState extends State<HomePage> {
   }
 
   updateTodos(){
-    dbHelper.getToDos().then((res) => this.setState(() {todos = res;}));
+    // dbHelper.getToDos().then((res) => this.setState(() {todos = res;}));
   }
   
   @override
@@ -92,11 +98,11 @@ class HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'TODO NAME',
+                    todo.task.name,
                     style: TextStyle(fontSize: 20.0,),
                   ),
                   Text(
-                    'todo.deadline.toString().substring(0,19)',
+                    TimeFunctions.getRemainingTime(todo.startDate),
                     style: TextStyle(fontSize: 14.0, color: Colors.grey[700]),
                   ),
                 ],          
