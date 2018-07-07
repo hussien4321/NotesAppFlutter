@@ -27,6 +27,3 @@ class Task{
         _creationDate = DateTime.parse(json['creation_date']);
 
 }
-
-
-//// CREATE TABLE task (task_id integer primary key, name text, icon text, recommend boolean, creation_date text);
