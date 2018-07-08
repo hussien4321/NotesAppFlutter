@@ -175,7 +175,7 @@ class DBHelper{
   }
 
 
-  Future<List<Task>> getNumberOfSuccess() async {
+  Future<int> getNumberOfSuccesses() async {
     var dbClient = await db;
 
     List<Map> list = await dbClient.rawQuery('SELECT COUNT(*) AS "successes" FROM todo WHERE success = "true"');
@@ -184,11 +184,12 @@ class DBHelper{
     return answer['successes']; 
   }
 
-  Future<List<Task>> getNumberOfFailures() async {
+  Future<int> getNumberOfFailures() async {
     var dbClient = await db;
 
+    String yesterdayTime = TimeFunctions.nowToNearestSecond().subtract(Duration(days: 1)).toIso8601String();
     //TODO : (date < yesterday AND success = "false") OR forfeit = "true"
-    List<Map> list = await dbClient.rawQuery('SELECT COUNT(*) AS "failures" FROM todo WHERE forfeit = "true"');
+    List<Map> list = await dbClient.rawQuery('SELECT COUNT(*) AS "failures" FROM todo WHERE forfeit = "true" OR (datetime(start_date) < datetime("'+yesterdayTime+'") AND success = "false")');
     Map answer = list[0];
     
     return answer['failures']; 

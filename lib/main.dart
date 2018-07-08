@@ -8,7 +8,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: '24h To-Dos',
+      title: '24h Tasks',
       debugShowCheckedModeBanner: false, 
       theme: new ThemeData(
         primarySwatch: Colors.orange,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../db/database.dart';
 import '../model/todo.dart';
+import './analytics_page.dart';
 import '../utils/helpers/time_functions.dart';
 import '../utils/helpers/countdown.dart';
+import '../utils/helpers/custom_page_route.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/loading_screen.dart';
 import './tasks_page.dart';
@@ -68,25 +70,47 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     updateTodos();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("24h To-Dos ⏳"),
-        centerTitle: true,
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => TasksPage()),
-              );
-            },
-            icon: Icon(Icons.add),
-          )
-        ],
-      ),
-      body: fadedBackground(
-        child: loading ? LoadingScreen() : (todos.isEmpty ? noItemWidget() : notesListView(todos, dbHelper)),
-      ), 
-    );
+    //TODO: Separate tab controller to a file 
+    return DefaultTabController(
+        initialIndex: 0,
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            actions: <Widget>[
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (BuildContext context) => TasksPage()),
+                  );
+                },
+                icon: Icon(Icons.add),
+              )
+            ],
+            bottom: TabBar(
+              tabs: [
+                Tab(icon: Icon(Icons.check)),
+                Tab(icon: Icon(Icons.assessment)),
+                Tab(icon: Icon(Icons.settings)),
+              ],
+            ),
+            title: Text('24h Tasks ⏳'),
+          ),
+          body: fadedBackground(
+            //TODO: Override TabBarView to remove the scrolling animation on page change
+            child: TabBarView(
+              physics: new NeverScrollableScrollPhysics(),
+              children: [
+                loading ? LoadingScreen() : (todos.isEmpty ? noItemWidget() : notesListView(todos, dbHelper)),
+                AnalyticsPage(),
+                Center(
+                  child: Text('This page is still being built 🚧'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
   }  
 
   Widget noItemWidget() {
@@ -122,15 +146,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       key: Key(todo.id.toString()),
       dismissThresholds:  <DismissDirection, double>{DismissDirection.startToEnd: 0.6, DismissDirection.endToStart: 0.6, },
       onDismissed: (direction) {
-
+        ToDo temp = todos[index];
+        todos.removeAt(index);
+        
         if(direction == DismissDirection.startToEnd){
-          dbHelper.completeToDo(todo);
+          dbHelper.completeToDo(temp);
         }else{
-          dbHelper.giveUpToDo(todo);
+          dbHelper.giveUpToDo(temp);
         }
         _countdownControllers[index].dispose();
         _countdownControllers.removeAt(index);
-        todos.removeAt(index);
         updateTodos();      
       },
       secondaryBackground: Container(

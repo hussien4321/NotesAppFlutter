@@ -95,7 +95,7 @@ class TasksPageState extends State<TasksPage> {
                   border: new Border(bottom: BorderSide(color: Colors.grey)),
                 ),
                 padding: EdgeInsets.only(top: 15.0, left: 5.0, bottom: 5.0),
-                child: Text('Suggested tasks', style: TextStyle(fontSize: 23.0, fontWeight: FontWeight.bold), textAlign: TextAlign.start,),
+                child: Text('Saved tasks', style: TextStyle(fontSize: 23.0, fontWeight: FontWeight.bold), textAlign: TextAlign.start,),
               ),
             ),
           ],
@@ -106,6 +106,7 @@ class TasksPageState extends State<TasksPage> {
                 return TaskView(_tasks[i], _isEditMode, 
                   () {
                     if(!_isEditMode){
+                      //TODO: REDIRECT TO TODO TAB ON HOMEPAGE
                       _dbHelper.createToDo(ToDo(0, _tasks[i]));
                       Navigator.of(context).pop();
                     }
@@ -164,7 +165,11 @@ class TasksPageState extends State<TasksPage> {
     }
 
   _newTaskDialog([Task dialogTask]) async {
-    if(dialogTask != null){
+    if(dialogTask == null){
+      taskNameController.clear();
+      taskIconController.clear();
+    }
+    else{
       taskNameController.text= dialogTask.name;
       taskIconController.text = dialogTask.icon;
     }
