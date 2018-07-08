@@ -1,4 +1,5 @@
 import './task.dart';
+import '../utils/helpers/time_functions.dart';
 
 class ToDo{
 
@@ -19,9 +20,9 @@ class ToDo{
   ToDo(int id, Task task){
     _id = id;
     _task = task;
-    _startDate = DateTime.now();
+    _startDate = TimeFunctions.nowToNearestSecond();
     _success = false;
-    _completionDate = DateTime.now();
+    _completionDate = TimeFunctions.nowToNearestSecond();
     _forfeit = false;
   }
   

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../db/database.dart';
 import '../model/task.dart';
+import '../model/todo.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/task_view.dart';
@@ -102,7 +103,17 @@ class TasksPageState extends State<TasksPage> {
         Expanded(
           child: ListView.builder(
             itemBuilder: (BuildContext context, int i) { 
-                return TaskView(_tasks[i], _isEditMode, _dbHelper);
+                return TaskView(_tasks[i], _isEditMode, 
+                  () {
+                    if(!_isEditMode){
+                      _dbHelper.createToDo(ToDo(0, _tasks[i]));
+                      Navigator.of(context).pop();
+                    }
+                    else{
+                      _newTaskDialog(_tasks[i]);
+                    }
+                  }
+                );
               },
             itemCount: _tasks.length,
           ),
@@ -112,7 +123,7 @@ class TasksPageState extends State<TasksPage> {
   }
 
   
-    Widget createTaskWidget(BuildContext context){
+  Widget createTaskWidget(BuildContext context){
     return Container(
           padding: EdgeInsets.all(15.0),
           decoration: new BoxDecoration(
@@ -152,12 +163,16 @@ class TasksPageState extends State<TasksPage> {
         );
     }
 
-  _newTaskDialog() async {
+  _newTaskDialog([Task dialogTask]) async {
+    if(dialogTask != null){
+      taskNameController.text= dialogTask.name;
+      taskIconController.text = dialogTask.icon;
+    }
     await showDialog(
       context: context,
       child: new AlertDialog(
         contentPadding: const EdgeInsets.all(16.0),
-        title: Text('New Task 🌟',textAlign: TextAlign.center, style: TextStyle(fontSize: 22.0),),
+        title: Text(dialogTask == null ? 'New Task 🌟' : 'Edit Task ✏️',textAlign: TextAlign.center, style: TextStyle(fontSize: 22.0),),
         content: Form(
           key: _formKey,
           child: Column(
@@ -194,7 +209,7 @@ class TasksPageState extends State<TasksPage> {
                     },
                     controller: taskNameController,
                     style: TextStyle(fontSize: 17.0,color: Colors.black),
-                    autofocus: true,
+                    autofocus: dialogTask == null,
                     decoration: InputDecoration(
                         labelText: 'Task name', hintText: 'eg. Do 10 push ups', contentPadding: EdgeInsets.only(bottom: 5.0),),
                   ),
@@ -209,11 +224,16 @@ class TasksPageState extends State<TasksPage> {
                   Expanded(
                     child: RaisedButton(
                       color: Colors.redAccent,
-                      child: Text('CANCEL', style: TextStyle(color: Colors.black),),
+                      child: Text(dialogTask == null ? 'CANCEL' : 'DELETE', style: TextStyle(color: Colors.black),),
                       onPressed: () {
+                        //TODO: ADD YES/NO DIALOG TO CONFIRM 
+                        if(dialogTask != null){
+                          _dbHelper.deleteTask(dialogTask);
+                          updateTodos();
+                        }
+                        Navigator.pop(context);
                         taskNameController.clear();
                         taskIconController.clear();
-                        Navigator.pop(context);
                       }),
                   ),
                   Padding( padding: EdgeInsets.all(5.0)),
@@ -221,17 +241,24 @@ class TasksPageState extends State<TasksPage> {
                     child: RaisedButton(
                       elevation: 2.0,
                       color: Colors.greenAccent,
-                      child: Text('ADD', style: TextStyle(color: Colors.black),),
+                      child: Text(dialogTask == null ? 'ADD' : 'SAVE', style: TextStyle(color: Colors.black),),
                       onPressed: () {
                         if(_formKey.currentState.validate()){
-                          _dbHelper.createTask(new Task(0, taskNameController.text, taskIconController.text));
+                          if(dialogTask == null){
+                            _dbHelper.createTask(new Task(0, taskNameController.text, taskIconController.text));
+                          }
+                          else{
+                            dialogTask.update(taskNameController.text, taskIconController.text);
+                            _dbHelper.updateTask(dialogTask);
+                            updateTodos();
+                          }
+                          Navigator.pop(context);
                           taskNameController.clear();
                           taskIconController.clear();
                           //TODO: Fix snackbar
                           // Scaffold
                           //     .of(context)
                           //     .showSnackBar(SnackBar(content: Text('Task created!')));
-                          Navigator.pop(context);
                         }
                       }),
                   ),

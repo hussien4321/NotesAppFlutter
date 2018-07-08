@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import '../../model/task.dart';
 import '../../model/todo.dart';
 import '../../db/database.dart';
+import 'dart:async';
 
 class TaskView extends StatelessWidget{
   
   final Task _task;
   bool _isEditMode;
-  DBHelper _dbHelper;
+  final VoidCallback onPressed;
+  
 
-  TaskView(this._task, this._isEditMode, this._dbHelper);
+  TaskView(this._task, this._isEditMode, this.onPressed);
 
   
   @override
@@ -40,15 +42,7 @@ class TaskView extends StatelessWidget{
                 Padding(
                   padding: EdgeInsets.all(5.0),
                   child: RaisedButton(
-                    onPressed: () {
-                      if(!_isEditMode){
-                        _dbHelper.createToDo(new ToDo(0, _task));
-                        Navigator.of(context).pop();
-                      }
-                      else{
-                        //TODO: EDIT ACTIVITY
-                      }
-                    },
+                    onPressed: onPressed,
                     child: Text(_isEditMode  ? 'Edit' : 'Start'),
                     color: _isEditMode  ? Colors.greenAccent : Theme.of(context).primaryColor,
                   ),

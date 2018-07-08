@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../db/database.dart';
-import '../model/task.dart';
 import '../model/todo.dart';
+import '../utils/helpers/time_functions.dart';
+import '../utils/helpers/countdown.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/loading_screen.dart';
-import '../utils/helpers/countdown.dart';
 import './tasks_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -49,7 +49,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     for(int i = 0; i < todos.length; i ++){
       AnimationController temp = new AnimationController(
         vsync: this,
-        duration: todos[i].startDate.add(Duration(days: 1)).difference(DateTime.now()),
+        duration: todos[i].startDate.add(Duration(days: 1)).difference(TimeFunctions.nowToNearestSecond()),
       );
       _countdownControllers.add(temp);
       _countdownControllers[i].forward();
@@ -153,7 +153,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         child: Row(
           children: <Widget>[
             Text(
-              'COMPLETED',
+              'COMPLETE',
               style: TextStyle(fontSize: 20.0, letterSpacing: 2.0, fontWeight: FontWeight.bold),
               textAlign: TextAlign.left,
             ),
@@ -167,7 +167,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget todoBuilder(ToDo todo, DBHelper dbHelper, int index){
     return Container(
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(3.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
@@ -189,7 +189,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
             ),
             Container(
-              padding: EdgeInsets.all(5.0),
+              padding: EdgeInsets.all(10.0),
               child: Text(
                 todo.task.icon,
                 style: TextStyle(fontSize: 50.0),
@@ -205,7 +205,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                   Countdown(
                     animation: new StepTween(
-                      begin: todo.startDate.add(Duration(days: 1)).difference(DateTime.now()).inSeconds,
+                      begin: todo.startDate.add(Duration(days: 1)).difference(TimeFunctions.nowToNearestSecond()).inSeconds,
                       end: 0,
                     ).animate(_countdownControllers[index]),
                   ),

@@ -1,3 +1,5 @@
+import '../utils/helpers/time_functions.dart';
+
 class Task{
 
   int _id;
@@ -16,9 +18,14 @@ class Task{
     _name = name;
     _icon = icon;
     _recommended = recommended;
-    _creationDate = DateTime.now();
+    _creationDate = TimeFunctions.nowToNearestSecond();
   }
   
+  void update(String newName, String newIcon){
+    _name = newName;
+    _icon = newIcon;
+  }
+
   Task.fromJson(Map<String, dynamic> json)
       : _id = json['task_id'],
         _name = json['name'],

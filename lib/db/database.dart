@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import '../model/todo.dart';
 import '../model/task.dart';
-
+import '../utils/helpers/time_functions.dart';
 
 class DBHelper{
 
@@ -46,7 +46,7 @@ class DBHelper{
     String result = '';
     for(int i = 0; i < _recommendedTasks.length; i++){
       Task temp = _recommendedTasks[i];
-      result+='("'+temp.name+'","'+temp.icon+'","'+temp.recommended.toString()+'","'+temp.creationDate.toIso8601String()+'")';
+      result+='("'+temp.name+'","'+temp.icon+'","'+temp.recommended.toString()+'","'+temp.creationDate.toIso8601String()+'", "false")';
       result+= i == (_recommendedTasks.length - 1) ? '' : ', ';
     }
 
@@ -55,22 +55,22 @@ class DBHelper{
 
   void _onCreate(Database db, int version) async {
 
-    //creates our 2 tables
     await db.execute("CREATE TABLE todo( todo_id integer primary key, task_fid integer REFERENCES task(task_id) ON UPDATE CASCADE ON DELETE CASCADE, start_date text, success boolean, completion_date text, forfeit boolean)");
 
 
-    await db.execute("CREATE TABLE task (task_id integer primary key, name text, icon text, recommended boolean, creation_date text)");
+    await db.execute("CREATE TABLE task (task_id integer primary key, name text, icon text, recommended boolean, creation_date text, deleted boolean)");
 
     //adds in recommended tasks for people getting started
     await db.transaction((txn) async {
         await txn.rawInsert(
-          'INSERT INTO task(name, icon, recommended, creation_date) VALUES '+_generateRecommnendedTasksScript());
+          'INSERT INTO task(name, icon, recommended, creation_date, deleted) VALUES '+_generateRecommnendedTasksScript());
     });
 
     print("Created tables");
   }
 
 
+  //TODO: Check if todo exists and is active
   createToDo(ToDo todo) async {
   var database = await db;
   
@@ -81,12 +81,13 @@ class DBHelper{
   }
 
 
+  //TODO: Check if task exists with same name and icon
   createTask(Task task) async {
   var database = await db;
   
     await database.transaction((txn) async {
       await txn.rawInsert(
-          'INSERT INTO task(name, icon, recommended, creation_date) VALUES("'+task.name+'","'+task.icon+'","'+task.recommended.toString()+'","'+task.creationDate.toIso8601String()+'")');
+          'INSERT INTO task(name, icon, recommended, creation_date, deleted) VALUES("'+task.name+'","'+task.icon+'","'+task.recommended.toString()+'","'+task.creationDate.toIso8601String()+'", "false")');
     });
   }
 
@@ -94,7 +95,7 @@ class DBHelper{
     var database = await db;
 
     await database
-      .rawDelete('DELETE FROM Task WHERE task_id = '+task.id.toString());
+      .rawDelete('UPDATE Task SET deleted = "true" WHERE task_id = '+task.id.toString());
   }
 
   
@@ -111,7 +112,7 @@ class DBHelper{
 
     await database.transaction((txn) async {
       await txn.rawUpdate(
-          'UPDATE Todo SET success = "true", completion_date= "'+DateTime.now().toIso8601String()+'" WHERE todo_id = '+todo.id.toString());
+          'UPDATE Todo SET success = "true", completion_date= "'+TimeFunctions.nowToNearestSecond().toIso8601String()+'" WHERE todo_id = '+todo.id.toString());
     });
   }
   
@@ -120,7 +121,16 @@ class DBHelper{
 
     await database.transaction((txn) async {
       await txn.rawUpdate(
-          'UPDATE ToDo SET completion_date= "'+DateTime.now().toIso8601String()+'", forfeit = "true" WHERE todo_id = '+todo.id.toString());
+          'UPDATE ToDo SET completion_date= "'+TimeFunctions.nowToNearestSecond().toIso8601String()+'", forfeit = "true" WHERE todo_id = '+todo.id.toString());
+    });
+  }
+
+  updateTask(Task task) async {
+    var database = await db;
+
+    await database.transaction((txn) async {
+      await txn.rawUpdate(
+          'UPDATE task SET name = "'+task.name+'", icon= "'+task.icon+'" WHERE task_id = '+task.id.toString());
     });
   }
   
@@ -128,7 +138,7 @@ class DBHelper{
   Future<List<ToDo>> getActiveToDos() async {
     var dbClient = await db;
 
-    String dateRange = DateTime.now().subtract(Duration(days: 1)).toIso8601String();
+    String dateRange = TimeFunctions.nowToNearestSecond().subtract(Duration(days: 1)).toIso8601String();
 
     List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE task.task_id = todo.task_fid AND forfeit = "false" AND success = "false" AND start_date > datetime("'+dateRange+'")');
     List<ToDo> todos = new List();
@@ -138,16 +148,16 @@ class DBHelper{
     return todos;
   }
 
-  //TODO: UPDATE QUERY TO ORDER TASKS IN TERMS OF MOST RECENTLY USED
+  //TODO: the first 2 lists need to joined based on the creation_date from list 1 and the start_date from list 2
   Future<List<Task>> getAllTasks() async {
     var dbClient = await db;
 
-    List<Map> unusedNewTasksList= await dbClient.rawQuery('SELECT * FROM task WHERE (SELECT COUNT(todo.task_fid) FROM todo WHERE todo.task_fid == task.task_id) = 0 and recommended = "false" ORDER BY datetime(creation_date) DESC;');
+    List<Map> unusedNewTasksList= await dbClient.rawQuery('SELECT * FROM task WHERE (SELECT COUNT(todo.task_fid) FROM todo WHERE todo.task_fid == task.task_id) = 0 AND deleted = "false" AND recommended = "false" ORDER BY datetime(creation_date) DESC;');
 
-    List<Map> usedTasksList = await dbClient.rawQuery('SELECT task_id, name, icon, recommended, creation_date FROM task, todo WHERE task.task_id = todo.task_fid GROUP BY task_id ORDER BY datetime(start_date) DESC');
+    List<Map> usedTasksList = await dbClient.rawQuery('SELECT task_id, name, icon, recommended, creation_date FROM task, todo WHERE task.task_id = todo.task_fid AND deleted = "false" GROUP BY task_id ORDER BY datetime(start_date) DESC');
     
     //could be updated to sort by creation date instead of id
-    List<Map> unusedDefaultTasksList= await dbClient.rawQuery('SELECT * FROM task WHERE (SELECT COUNT(todo.task_fid) FROM todo WHERE todo.task_fid == task.task_id) = 0 and recommended = "true" ORDER BY task_id DESC;');
+    List<Map> unusedDefaultTasksList= await dbClient.rawQuery('SELECT * FROM task WHERE (SELECT COUNT(todo.task_fid) FROM todo WHERE todo.task_fid == task.task_id) = 0 AND deleted = "false" AND recommended = "true" ORDER BY task_id DESC;');
     
     List<Task> tasks = new List();
     
@@ -222,16 +232,3 @@ class DBHelper{
   
 
 }
-
-//TEST QUERIES
-// CREATE TABLE task( task_id integer primary key, name text);
-
-// CREATE TABLE todo( todo_id integer primary key, task_fid integer REFERENCES task(task_id) ON UPDATE CASCADE, info text);
-
-// INSERT INTO task(name) 
-// VALUES ('go running'), ('buy dinner'), ('make dinner'), ('read chapter of book');
-
-// INSERT INTO todo(task_fid, info)
-// VALUES (4, 'PASSED'), (3, 'FAILED'), (2, 'WORKING ON IT');  
-
-// select * from task, todo where task.task_id = todo.task_fid;
