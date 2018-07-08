@@ -3,7 +3,7 @@ import '../db/database.dart';
 import '../model/task.dart';
 import '../model/todo.dart';
 import '../utils/views/faded_background.dart';
-import '../utils/helpers/time_functions.dart';
+import '../utils/views/loading_screen.dart';
 import '../utils/helpers/countdown.dart';
 import './tasks_page.dart';
 
@@ -18,13 +18,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   List<ToDo> todos = [];
   List<AnimationController> _countdownControllers = [];
-  
+
+  bool loading;  
 
   @override
   void initState() {
       super.initState();
       dbSetUp();
-      initializeControllers(todos);
+      loading = true;
   }
 
   dbSetUp() async {
@@ -37,6 +38,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       if(todos != res){
         initializeControllers(res);
         todos = res;
+        setState(() {
+          loading = false;
+        });
       }
     }));
   }
@@ -71,7 +75,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ],
       ),
       body: fadedBackground(
-        child: todos.isEmpty ? noItemWidget() : notesListView(todos, dbHelper),
+        child: loading ? LoadingScreen() : (todos.isEmpty ? noItemWidget() : notesListView(todos, dbHelper)),
       ), 
     );
   }  

@@ -16,7 +16,7 @@ class LoadingScreenState extends State<LoadingScreen> with SingleTickerProviderS
   @override
   void initState() {
     super.initState();
-    _animationController = new AnimationController(duration: new Duration(seconds: 3), vsync: this);
+    _animationController = new AnimationController(duration: new Duration(seconds: 1), vsync: this);
     _animation = new CurvedAnimation(parent: _animationController, curve: Curves.easeInOut,);
     _animation.addListener(() => this.setState(() {}));
     _animationController.repeat();
