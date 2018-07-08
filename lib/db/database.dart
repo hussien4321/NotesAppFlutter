@@ -10,10 +10,18 @@ import '../model/task.dart';
 class DBHelper{
 
   static List<Task> _recommendedTasks = [
-      new Task(1,'Exercise', '🏋️', true),
-      new Task(2,'Finish homework', '📝', true),
-      new Task(3,'Go grocery shopping', '🛒', true),
-      new Task(4,'Cook dinner', '🍽️', true),
+      new Task(1, 'Read 1 chapter of a book', '📕', true),
+      new Task(2, 'Pay bills', '💰', true),
+      new Task(3, 'Go to the bank', '🏦', true),
+      new Task(4, 'Take a walk', '🏞️', true),
+      new Task(5, 'Check email', '📧', true),
+      new Task(6, 'Make reservation', '📞', true),
+      new Task(7, 'Take medicine', '💊', true),
+      new Task(8, 'Get Haircut', '💇🏻', true),
+      new Task(9,'Cook dinner', '🍽️', true),
+      new Task(10,'Go grocery shopping', '🛒', true),
+      new Task(11,'Finish homework', '📝', true),
+      new Task(12,'Exercise', '🏋️', true),
     ];
   static Database _db;
 
@@ -78,7 +86,7 @@ class DBHelper{
   
     await database.transaction((txn) async {
       await txn.rawInsert(
-          'INSERT INTO task(name, icon, recommended, creation_date) VALUES("'+task.name+'","'+task.icon+'",'+task.recommended.toString()+',"'+task.creationDate.toIso8601String()+'")');
+          'INSERT INTO task(name, icon, recommended, creation_date) VALUES("'+task.name+'","'+task.icon+'","'+task.recommended.toString()+'","'+task.creationDate.toIso8601String()+'")');
     });
   }
 
@@ -134,7 +142,7 @@ class DBHelper{
   Future<List<Task>> getAllTasks() async {
     var dbClient = await db;
 
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM task ORDER BY date(creation_date) DESC');
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM task ORDER BY task_id DESC');
     List<Task> tasks = new List();
     for (int i = 0; i < list.length; i++) {
       tasks.add(new Task.fromJson(list[i]));

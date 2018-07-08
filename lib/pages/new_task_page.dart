@@ -17,7 +17,7 @@ class NewTaskPageState extends State<NewTaskPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Create a new task 📝"),
+        title: Text("New task 💡"),
         centerTitle: true,
         actions: <Widget>[
           IconButton(

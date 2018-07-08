@@ -8,6 +8,7 @@ class TaskView extends StatelessWidget{
 
   TaskView(this._task, this._isEditMode);
 
+  
   @override
   Widget build(BuildContext context){
     return Container(
