@@ -4,7 +4,7 @@ import '../model/task.dart';
 import '../model/todo.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/helpers/time_functions.dart';
-import './new_task_page.dart';
+import '../utils/helpers/countdown.dart';
 import './tasks_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,18 +13,18 @@ class HomePage extends StatefulWidget {
 }
 
 
-class HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   DBHelper dbHelper = new DBHelper();
 
-  static Task demoTask = new Task(1,'Get Haircut', '💇🏻', false);
-  static ToDo demoTodo = new ToDo(1, demoTask);
-
-  List<ToDo> todos = [demoTodo];
+  List<ToDo> todos = [];
+  List<AnimationController> _countdownControllers = [];
+  
 
   @override
   void initState() {
       super.initState();
       dbSetUp();
+      initializeControllers(todos);
   }
 
   dbSetUp() async {
@@ -33,7 +33,23 @@ class HomePageState extends State<HomePage> {
   }
 
   updateTodos(){
-    // dbHelper.getToDos().then((res) => this.setState(() {todos = res;}));
+    dbHelper.getToDos().then((res) => this.setState(() {
+      if(todos != res){
+        initializeControllers(res);
+        todos = res;
+      }
+    }));
+  }
+  
+  initializeControllers(List<ToDo> todos){
+    for(int i = 0; i < todos.length; i ++){
+      AnimationController temp = new AnimationController(
+        vsync: this,
+        duration: todos[i].startDate.add(Duration(days: 1)).difference(DateTime.now()),
+      );
+      _countdownControllers.add(temp);
+      _countdownControllers[i].forward();
+    }
   }
   
   @override
@@ -82,17 +98,41 @@ class HomePageState extends State<HomePage> {
   Widget notesListView(List<ToDo> todos, DBHelper dbHelper){
     
     return ListView.builder(
-      itemBuilder: (BuildContext context, int i) => todoBuilder(todos[i], dbHelper),
+      itemBuilder: (BuildContext context, int i) => todoBuilder(todos[i], dbHelper, i),
       itemCount: todos.length,
     );
   }
 
-  Widget todoBuilder(ToDo todo, DBHelper dbHelper){
+  Widget todoBuilder(ToDo todo, DBHelper dbHelper, int index){
     return Container(
       padding: EdgeInsets.all(10.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
+            Opacity(
+              opacity: 0.8,
+              child: Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(5.0),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.green,
+                ),
+                child: Center(
+                  child: Text(
+                  '👉',
+                  style: TextStyle(fontSize: 15.0,),
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(5.0),
+              child: Text(
+                todo.task.icon,
+                style: TextStyle(fontSize: 50.0),
+              ),
+            ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,14 +145,31 @@ class HomePageState extends State<HomePage> {
                     TimeFunctions.getRemainingTime(todo.startDate),
                     style: TextStyle(fontSize: 14.0, color: Colors.grey[700]),
                   ),
+                  Countdown(
+                    animation: new StepTween(
+                      begin: todo.startDate.add(Duration(days: 1)).difference(DateTime.now()).inSeconds,
+                      end: 0,
+                    ).animate(_countdownControllers[index]),
+                  ),
                 ],          
               ),
             ),
-            Checkbox(
-              value: todo.success,
-              onChanged: (newStatus) {
-                dbHelper.completeToDo(todo);
-              },
+            Opacity(
+              opacity: 0.8,
+              child: Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(5.0),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.redAccent,
+                ),
+                child: Center(
+                  child: Text(
+                  '👈',
+                  style: TextStyle(fontSize: 15.0, color: Colors.green),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
