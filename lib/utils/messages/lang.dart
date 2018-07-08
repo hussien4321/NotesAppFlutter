@@ -13,6 +13,7 @@ class Lang {
 
   static String getMessageText(String key){
     //access path and pull string with that key or return key if not existing. 
+    return null;
   }
 
 

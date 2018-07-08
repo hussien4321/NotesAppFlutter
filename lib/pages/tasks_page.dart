@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../db/database.dart';
 import '../model/task.dart';
-import './new_task_page.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/task_view.dart';
@@ -181,7 +180,7 @@ class TasksPageState extends State<TasksPage> {
                     textAlign: TextAlign.center,
                     autofocus: false,
                     decoration: InputDecoration(
-                        labelText: 'Emoji', hintText: '😀', contentPadding: EdgeInsets.only(bottom: 5.0),),
+                        labelText: 'Emoji', hintText: 'eg. 😀', contentPadding: EdgeInsets.only(bottom: 5.0),),
                   ),
                 ),
                 Padding(padding: EdgeInsets.only(left: 10.0),),
@@ -226,6 +225,8 @@ class TasksPageState extends State<TasksPage> {
                       onPressed: () {
                         if(_formKey.currentState.validate()){
                           _dbHelper.createTask(new Task(0, taskNameController.text, taskIconController.text));
+                          taskNameController.clear();
+                          taskIconController.clear();
                           //TODO: Fix snackbar
                           // Scaffold
                           //     .of(context)
