@@ -142,18 +142,23 @@ class DBHelper{
   Future<List<Task>> getAllTasks() async {
     var dbClient = await db;
 
+    List<Map> unusedNewTasksList= await dbClient.rawQuery('SELECT * FROM task WHERE (SELECT COUNT(todo.task_fid) FROM todo WHERE todo.task_fid == task.task_id) = 0 and recommended = "false" ORDER BY datetime(creation_date) DESC;');
+
     List<Map> usedTasksList = await dbClient.rawQuery('SELECT task_id, name, icon, recommended, creation_date FROM task, todo WHERE task.task_id = todo.task_fid GROUP BY task_id ORDER BY datetime(start_date) DESC');
     
     //could be updated to sort by creation date instead of id
-    List<Map> unusedTasksList= await dbClient.rawQuery('SELECT * FROM task WHERE (SELECT COUNT(todo.task_fid) FROM todo WHERE todo.task_fid == task.task_id) = 0 ORDER BY task_id DESC;');
+    List<Map> unusedDefaultTasksList= await dbClient.rawQuery('SELECT * FROM task WHERE (SELECT COUNT(todo.task_fid) FROM todo WHERE todo.task_fid == task.task_id) = 0 and recommended = "true" ORDER BY task_id DESC;');
     
     List<Task> tasks = new List();
     
+    for (int i = 0; i < unusedNewTasksList.length; i++) {
+      tasks.add(new Task.fromJson(unusedNewTasksList[i]));
+    }
     for (int i = 0; i < usedTasksList.length; i++) {
       tasks.add(new Task.fromJson(usedTasksList[i]));
     }
-    for (int i = 0; i < unusedTasksList.length; i++) {
-      tasks.add(new Task.fromJson(unusedTasksList[i]));
+    for (int i = 0; i < unusedDefaultTasksList.length; i++) {
+      tasks.add(new Task.fromJson(unusedDefaultTasksList[i]));
     }
     
     return tasks; 
