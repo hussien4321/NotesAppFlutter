@@ -130,7 +130,7 @@ class DBHelper{
 
     String dateRange = DateTime.now().subtract(Duration(days: 1)).toIso8601String();
 
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE task.task_id = todo.task_fid AND forfeit = "false" AND success = "false" AND start_date > date("'+dateRange+'")');
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE task.task_id = todo.task_fid AND forfeit = "false" AND success = "false" AND start_date > datetime("'+dateRange+'")');
     List<ToDo> todos = new List();
     for (int i = 0; i < list.length; i++) {
       todos.add(new ToDo.fromJson(list[i]));
@@ -142,7 +142,7 @@ class DBHelper{
   Future<List<Task>> getAllTasks() async {
     var dbClient = await db;
 
-    List<Map> usedTasksList = await dbClient.rawQuery('SELECT task_id, name, icon, recommended, creation_date FROM task, todo WHERE task.task_id = todo.task_fid ORDER BY date(start_date) DESC;');
+    List<Map> usedTasksList = await dbClient.rawQuery('SELECT task_id, name, icon, recommended, creation_date FROM task, todo WHERE task.task_id = todo.task_fid GROUP BY task_id ORDER BY datetime(start_date) DESC');
     
     //could be updated to sort by creation date instead of id
     List<Map> unusedTasksList= await dbClient.rawQuery('SELECT * FROM task WHERE (SELECT COUNT(todo.task_fid) FROM todo WHERE todo.task_fid == task.task_id) = 0 ORDER BY task_id DESC;');

@@ -55,6 +55,15 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       _countdownControllers[i].forward();
     }
   }
+
+  @override
+  void dispose() {
+    for(int i = 0; i < _countdownControllers.length; i++){
+      _countdownControllers[i].dispose();
+    }
+    super.dispose();
+  }
+
   
   @override
   Widget build(BuildContext context) {
@@ -102,8 +111,57 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget notesListView(List<ToDo> todos, DBHelper dbHelper){
     
     return ListView.builder(
-      itemBuilder: (BuildContext context, int i) => todoBuilder(todos[i], dbHelper, i),
+      itemBuilder: (BuildContext context, int i) => taskDismassable(todos[i], dbHelper, i),
       itemCount: todos.length,
+    );
+  }
+
+
+  Widget taskDismassable(ToDo todo, DBHelper dbHelper, int index){
+    return Dismissible(
+      key: Key(todo.id.toString()),
+      dismissThresholds:  <DismissDirection, double>{DismissDirection.startToEnd: 0.6, DismissDirection.endToStart: 0.6, },
+      onDismissed: (direction) {
+
+        if(direction == DismissDirection.startToEnd){
+          dbHelper.completeToDo(todo);
+        }else{
+          dbHelper.giveUpToDo(todo);
+        }
+        _countdownControllers[index].dispose();
+        _countdownControllers.removeAt(index);
+        todos.removeAt(index);
+        updateTodos();      
+      },
+      secondaryBackground: Container(
+        padding: EdgeInsets.all(20.0),
+        color: Colors.red,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Text(
+              'GIVE UP',
+              style: TextStyle(fontSize: 20.0, letterSpacing: 2.0, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.right,
+            ),
+          ],
+        ),
+      ), 
+      background: Container(
+        padding: EdgeInsets.all(20.0),
+        color: Colors.green,
+        child: Row(
+          children: <Widget>[
+            Text(
+              'COMPLETED',
+              style: TextStyle(fontSize: 20.0, letterSpacing: 2.0, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.left,
+            ),
+          ],
+        ),
+      ),
+
+      child: todoBuilder(todo, dbHelper, index),
     );
   }
 
