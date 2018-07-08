@@ -76,7 +76,7 @@ class DBHelper{
   
     await database.transaction((txn) async {
       await txn.rawInsert(
-          'INSERT INTO todo(task_fid, start_date, success, completion_date, forfeit) VALUES('+todo.task.id.toString()+', "'+todo.startDate.toIso8601String()+'", "'+todo.success.toString()+'", "'+todo.completionDate.toIso8601String()+'", '+todo.forfeit.toString()+')');
+          'INSERT INTO todo(task_fid, start_date, success, completion_date, forfeit) VALUES('+todo.task.id.toString()+', "'+todo.startDate.toIso8601String()+'", "'+todo.success.toString()+'", "'+todo.completionDate.toIso8601String()+'", "'+todo.forfeit.toString()+'")');
     });
   }
 
@@ -181,7 +181,7 @@ class DBHelper{
 
   Future<List<ToDo>> getToDos() async {
     var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo');
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE todo.task_fid = task.task_id');
     List<ToDo> todos = new List();
     for (int i = 0; i < list.length; i++) {
       todos.add(new ToDo.fromJson(list[i]));

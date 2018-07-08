@@ -30,8 +30,8 @@ class ToDo{
         _task = Task.fromJson(json),
         _startDate = DateTime.parse(json['start_date']),
         _success = json['success'] == 'true',
-        _completionDate = json['completion_date'],
-        _forfeit = json['forfeit'];
+        _completionDate = DateTime.parse(json['completion_date']),
+        _forfeit = json['forfeit'] == 'true';
 
 
 }

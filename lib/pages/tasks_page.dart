@@ -102,7 +102,7 @@ class TasksPageState extends State<TasksPage> {
         Expanded(
           child: ListView.builder(
             itemBuilder: (BuildContext context, int i) { 
-                return TaskView(_tasks[i], _isEditMode);
+                return TaskView(_tasks[i], _isEditMode, _dbHelper);
               },
             itemCount: _tasks.length,
           ),

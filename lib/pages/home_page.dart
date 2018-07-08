@@ -33,7 +33,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   updateTodos(){
-    dbHelper.getToDos().then((res) => this.setState(() {
+    dbHelper.getActiveToDos().then((res) => this.setState(() {
       if(todos != res){
         initializeControllers(res);
         todos = res;
@@ -140,10 +140,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   Text(
                     todo.task.name,
                     style: TextStyle(fontSize: 20.0,),
-                  ),
-                  Text(
-                    TimeFunctions.getRemainingTime(todo.startDate),
-                    style: TextStyle(fontSize: 14.0, color: Colors.grey[700]),
                   ),
                   Countdown(
                     animation: new StepTween(

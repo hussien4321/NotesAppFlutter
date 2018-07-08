@@ -25,5 +25,4 @@ class Task{
         _icon = json['icon'],
         _recommended = json['recommended'] == 'true',
         _creationDate = DateTime.parse(json['creation_date']);
-
 }
