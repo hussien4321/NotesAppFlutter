@@ -42,10 +42,10 @@ class TasksPageState extends State<TasksPage> {
 
   dbSetUp() async {
     await _dbHelper.initDb();  
-    updateTodos();
+    updateTasks();
   }
 
-  updateTodos(){
+  updateTasks(){
     _dbHelper.getAllTasks().then((res) => this.setState(() {
       _tasks = res; 
       _loadingPage = false;
@@ -55,7 +55,7 @@ class TasksPageState extends State<TasksPage> {
   @override
   void didUpdateWidget(TasksPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    updateTodos();
+    updateTasks();
   }
 
 
@@ -234,7 +234,7 @@ class TasksPageState extends State<TasksPage> {
                         //TODO: ADD YES/NO DIALOG TO CONFIRM 
                         if(dialogTask != null){
                           _dbHelper.deleteTask(dialogTask);
-                          updateTodos();
+                          updateTasks();
                         }
                         Navigator.pop(context);
                         taskNameController.clear();
@@ -255,8 +255,8 @@ class TasksPageState extends State<TasksPage> {
                           else{
                             dialogTask.update(taskNameController.text, taskIconController.text);
                             _dbHelper.updateTask(dialogTask);
-                            updateTodos();
                           }
+                          updateTasks();
                           Navigator.pop(context);
                           taskNameController.clear();
                           taskIconController.clear();

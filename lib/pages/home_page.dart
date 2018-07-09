@@ -3,7 +3,8 @@ import '../db/database.dart';
 import '../model/todo.dart';
 import './analytics_page.dart';
 import '../utils/helpers/time_functions.dart';
-import '../utils/helpers/countdown.dart';
+import '../utils/views/countdown.dart';
+import '../utils/views/progress_bar.dart';
 import '../utils/helpers/custom_page_route.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/loading_screen.dart';
@@ -20,6 +21,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   List<ToDo> todos = [];
   List<AnimationController> _countdownControllers = [];
+  List<AnimationController> _colorControllers = [];
 
   bool loading;  
 
@@ -55,6 +57,17 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       );
       _countdownControllers.add(temp);
       _countdownControllers[i].forward();
+      _countdownControllers[i].addListener(() => setState((){}));
+
+    }
+    for(int i = 0; i < todos.length; i ++){
+      AnimationController temp = new AnimationController(
+        vsync: this,
+        duration: todos[i].startDate.add(Duration(days: 1)).difference(TimeFunctions.nowToNearestSecond()),
+      );
+      _colorControllers.add(temp);
+      _colorControllers[i].forward();
+
     }
   }
 
@@ -228,15 +241,39 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     todo.task.name,
                     style: TextStyle(fontSize: 20.0,),
                   ),
-                  Countdown(
-                    animation: new StepTween(
-                      begin: todo.startDate.add(Duration(days: 1)).difference(TimeFunctions.nowToNearestSecond()).inSeconds,
-                      end: 0,
-                    ).animate(_countdownControllers[index]),
+                  Container(
+                    padding: EdgeInsets.only(top: 10.0),
+                    child: Column(
+                      children: <Widget>[
+                        ProgressBar(
+                          animation: new StepTween(
+                            begin: TimeFunctions.getRemainingTimeInSeconds(todo.startDate),
+                            end: 0,
+                          ).animate(_countdownControllers[index]),
+                          colorAnimation: ColorTween(
+                            begin: ColorTween (
+                              begin: ColorTween (
+                                begin:Colors.green[700],
+                                end: Colors.yellow,  
+                              ).lerp(_tweenPercentageGetter(TimeFunctions.getPercentageTimeRemaining(todo.startDate), true)),
+                              end:Colors.red[700],
+                            ).lerp(_tweenPercentageGetter(TimeFunctions.getPercentageTimeRemaining(todo.startDate), false)),
+                            end: Colors.red[700],  
+                          ).animate(_colorControllers[index]),
+                        ),
+                        Countdown(
+                          animation: new StepTween(
+                            begin: TimeFunctions.getRemainingTimeInSeconds(todo.startDate),
+                            end: 0,
+                          ).animate(_countdownControllers[index]),
+                        ),
+                      ],
+                    ),
                   ),
                 ],          
-              ),
+              )
             ),
+            Padding(padding: EdgeInsets.only(right: 20.0),),
             Opacity(
               opacity: 0.8,
               child: Container(
@@ -257,6 +294,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ],
         ),
     );
+  }
+
+  //this function helps me control a tween with a start, middle and end value. TODO: Make into 3-level Tween class 
+  double _tweenPercentageGetter(double percentage, bool isBeginTween){
+
+    if(percentage < 0.5){
+      return isBeginTween ? percentage * 2 : 0.0;
+    }else{
+      return isBeginTween ? 1.0 : (percentage - 0.5)*2;
+    }
   }
 
 }

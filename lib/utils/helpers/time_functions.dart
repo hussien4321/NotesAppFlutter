@@ -1,6 +1,6 @@
 class TimeFunctions {
   
-  static String getRemainingTime(DateTime startDate){
+  static String getRemainingTimeAsStirng(DateTime startDate){
     Duration difference = startDate.add(Duration(days: 1)).difference(nowToNearestSecond());
     int hours = difference.inHours;
     int minutes = difference.inMinutes - hours * 60;
@@ -19,7 +19,7 @@ class TimeFunctions {
     int seconds = timeInSeconds -  minutes * 60 - hours * 60 * 60;
     String secondsString = seconds < 10 ? '0'+seconds.toString() : seconds.toString();
 
-    return hoursString + "h " + minutesString + "m " + secondsString + "s remaining";
+    return hoursString + "h " + minutesString + "m " + secondsString + "s";
   }
 
   static DateTime nowToNearestSecond(){
@@ -27,4 +27,14 @@ class TimeFunctions {
     return timeNow.subtract(Duration(milliseconds: timeNow.millisecond, microseconds: timeNow.microsecond));
       }
 
+  static int getRemainingTimeInSeconds(DateTime startDate){
+    return startDate.add(Duration(days: 1)).difference(nowToNearestSecond()).inSeconds;
+  }
+
+  static double getPercentageTimeRemaining(DateTime startDate){
+    int max = Duration(days: 1).inSeconds;
+    int current = getRemainingTimeInSeconds(startDate);
+    double percentage = (max - current) /max;
+    return percentage;
+  }
 }
