@@ -73,7 +73,7 @@ class DBHelper{
   //TODO: Check if todo exists and is active
   createToDo(ToDo todo) async {
   var database = await db;
-  
+
     await database.transaction((txn) async {
       await txn.rawInsert(
           'INSERT INTO todo(task_fid, start_date, success, completion_date, forfeit) VALUES('+todo.task.id.toString()+', "'+todo.startDate.toIso8601String()+'", "'+todo.success.toString()+'", "'+todo.completionDate.toIso8601String()+'", "'+todo.forfeit.toString()+'")');
@@ -140,7 +140,7 @@ class DBHelper{
 
     String dateRange = TimeFunctions.nowToNearestSecond().subtract(Duration(days: 1)).toIso8601String();
 
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE task.task_id = todo.task_fid AND forfeit = "false" AND success = "false" AND start_date > datetime("'+dateRange+'")');
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE task.task_id = todo.task_fid AND forfeit = "false" AND success = "false" AND datetime(start_date) > datetime("'+dateRange+'")');
     List<ToDo> todos = new List();
     for (int i = 0; i < list.length; i++) {
       todos.add(new ToDo.fromJson(list[i]));

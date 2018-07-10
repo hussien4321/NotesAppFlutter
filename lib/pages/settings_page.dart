@@ -7,3 +7,5 @@
 //3 - reset data (delete databases and rerun onCreate script)
 
 //4- Change languages
+
+//5- share to friends

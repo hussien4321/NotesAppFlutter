@@ -58,7 +58,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       _countdownControllers.add(temp);
       _countdownControllers[i].forward();
       _countdownControllers[i].addListener(() => setState((){}));
-
     }
     for(int i = 0; i < todos.length; i ++){
       AnimationController temp = new AnimationController(
