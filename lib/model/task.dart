@@ -21,6 +21,10 @@ class Task{
     _creationDate = TimeFunctions.nowToNearestSecond();
   }
   
+  void setId(int newId){
+    _id = newId;
+  }
+  
   void update(String newName, String newIcon){
     _name = newName;
     _icon = newIcon;

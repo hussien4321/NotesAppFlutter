@@ -247,19 +247,25 @@ class TasksPageState extends State<TasksPage> {
                       elevation: 2.0,
                       color: Colors.greenAccent,
                       child: Text(dialogTask == null ? 'ADD' : 'SAVE', style: TextStyle(color: Colors.black),),
-                      onPressed: () {
+                      onPressed: () async {
                         if(_formKey.currentState.validate()){
                           if(dialogTask == null){
-                            _dbHelper.createTask(new Task(0, taskNameController.text, taskIconController.text));
+                            Task newTask = new Task(0, taskNameController.text, taskIconController.text);
+
+                            int newId = await _dbHelper.createTask(new Task(0, taskNameController.text, taskIconController.text));
+                            newTask.setId(newId);
+                            _dbHelper.createToDo(new ToDo(0, newTask));
+                            Navigator.pop(context);
+                            Navigator.pop(context);
                           }
                           else{
                             dialogTask.update(taskNameController.text, taskIconController.text);
                             _dbHelper.updateTask(dialogTask);
+                            updateTasks();
+                            Navigator.pop(context);
+                            taskNameController.clear();
+                            taskIconController.clear();
                           }
-                          updateTasks();
-                          Navigator.pop(context);
-                          taskNameController.clear();
-                          taskIconController.clear();
                           //TODO: Fix snackbar
                           // Scaffold
                           //     .of(context)

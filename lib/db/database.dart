@@ -85,8 +85,8 @@ class DBHelper{
   createTask(Task task) async {
   var database = await db;
   
-    await database.transaction((txn) async {
-      await txn.rawInsert(
+  return await database.transaction((txn) async {
+      return await txn.rawInsert(
           'INSERT INTO task(name, icon, recommended, creation_date, deleted) VALUES("'+task.name+'","'+task.icon+'","'+task.recommended.toString()+'","'+task.creationDate.toIso8601String()+'", "false")');
     });
   }
@@ -152,18 +152,13 @@ class DBHelper{
   Future<List<Task>> getAllTasks() async {
     var dbClient = await db;
 
-    List<Map> unusedNewTasksList= await dbClient.rawQuery('SELECT * FROM task WHERE (SELECT COUNT(todo.task_fid) FROM todo WHERE todo.task_fid == task.task_id) = 0 AND deleted = "false" AND recommended = "false" ORDER BY datetime(creation_date) DESC;');
-
     List<Map> usedTasksList = await dbClient.rawQuery('SELECT task_id, name, icon, recommended, creation_date FROM task, todo WHERE task.task_id = todo.task_fid AND deleted = "false" GROUP BY task_id ORDER BY datetime(start_date) DESC');
     
     //could be updated to sort by creation date instead of id
     List<Map> unusedDefaultTasksList= await dbClient.rawQuery('SELECT * FROM task WHERE (SELECT COUNT(todo.task_fid) FROM todo WHERE todo.task_fid == task.task_id) = 0 AND deleted = "false" AND recommended = "true" ORDER BY task_id DESC;');
     
     List<Task> tasks = new List();
-    
-    for (int i = 0; i < unusedNewTasksList.length; i++) {
-      tasks.add(new Task.fromJson(unusedNewTasksList[i]));
-    }
+
     for (int i = 0; i < usedTasksList.length; i++) {
       tasks.add(new Task.fromJson(usedTasksList[i]));
     }
