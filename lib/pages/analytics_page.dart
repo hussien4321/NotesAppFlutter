@@ -28,24 +28,31 @@ class AnalyticsPageState extends State<AnalyticsPage> {
     updateAnalytics();
   }
   updateAnalytics(){
-    dbHelper.getNumberOfSuccesses().then((res) => this.setState(() {
-       if(_numOfSuccesses != res || loading) {
-        setState(() {
-            loading = false;
-            _numOfSuccesses = res;
+    dbHelper.getNumberOfSuccesses().then((res) {
+      if(mounted){
+        this.setState(() {
+        if(_numOfSuccesses != res || loading) {
+          setState(() {
+              loading = false;
+              _numOfSuccesses = res;
+          });
+        }
         });
-       }
       }
-    ));
-    dbHelper.getNumberOfFailures().then((res) => this.setState(() {
-       if(_numOfFailures != res || loading) {
-        setState(() {
-            loading = false;
-            _numOfFailures = res;//BUG  LOGS; setState() called after dispose(): AnalyticsPageState#5c49d(lifecycle state: defunct, not mounted)
-        });
-       }
+    }
+    );
+    dbHelper.getNumberOfFailures().then((res) {
+      if(mounted){
+          this.setState(() {
+            if(_numOfFailures != res || loading) {
+            setState(() {
+                loading = false;
+                _numOfFailures = res;//BUG  LOGS; setState() called after dispose(): AnalyticsPageState#5c49d(lifecycle state: defunct, not mounted)
+            });
+            }
+          });
       }
-    ));
+    });
 
   }
 

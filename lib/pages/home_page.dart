@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../db/database.dart';
 import '../model/todo.dart';
 import './analytics_page.dart';
+import './settings_page.dart';
 import '../utils/helpers/time_functions.dart';
 import '../utils/views/countdown.dart';
 import '../utils/views/progress_bar.dart';
@@ -115,9 +116,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: [
                 loading ? LoadingScreen() : (todos.isEmpty ? noItemWidget() : notesListView(todos, dbHelper)),
                 AnalyticsPage(),
-                Center(
-                  child: Text('This page is still being built 🚧'),
-                ),
+                SettingsPage(),
               ],
             ),
           ),

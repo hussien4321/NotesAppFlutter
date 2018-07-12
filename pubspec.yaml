@@ -11,7 +11,12 @@ dependencies:
   sqflite: any
 
   path_provider: 0.4.1
-  
+  font_awesome_flutter: 7.1.0
+  share: 0.5.2
+  url_launcher: any
+
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
