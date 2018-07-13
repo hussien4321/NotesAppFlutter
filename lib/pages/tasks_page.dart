@@ -23,23 +23,39 @@ class TasksPageState extends State<TasksPage> {
 
   final _formKey = GlobalKey<FormState>();
 
+  String previousIcon = "";
   final taskNameController = TextEditingController();
   final taskIconController = TextEditingController();
 
   @override
   void dispose() {
     // Clean up the controller when the Widget is disposed
+    taskIconController.removeListener(_iconRealtimeValidation);
     taskNameController.dispose();
     taskIconController.dispose();
     super.dispose();
   }
 
+  _iconRealtimeValidation(){
+    RegExp exp = new RegExp(r"(\w+|\s)");
+    if(exp.hasMatch(taskIconController.text)){
+      taskIconController.clear();
+      taskIconController.text = "";
+    }
+    previousIcon = taskIconController.text;
+  }
+
+
   @override
   void initState() {
       super.initState();
       _isEditMode = false;
+
+      previousIcon = "";
+      taskIconController.addListener(_iconRealtimeValidation);
       dbSetUp();
   }
+
 
   dbSetUp() async {
     await _dbHelper.initDb();  
@@ -170,10 +186,12 @@ class TasksPageState extends State<TasksPage> {
     if(dialogTask == null){
       taskNameController.clear();
       taskIconController.clear();
+      previousIcon = "";
     }
     else{
       taskNameController.text= dialogTask.name;
       taskIconController.text = dialogTask.icon;
+      previousIcon = dialogTask.icon;
     }
     await showDialog(
       context: context,
@@ -193,7 +211,7 @@ class TasksPageState extends State<TasksPage> {
                   flex: 2,
                   child: TextFormField(
                     validator: (value) {
-                      if (value.isEmpty) {
+                      if (previousIcon.isEmpty) {
                         return 'Invalid\nemoji';
                       }
                     },
@@ -238,9 +256,10 @@ class TasksPageState extends State<TasksPage> {
                           _dbHelper.deleteTask(dialogTask);
                           updateTasks();
                         }
-                        Navigator.pop(context);
                         taskNameController.clear();
                         taskIconController.clear();
+                        previousIcon = '';
+                        Navigator.pop(context);
                       }),
                   ),
                   Padding( padding: EdgeInsets.all(5.0)),
@@ -254,9 +273,10 @@ class TasksPageState extends State<TasksPage> {
                           if(dialogTask == null){
                             Task newTask = new Task(0, taskNameController.text, taskIconController.text);
 
-                            int newId = await _dbHelper.createTask(new Task(0, taskNameController.text, taskIconController.text));
+                            int newId = await _dbHelper.createTask(newTask);
                             newTask.setId(newId);
                             _dbHelper.createToDo(new ToDo(0, newTask));
+                            Navigator.pop(context);
                             Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => HomePage()),
                               (Route route) => route == null
                             );
@@ -265,9 +285,10 @@ class TasksPageState extends State<TasksPage> {
                             dialogTask.update(taskNameController.text, taskIconController.text);
                             _dbHelper.updateTask(dialogTask);
                             updateTasks();
-                            Navigator.pop(context);
                             taskNameController.clear();
                             taskIconController.clear();
+                            previousIcon = '';
+                            Navigator.pop(context);
                           }
                           //TODO: Fix snackbar
                           // Scaffold
