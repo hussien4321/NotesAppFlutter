@@ -5,6 +5,7 @@ import '../model/todo.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/task_view.dart';
+import './home_page.dart';
 
 class TasksPage extends StatefulWidget {
     @override
@@ -106,9 +107,10 @@ class TasksPageState extends State<TasksPage> {
                 return TaskView(_tasks[i], _isEditMode, 
                   () {
                     if(!_isEditMode){
-                      //TODO: REDIRECT TO TODO TAB ON HOMEPAGE
-                      _dbHelper.createToDo(ToDo(0, _tasks[i]));
-                      Navigator.of(context).pop();
+                      _dbHelper.createToDo(ToDo(0, _tasks[i]));                      
+                      Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => HomePage()),
+                        (Route route) => route == null
+                      );
                     }
                     else{
                       _newTaskDialog(_tasks[i]);
@@ -255,8 +257,9 @@ class TasksPageState extends State<TasksPage> {
                             int newId = await _dbHelper.createTask(new Task(0, taskNameController.text, taskIconController.text));
                             newTask.setId(newId);
                             _dbHelper.createToDo(new ToDo(0, newTask));
-                            Navigator.pop(context);
-                            Navigator.pop(context);
+                            Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => HomePage()),
+                              (Route route) => route == null
+                            );
                           }
                           else{
                             dialogTask.update(taskNameController.text, taskIconController.text);

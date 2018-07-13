@@ -47,7 +47,7 @@ class AnalyticsPageState extends State<AnalyticsPage> {
             if(_numOfFailures != res || loading) {
             setState(() {
                 loading = false;
-                _numOfFailures = res;//BUG  LOGS; setState() called after dispose(): AnalyticsPageState#5c49d(lifecycle state: defunct, not mounted)
+                _numOfFailures = res;
             });
             }
           });

@@ -12,12 +12,13 @@ import '../utils/views/loading_screen.dart';
 import './tasks_page.dart';
 
 class HomePage extends StatefulWidget {
+
     @override
     State createState() => new HomePageState();
 }
 
 
-class HomePageState extends State<HomePage> with TickerProviderStateMixin {
+class HomePageState extends State<HomePage> with TickerProviderStateMixin  {
   DBHelper dbHelper = new DBHelper();
 
   List<ToDo> todos = [];
@@ -26,6 +27,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   bool loading;  
 
+
   @override
   void initState() {
       super.initState();
@@ -33,6 +35,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       loading = true;
   }
 
+  
   dbSetUp() async {
     await dbHelper.initDb();  
     updateTodos();
@@ -67,14 +70,18 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       );
       _colorControllers.add(temp);
       _colorControllers[i].forward();
-
     }
   }
+
+
 
   @override
   void dispose() {
     for(int i = 0; i < _countdownControllers.length; i++){
       _countdownControllers[i].dispose();
+    }
+    for(int i = 0; i < _colorControllers.length; i++){
+      _colorControllers[i].dispose();
     }
     super.dispose();
   }
@@ -82,7 +89,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   
   @override
   Widget build(BuildContext context) {
-    updateTodos();
+    // updateTodos();
     //TODO: Separate tab controller to a file 
     return DefaultTabController(
         initialIndex: 0,
