@@ -34,7 +34,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   dbSetUp() async {
-    await dbHelper.initDb();  
+    // await dbHelper.initDb();  
     updateTodos();
   }
 

@@ -24,7 +24,7 @@ class AnalyticsPageState extends State<AnalyticsPage> {
   }
   
   dbSetUp() async {
-    await dbHelper.initDb();  
+    // await dbHelper.initDb();  
     updateAnalytics();
   }
   updateAnalytics(){

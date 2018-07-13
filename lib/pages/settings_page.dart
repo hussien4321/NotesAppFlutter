@@ -1,8 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:share/share.dart';
+import '../db/preferences.dart';
 
-class SettingsPage extends StatelessWidget {
+
+class SettingsPage extends StatefulWidget {
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+
+  bool isNotificationsEnabled = false;
+  int notificationSliderValue = 12;
+  int savedNotificationSliderValue = 12;
+
+  Preferences preferences = new Preferences();
+
+  @override
+  void initState() {
+    super.initState();
+    isNotificationsEnabled = preferences.isNotificationsEnabled();//get From preferences
+    notificationSliderValue = preferences.getNotificationSliderValue();//get From preferences
+    savedNotificationSliderValue = notificationSliderValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -31,20 +53,41 @@ class SettingsPage extends StatelessWidget {
                 ),
               ),
               settingsHeader('Notifications'),
-              settingsOption('Turn on notifications', Switch(
-                value: false,
-                onChanged: (status) => print('switched to '+status.toString()),
-              )),
-              settingsOption('Notify 3 hours before deadline', RaisedButton(
-                  onPressed: () {
-                    //Switch to a separate column slider for time change
-                  },
+              settingsOption('Enable notifications', Switch(
+                value: isNotificationsEnabled,
+                onChanged: (status) {
+                  isNotificationsEnabled = status;
+                  notificationSliderValue = savedNotificationSliderValue;
+                },
+                ),
+              ),
+              settingsOptionWithNull('Notify '+notificationSliderValue.round().toString()+' hours before each deadline', 
+                 RaisedButton(
+                  onPressed: (savedNotificationSliderValue != notificationSliderValue) ? () {
+                    savedNotificationSliderValue = notificationSliderValue;
+                  } : null,
                   child: Text(
-                    'Modify',
+                    'Update',
                     style: TextStyle(color: Colors.white), 
                   ),
                   color: Colors.orangeAccent,
                 ),
+                isNotificationsEnabled
+              ),
+              
+              Slider(
+                value: notificationSliderValue.toDouble(),
+                activeColor: isNotificationsEnabled ? SliderTheme.of(context).activeTrackColor : Colors.grey,
+                inactiveColor: isNotificationsEnabled ? SliderTheme.of(context).inactiveTrackColor : Colors.grey[300],
+                min: 1.0,
+                max: 23.0,
+                divisions: 22,
+                onChanged: (newValue) {
+                  if(isNotificationsEnabled){
+                    notificationSliderValue = newValue.round();
+                  }
+                },
+                
               ),
               settingsHeader('In-app purchases'),
               settingsOption('Disable ads', RaisedButton(
@@ -94,13 +137,27 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget settingsOption(String optionText, Widget button){
+    Widget settingsOptionWithNull(String optionText, Widget button, [bool enabled = true]){
+    return (button==null) ? Row(
+      children: <Widget>[
+        Expanded(
+          child: Text(
+            optionText,
+            style: TextStyle(fontSize: 17.0, color: enabled ? Colors.black : Colors.grey),
+          ),
+        ),
+      ],
+    ) : settingsOption(optionText, button, enabled);
+  }
+
+
+  Widget settingsOption(String optionText, Widget button, [bool enabled = true]){
     return Row(
       children: <Widget>[
         Expanded(
           child: Text(
             optionText,
-            style: TextStyle(fontSize: 17.0),
+            style: TextStyle(fontSize: 17.0, color: enabled ? Colors.black : Colors.grey),
           ),
         ),
         button,

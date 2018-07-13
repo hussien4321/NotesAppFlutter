@@ -57,8 +57,8 @@ class TasksPageState extends State<TasksPage> {
   }
 
 
-  dbSetUp() async {
-    await _dbHelper.initDb();  
+  dbSetUp() {
+    // await _dbHelper.initDb();  
     updateTasks();
   }
 

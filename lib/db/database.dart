@@ -18,7 +18,7 @@ class DBHelper{
       new Task(6, 'Make reservation', '📞', true),
       new Task(7, 'Take medicine', '💊', true),
       new Task(8, 'Get Haircut', '💇🏻', true),
-      new Task(9,'Cook dinner', '🍽️', true),
+      new Task(9, 'Cook dinner', '🍽️', true),
       new Task(10,'Go grocery shopping', '🛒', true),
       new Task(11,'Finish homework', '📝', true),
       new Task(12,'Exercise', '🏋️', true),
@@ -148,7 +148,6 @@ class DBHelper{
     return todos;
   }
 
-  //TODO: the first 2 lists need to joined based on the creation_date from list 1 and the start_date from list 2
   Future<List<Task>> getAllTasks() async {
     var dbClient = await db;
 
