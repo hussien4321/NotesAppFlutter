@@ -6,6 +6,9 @@ import '../utils/views/loading_screen.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/task_view.dart';
 import './home_page.dart';
+import '../db/notification_service.dart';
+import '../db/preferences.dart';
+
 
 class TasksPage extends StatefulWidget {
     @override
@@ -26,6 +29,11 @@ class TasksPageState extends State<TasksPage> {
   String previousIcon = "";
   final taskNameController = TextEditingController();
   final taskIconController = TextEditingController();
+
+  NotificationService notificationService = new NotificationService();
+  Preferences preferencesService = new Preferences();
+  bool notificationsEnabled;
+  int notificationsDelayValue;
 
   @override
   void dispose() {
@@ -49,18 +57,19 @@ class TasksPageState extends State<TasksPage> {
   @override
   void initState() {
       super.initState();
+      notificationService.initService();
+      preferencesService.initService().then((res){
+        notificationsDelayValue = preferencesService.getNotificationSliderValue();
+        notificationsEnabled = preferencesService.isNotificationsEnabled();
+      });
+
       _isEditMode = false;
 
       previousIcon = "";
       taskIconController.addListener(_iconRealtimeValidation);
-      dbSetUp();
+      updateTasks();
   }
 
-
-  dbSetUp() {
-    // await _dbHelper.initDb();  
-    updateTasks();
-  }
 
   updateTasks(){
     _dbHelper.getAllTasks().then((res) => this.setState(() {
@@ -123,7 +132,11 @@ class TasksPageState extends State<TasksPage> {
                 return TaskView(_tasks[i], _isEditMode, 
                   () {
                     if(!_isEditMode){
-                      _dbHelper.createToDo(ToDo(0, _tasks[i]));                      
+                      _dbHelper.createToDo(ToDo(0, _tasks[i])).then((taskId) {
+                        if(notificationsEnabled){
+                          notificationService.createNotification(ToDo(taskId, _tasks[i]),notificationsDelayValue);
+                        }
+                      });                      
                       Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => HomePage()),
                         (Route route) => route == null
                       );
@@ -275,7 +288,11 @@ class TasksPageState extends State<TasksPage> {
 
                             int newId = await _dbHelper.createTask(newTask);
                             newTask.setId(newId);
-                            _dbHelper.createToDo(new ToDo(0, newTask));
+                            _dbHelper.createToDo(new ToDo(0, newTask)).then((todoId){
+                              if(notificationsEnabled){
+                                notificationService.createNotification(new ToDo(todoId, newTask), notificationsDelayValue);
+                              }
+                            });
                             Navigator.pop(context);
                             Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => HomePage()),
                               (Route route) => route == null

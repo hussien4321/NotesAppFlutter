@@ -71,11 +71,11 @@ class DBHelper{
 
 
   //TODO: Check if todo exists and is active
-  createToDo(ToDo todo) async {
+  Future<int> createToDo(ToDo todo) async {
   var database = await db;
 
-    await database.transaction((txn) async {
-      await txn.rawInsert(
+    return await database.transaction((txn) async {
+      return await txn.rawInsert(
           'INSERT INTO todo(task_fid, start_date, success, completion_date, forfeit) VALUES('+todo.task.id.toString()+', "'+todo.startDate.toIso8601String()+'", "'+todo.success.toString()+'", "'+todo.completionDate.toIso8601String()+'", "'+todo.forfeit.toString()+'")');
     });
   }
@@ -209,7 +209,7 @@ class DBHelper{
   // completeToDo(ToDo todo);         DONEZO
   // giveUpToDo(ToDo todo);           DONEZO
 
-  // getActiveToDos();                DONEZO? 
+  // getActiveToDos();                DONEZO
 
   // getRecentTasks();                DONEZO
   // getRecommendedTasks();           DONEZO

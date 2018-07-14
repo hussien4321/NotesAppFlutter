@@ -3,6 +3,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:share/share.dart';
 import '../db/preferences.dart';
 import '../utils/views/loading_screen.dart';
+import '../db/notification_service.dart';
+import '../db/database.dart';
+import '../model/todo.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -19,13 +22,20 @@ class _SettingsPageState extends State<SettingsPage> {
   bool loading = true;
 
   Preferences preferences = new Preferences();
+  NotificationService notificationService = new NotificationService();
+  List<ToDo> existingTodos = [];
 
   @override
   void initState() {
     super.initState();
     loading = true;
-    preferences.initialize().then((res){
+    preferences.initService().then((res){
       _updateValues();
+    });
+    notificationService.initService();
+    DBHelper dbHelper = new DBHelper();
+    dbHelper.getActiveToDos().then((todos){
+      existingTodos = todos;
       setState(() {
         loading = false;
       }); 
@@ -73,26 +83,32 @@ class _SettingsPageState extends State<SettingsPage> {
                 onChanged: (status) {
                   isNotificationsEnabled = status;
                   preferences.updatePreference(Preferences.NOTIFICATIONS_ENABLED, status);
-                  preferences.updatePreferences().then((res) {
-                    _updateValues();
-                  });
+                  _updateValues();
+                  if(isNotificationsEnabled){
+                    notificationService.updateNotifications(existingTodos, savedNotificationSliderValue);
+                  }
+                  else{
+                    notificationService.cancelAllNotifications();
+                  }
                 },
                 ),
               ),
               settingsOptionWithNull('Notify '+notificationSliderValue.round().toString()+' hours before each deadline', 
-                 RaisedButton(
-                  onPressed: (savedNotificationSliderValue != notificationSliderValue) ? () {
-                    savedNotificationSliderValue = notificationSliderValue;
-                    preferences.updatePreference(Preferences.NOTIFICATIONS_DELAY, savedNotificationSliderValue);
-                    preferences.updatePreferences().then((res) {
-                        _updateValues();
-                    });
-                  } : null,
-                  child: Text(
-                    'Update',
-                    style: TextStyle(color: Colors.white), 
+                 Opacity(
+                   opacity: (savedNotificationSliderValue != notificationSliderValue) ? 1.0 : 0.0,
+                   child: RaisedButton(
+                    onPressed: (savedNotificationSliderValue != notificationSliderValue) ? () {
+                      savedNotificationSliderValue = notificationSliderValue;
+                      preferences.updatePreference(Preferences.NOTIFICATIONS_DELAY, savedNotificationSliderValue);
+                      _updateValues();
+                      notificationService.updateNotifications(existingTodos, savedNotificationSliderValue);
+                    } : null,
+                    child: Text(
+                      'Update',
+                      style: TextStyle(color: Colors.white), 
+                    ),
+                    color: Colors.orangeAccent,
                   ),
-                  color: Colors.orangeAccent,
                 ),
                 isNotificationsEnabled
               ),
@@ -100,7 +116,7 @@ class _SettingsPageState extends State<SettingsPage> {
               Slider(
                 value: notificationSliderValue.toDouble(),
                 activeColor: isNotificationsEnabled ? SliderTheme.of(context).activeTrackColor : Colors.grey,
-                inactiveColor: isNotificationsEnabled ? SliderTheme.of(context).inactiveTrackColor : Colors.grey[300],
+                inactiveColor: isNotificationsEnabled ? SliderTheme.of(context).inactiveTrackColor : Colors.grey,
                 min: 1.0,
                 max: 23.0,
                 divisions: 22,

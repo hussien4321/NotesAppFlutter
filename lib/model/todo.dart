@@ -26,6 +26,9 @@ class ToDo{
     _forfeit = false;
   }
   
+  void setId(int newId){
+    _id = newId;
+  }
   ToDo.fromJson(Map<String, dynamic> json)
       : _id = json['todo_id'],
         _task = Task.fromJson(json),

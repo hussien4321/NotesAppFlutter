@@ -24,7 +24,7 @@ class Preferences {
   final String fileName = 'preferences.json';
   File jsonFile;
   
-  initialize() async {
+  initService() async {
 
     await getApplicationDocumentsDirectory().then((Directory directory) {
       Directory dir = directory;
