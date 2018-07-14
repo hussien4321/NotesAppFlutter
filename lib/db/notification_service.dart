@@ -58,6 +58,15 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.cancel(todo.id);
   }
 
+  cancelOpenNotifications(List<ToDo> todos, int delayInHours) async {
+    for(int i = 0; i< todos.length; i++){
+      DateTime notificationTime = todos[i].startDate.add(Duration(hours:  delayInHours));
+      if(notificationTime.isBefore(DateTime.now())){
+        cancelNotification(todos[i]);
+      }
+    }
+  }
+
   cancelAllNotifications() async{
     await flutterLocalNotificationsPlugin.cancelAll();
   }

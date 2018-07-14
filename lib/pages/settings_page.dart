@@ -36,6 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
     DBHelper dbHelper = new DBHelper();
     dbHelper.getActiveToDos().then((todos){
       existingTodos = todos;
+      notificationService.cancelOpenNotifications(todos, preferences.getNotificationSliderValue());
       setState(() {
         loading = false;
       }); 

@@ -38,6 +38,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
   updateTodos(){
     dbHelper.getActiveToDos().then((res) => this.setState(() {
       if(todos != res){
+        notificationService.cancelOpenNotifications(res, preferences.getNotificationSliderValue());
         initializeControllers(res);
         todos = res;
         setState(() {
@@ -130,6 +131,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
         _countdownControllers.removeAt(index);
         updateTodos();      
         notificationService.cancelNotification(temp);
+        notificationService.cancelOpenNotifications(todos, preferences.getNotificationSliderValue());
       },
       secondaryBackground: Container(
         padding: EdgeInsets.all(20.0),

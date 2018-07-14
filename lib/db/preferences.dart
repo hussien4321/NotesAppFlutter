@@ -44,7 +44,6 @@ class Preferences {
   }
 
   void _createPreferencesFile(Map<String, dynamic> content) {
-    print("Creating file!");
     jsonFile.createSync();
     jsonFile.writeAsStringSync(JSON.encode(content));
   }
@@ -53,7 +52,6 @@ class Preferences {
     Map<String, dynamic> content = {key: value};
     Map<String, dynamic> jsonFileContent = json.decode(jsonFile.readAsStringSync());
     jsonFileContent.addAll(content);
-    print('updated preferences : '+jsonFileContent.toString());
     currentPreferences = jsonFileContent;
     jsonFile.writeAsStringSync(JSON.encode(jsonFileContent));
   }

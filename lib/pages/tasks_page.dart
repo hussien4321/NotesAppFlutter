@@ -76,6 +76,7 @@ class TasksPageState extends State<TasksPage> {
       _tasks = res; 
       _loadingPage = false;
     }));
+    _dbHelper.getActiveToDos().then((todos) => notificationService.cancelOpenNotifications(todos, preferencesService.getNotificationSliderValue()));
   }
 
   @override
