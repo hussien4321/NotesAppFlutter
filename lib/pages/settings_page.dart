@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:share/share.dart';
 import '../db/preferences.dart';
+import '../utils/views/loading_screen.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -15,21 +16,35 @@ class _SettingsPageState extends State<SettingsPage> {
   int notificationSliderValue = 12;
   int savedNotificationSliderValue = 12;
 
+  bool loading = true;
+
   Preferences preferences = new Preferences();
 
   @override
   void initState() {
     super.initState();
-    isNotificationsEnabled = preferences.isNotificationsEnabled();//get From preferences
-    notificationSliderValue = preferences.getNotificationSliderValue();//get From preferences
-    savedNotificationSliderValue = notificationSliderValue;
+    loading = true;
+    preferences.initialize().then((res){
+      _updateValues();
+      setState(() {
+        loading = false;
+      }); 
+    });
+  }
+
+  _updateValues(){
+    setState(() {
+      isNotificationsEnabled = preferences.isNotificationsEnabled();
+      notificationSliderValue = preferences.getNotificationSliderValue();
+      savedNotificationSliderValue = notificationSliderValue;
+    }); 
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(10.0),
-      child: ListView(
+      child: loading ? LoadingScreen() : ListView(
         scrollDirection: Axis.vertical,
         children: <Widget>[
           Column(
@@ -57,7 +72,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 value: isNotificationsEnabled,
                 onChanged: (status) {
                   isNotificationsEnabled = status;
-                  notificationSliderValue = savedNotificationSliderValue;
+                  preferences.updatePreference(Preferences.NOTIFICATIONS_ENABLED, status);
+                  preferences.updatePreferences().then((res) {
+                    _updateValues();
+                  });
                 },
                 ),
               ),
@@ -65,6 +83,10 @@ class _SettingsPageState extends State<SettingsPage> {
                  RaisedButton(
                   onPressed: (savedNotificationSliderValue != notificationSliderValue) ? () {
                     savedNotificationSliderValue = notificationSliderValue;
+                    preferences.updatePreference(Preferences.NOTIFICATIONS_DELAY, savedNotificationSliderValue);
+                    preferences.updatePreferences().then((res) {
+                        _updateValues();
+                    });
                   } : null,
                   child: Text(
                     'Update',
@@ -84,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 divisions: 22,
                 onChanged: (newValue) {
                   if(isNotificationsEnabled){
-                    notificationSliderValue = newValue.round();
+                    setState(() => notificationSliderValue = newValue.round());
                   }
                 },
                 
