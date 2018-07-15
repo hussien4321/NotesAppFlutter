@@ -43,10 +43,14 @@ class DBHelper{
     var database = await db;
     
     await database
-      .rawDelete('DELETE FROM Task WHERE recommended = "false"');
+      .rawDelete('DELETE FROM Task');
     await database
       .rawDelete('DELETE FROM Todo');
-      
+    await database.transaction((txn) async {
+        await txn.rawInsert(
+          'INSERT INTO task(name, icon, recommended, creation_date, deleted) VALUES '+_generateRecommnendedTasksScript());
+    });
+
   }
 
   String _generateRecommnendedTasksScript(){
@@ -89,6 +93,17 @@ class DBHelper{
   }
 
 
+  //TODO: Check if todo exists and is active
+  undoCreateToDo(ToDo todo) async {
+  var database = await db;
+
+    return await database.transaction((txn) async {
+      return await txn.rawInsert(
+          'DELETE FROM todo WHERE todo_id = "'+todo.id.toString()+'"');
+    });
+  }
+
+
   //TODO: Check if task exists with same name and icon
   createTask(Task task) async {
   var database = await db;
@@ -123,6 +138,16 @@ class DBHelper{
           'UPDATE Todo SET success = "true", completion_date= "'+TimeFunctions.nowToNearestSecond().toIso8601String()+'" WHERE todo_id = '+todo.id.toString());
     });
   }
+
+  
+  undoCompleteToDo(ToDo todo) async {
+    var database = await db;
+
+    await database.transaction((txn) async {
+      await txn.rawUpdate(
+          'UPDATE Todo SET success = "false" WHERE todo_id = '+todo.id.toString());
+    });
+  }
   
   giveUpToDo(ToDo todo) async {
     var database = await db;
@@ -133,6 +158,17 @@ class DBHelper{
     });
   }
 
+  
+  undoGiveUpToDo(ToDo todo) async {
+    var database = await db;
+
+    await database.transaction((txn) async {
+      await txn.rawUpdate(
+          'UPDATE ToDo SET forfeit = "false" WHERE todo_id = '+todo.id.toString());
+    });
+  }
+
+  
   updateTask(Task task) async {
     var database = await db;
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../db/database.dart';
 import '../model/todo.dart';
+import '../model/task.dart';
 import '../utils/helpers/time_functions.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/progress_bar.dart';
@@ -9,6 +10,7 @@ import '../db/preferences.dart';
 import '../db/notification_service.dart';
 
 class ToDosPage extends StatefulWidget {
+
   @override
   _ToDosPageState createState() => _ToDosPageState();
 }
@@ -33,7 +35,6 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
       notificationService.initService();
       loading = true;
   }
-
 
   updateTodos(){
     dbHelper.getActiveToDos().then((res) => this.setState(() {
@@ -121,11 +122,24 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
       onDismissed: (direction) {
         ToDo temp = todos[index];
         todos.removeAt(index);
-        
         if(direction == DismissDirection.startToEnd){
           dbHelper.completeToDo(temp);
+          Scaffold.of(context).showSnackBar(new SnackBar(
+            content: new Text("Task completed 😁"),
+            action: SnackBarAction(
+              label: 'Undo',
+              onPressed: () => dbHelper.undoCompleteToDo(temp).then((res) => updateTodos()),
+            ),
+          ));
         }else{
           dbHelper.giveUpToDo(temp);
+          Scaffold.of(context).showSnackBar(new SnackBar(
+            content: new Text("Task failed 😞"),
+            action: SnackBarAction(
+              label: 'Undo',
+              onPressed: () => dbHelper.undoGiveUpToDo(temp).then((res) => updateTodos()),
+            ),
+          ));
         }
         _countdownControllers[index].dispose();
         _countdownControllers.removeAt(index);

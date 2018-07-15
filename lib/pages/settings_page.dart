@@ -66,6 +66,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     dbHelper.resetDb().then((res) {
                       notificationService.cancelAllNotifications();
                       loading = false;
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text('Data reset successfully ✨'),
+                      ));
                     });
                   },
                   child: Text(
@@ -87,10 +90,16 @@ class _SettingsPageState extends State<SettingsPage> {
                   isNotificationsEnabled = status;
                   preferences.updatePreference(Preferences.NOTIFICATIONS_ENABLED, status);
                   _updateValues();
-                  if(isNotificationsEnabled){
+                  if(isNotificationsEnabled){                    
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text('Notifications enabled 🔔'),
+                    ));
                     notificationService.updateNotifications(existingTodos, savedNotificationSliderValue);
                   }
                   else{
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text('Notifications disabled 🔕'),
+                    ));
                     notificationService.cancelAllNotifications();
                   }
                 },
@@ -105,6 +114,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       preferences.updatePreference(Preferences.NOTIFICATIONS_DELAY, savedNotificationSliderValue);
                       _updateValues();
                       notificationService.updateNotifications(existingTodos, savedNotificationSliderValue);
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text('Timer updated ⏰'),
+                      ));
                     } : null,
                     child: Text(
                       'Update',

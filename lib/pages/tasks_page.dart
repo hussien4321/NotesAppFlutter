@@ -24,6 +24,7 @@ class TasksPageState extends State<TasksPage> {
   bool _loadingPage = true;
   List<Task> _tasks = [];
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
 
   String previousIcon = "";
@@ -89,6 +90,7 @@ class TasksPageState extends State<TasksPage> {
   @override
     Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text("Select a task 💭"),
         centerTitle: true,
@@ -211,7 +213,7 @@ class TasksPageState extends State<TasksPage> {
       context: context,
       child: new AlertDialog(
         contentPadding: const EdgeInsets.all(16.0),
-        title: Text(dialogTask == null ? 'New Task 🌟' : 'Edit Task ✏️',textAlign: TextAlign.center, style: TextStyle(fontSize: 22.0),),
+        title: Text(dialogTask == null ? 'Create task 🌟' : 'Edit task ✏️',textAlign: TextAlign.center, style: TextStyle(fontSize: 22.0),),
         content: Form(
           key: _formKey,
           child: Column(
@@ -269,12 +271,16 @@ class TasksPageState extends State<TasksPage> {
                         if(dialogTask != null){
                           _dbHelper.deleteTask(dialogTask);
                           updateTasks();
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: new Text('Task deleted ☠️️'),
+                          ));
                         }
                         taskNameController.clear();
                         taskIconController.clear();
                         previousIcon = '';
                         Navigator.pop(context);
-                      }),
+                      }
+                    ),
                   ),
                   Padding( padding: EdgeInsets.all(5.0)),
                   Expanded(
@@ -293,16 +299,23 @@ class TasksPageState extends State<TasksPage> {
                               if(notificationsEnabled){
                                 notificationService.createNotification(new ToDo(todoId, newTask), notificationsDelayValue);
                               }
+                              Navigator.pop(context);
+                              Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => 
+                                HomePage()),
+                                (Route route) => route == null
+                              );
                             });
-                            Navigator.pop(context);
-                            Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => HomePage()),
-                              (Route route) => route == null
-                            );
                           }
                           else{
-                            dialogTask.update(taskNameController.text, taskIconController.text);
-                            _dbHelper.updateTask(dialogTask);
-                            updateTasks();
+                            if(taskNameController.text != dialogTask.name || taskIconController.text != dialogTask.icon){
+                              dialogTask.update(taskNameController.text, taskIconController.text);
+                              _dbHelper.updateTask(dialogTask).then((res){
+                                updateTasks();
+                                _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                  content: Text('Task updated 👌'),
+                                ));
+                              });
+                            }
                             taskNameController.clear();
                             taskIconController.clear();
                             previousIcon = '';

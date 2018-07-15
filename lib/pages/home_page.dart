@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../db/database.dart';
 import '../model/todo.dart';
+import '../model/task.dart';
 import './analytics_page.dart';
 import './settings_page.dart';
 import './todos_page.dart';
@@ -13,7 +14,7 @@ import '../utils/views/loading_screen.dart';
 import './tasks_page.dart';
 
 class HomePage extends StatelessWidget {
-  
+
   @override
   Widget build(BuildContext context) {
     //TODO: Separate tab controller to a file 
