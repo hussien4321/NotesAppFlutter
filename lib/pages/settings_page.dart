@@ -6,7 +6,7 @@ import '../utils/views/loading_screen.dart';
 import '../db/notification_service.dart';
 import '../db/database.dart';
 import '../model/todo.dart';
-
+import '../utils/views/yes_no_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -63,13 +63,28 @@ class _SettingsPageState extends State<SettingsPage> {
               settingsOption('Reset data', RaisedButton(
                   onPressed: () {
                     loading = true;
-                    dbHelper.resetDb().then((res) {
-                      notificationService.cancelAllNotifications();
-                      loading = false;
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                        content: Text('Data reset successfully ✨'),
-                      ));
-                    });
+                    showDialog(
+                        context: context,
+                        builder: (newContext) => YesNoDialog(
+                          title: 'Reset data',
+                          description: 'WARNING: This will delete all task data saved on the app so far.\n\nAre you sure you would like to delete it?',
+                          yesText: 'Yes',
+                          noText: 'No',
+                          onYes: () {
+                            dbHelper.resetDb().then((res) {
+                              notificationService.cancelAllNotifications();
+                              loading = false;
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                content: Text('Data reset successfully ✨'),
+                              ));
+                            });
+                            Navigator.pop(context);
+                          },
+                          onNo: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                    );
                   },
                   child: Text(
                     'RESET',

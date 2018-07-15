@@ -37,16 +37,23 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
   }
 
   updateTodos(){
-    dbHelper.getActiveToDos().then((res) => this.setState(() {
-      if(todos != res){
-        notificationService.cancelOpenNotifications(res, preferences.getNotificationSliderValue());
-        initializeControllers(res);
-        todos = res;
-        setState(() {
-          loading = false;
+    dbHelper.getActiveToDos().then((res) {
+      if(mounted){
+        this.setState(() {
+          if(todos != res){
+            notificationService.cancelOpenNotifications(res, preferences.getNotificationSliderValue());
+            initializeControllers(res);
+            todos = res;
+            setState(() {
+              loading = false;
+            });
+          }
         });
       }
-    }));
+      else{
+        loading = false;
+      }
+    });
   }
   
   initializeControllers(List<ToDo> todos){
@@ -93,7 +100,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            'You currently have no task to do at the moment 👍',
+            'You currently have no tasks to do 🤔',
             style: TextStyle(fontSize: 15.0),
           ),
           Padding(padding: EdgeInsets.only(top:10.0),),

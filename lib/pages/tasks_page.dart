@@ -8,7 +8,7 @@ import '../utils/views/task_view.dart';
 import './home_page.dart';
 import '../db/notification_service.dart';
 import '../db/preferences.dart';
-
+import '../utils/views/yes_no_dialog.dart';
 
 class TasksPage extends StatefulWidget {
     @override
@@ -269,16 +269,35 @@ class TasksPageState extends State<TasksPage> {
                       onPressed: () {
                         //TODO: ADD YES/NO DIALOG TO CONFIRM 
                         if(dialogTask != null){
-                          _dbHelper.deleteTask(dialogTask);
-                          updateTasks();
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(
-                            content: new Text('Task deleted ☠️️'),
-                          ));
+                          // Navigator.pop(context);
+                          showDialog(
+                            context: context,
+                            builder: (newContext) {
+                              return YesNoDialog(
+                                title: 'Delete task',
+                                description: 'Are you sure you want to delete this task?',
+                                yesText: 'Yes',
+                                noText: 'No',
+                                onYes: (){
+                                  _dbHelper.deleteTask(dialogTask);
+                                  updateTasks();
+                                  _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                    content: new Text('Task deleted ☠️️'),
+                                  ));
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                },
+                                onNo: (){
+                                  Navigator.pop(context);
+                                },
+                              );
+                            }
+                          );
+                        }else{
+                          taskNameController.clear();
+                          taskIconController.clear();
+                          previousIcon = '';
                         }
-                        taskNameController.clear();
-                        taskIconController.clear();
-                        previousIcon = '';
-                        Navigator.pop(context);
                       }
                     ),
                   ),
@@ -321,10 +340,6 @@ class TasksPageState extends State<TasksPage> {
                             previousIcon = '';
                             Navigator.pop(context);
                           }
-                          //TODO: Fix snackbar
-                          // Scaffold
-                          //     .of(context)
-                          //     .showSnackBar(SnackBar(content: Text('Task created!')));
                         }
                       }),
                   ),
