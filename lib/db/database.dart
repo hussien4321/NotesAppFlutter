@@ -5,7 +5,9 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import '../model/todo.dart';
 import '../model/task.dart';
+import '../model/graph_data.dart';
 import '../utils/helpers/time_functions.dart';
+
 
 class DBHelper{
 
@@ -164,7 +166,7 @@ class DBHelper{
 
     await database.transaction((txn) async {
       await txn.rawUpdate(
-          'UPDATE ToDo SET forfeit = "false" WHERE todo_id = '+todo.id.toString());
+          'UPDATE ToDo SET forfeit = "false", completion_date= "'+todo.startDate.add(Duration(days: 1)).toIso8601String()+'" WHERE todo_id = '+todo.id.toString());
     });
   }
 
@@ -241,6 +243,85 @@ class DBHelper{
     }
     return todos;
   }
+
+  getMostSuccessfulTasks() async {
+    var dbClient = await db;
+    String yesterdayTime = TimeFunctions.nowToNearestSecond().subtract(Duration(days: 1)).toIso8601String();
+    
+    List<Map> successes = await dbClient.rawQuery('SELECT COUNT(*) AS "answer", creation_date FROM task, todo t2 WHERE t2.task_fid = task.task_id AND t2.success = "true" GROUP BY date(completion_date)');
+    List<Map> failures = await dbClient.rawQuery('SELECT COUNT(*) AS "answer", creation_date FROM task, todo t3 WHERE t3.task_fid = task.task_id AND (t3.forfeit = "true" OR ((datetime(t3.start_date) < datetime("'+yesterdayTime+'")) AND t3.success = "false")) GROUP BY date(start_date)');
+    for (int i = 0; i < successes.length; i++) {
+      Map answer = successes[i];
+      print('successes per day : '+answer['answer'].toString()+' / day :'+answer['creation_date']);
+    }
+    for (int i = 0; i < failures.length; i++) {
+      Map answer = failures[i];
+      print('failures per day : '+answer['answer'].toString()+' / day :'+answer['creation_date']);
+    }
+  }
+
+
+  Future<List<GraphData>> getNumberOfSuccessesPerDay([int numberOfDays = 7]) async {
+    var dbClient = await db;
+    
+    List<GraphData> plot = [];
+    DateTime todaysDate = TimeFunctions.nowToNearestSecond();
+    DateTime endDate = todaysDate;
+    for(int i = 0; i < numberOfDays; i++){
+      plot.add(new GraphData(endDate, 0));
+      endDate = endDate.subtract(Duration(days: 1));
+    }
+
+    List<Map> successes = await dbClient.rawQuery('SELECT COUNT(*) AS "successPerDay", completion_date FROM task, todo t2 WHERE t2.task_fid = task.task_id AND t2.success = "true" AND date(completion_date) > date("'+endDate.toIso8601String()+'") GROUP BY date(completion_date)');
+
+    for (int i = 0; i < successes.length; i++) {
+      Map answer = successes[i];
+      print('per day '+answer['completion_date']+' / '+answer['successPerDay'].toString());
+      DateTime tempDate = DateTime.parse(answer['completion_date']);
+      
+      if(tempDate.isBefore(todaysDate) && tempDate.isAfter(endDate)){
+        plot.forEach((innerList) {
+          if(innerList.startDate.day == tempDate.day){
+            innerList.setValue(answer['successPerDay']);
+          }
+        });
+      }
+    }
+    return plot;
+  }
+
+  Future<List<GraphData>> getNumberOfFailuresPerDay([int numberOfDays = 7]) async {
+    var dbClient = await db;
+    
+    List<GraphData> plot = [];
+    DateTime todaysDate = TimeFunctions.nowToNearestSecond();
+    DateTime endDate = todaysDate;
+    for(int i = 0; i < numberOfDays; i++){
+      plot.add(new GraphData(endDate, 0));
+      endDate = endDate.subtract(Duration(days: 1));
+    }
+
+    String yesterdayTime = todaysDate.subtract(Duration(days: 1)).toIso8601String();
+    List<Map> failures = await dbClient.rawQuery('SELECT COUNT(*) AS "failuresPerDay", completion_date FROM task, todo t3 WHERE t3.task_fid = task.task_id AND date(completion_date) > date("'+endDate.toIso8601String()+'") AND (t3.forfeit = "true" OR ((datetime(t3.start_date) < datetime("'+yesterdayTime+'")) AND t3.success = "false")) GROUP BY date(completion_date)');
+
+    for (int i = 0; i < failures.length; i++) {
+      Map answer = failures[i];
+      DateTime tempDate = DateTime.parse(answer['completion_date']);
+      
+      if(tempDate.isBefore(todaysDate) && tempDate.isAfter(endDate)){
+        plot.forEach((innerList) {
+          if(innerList.startDate.day == tempDate.day){
+            innerList.setValue(answer['failuresPerDay']);
+          }
+        });
+      }
+    }
+    
+    return plot;
+  }
+
+  // getNumberOfFailuresPerDay();
+
 
 
   // createNewTask(Task task);        DONEZO

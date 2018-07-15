@@ -297,6 +297,7 @@ class TasksPageState extends State<TasksPage> {
                           taskNameController.clear();
                           taskIconController.clear();
                           previousIcon = '';
+                          Navigator.pop(context);
                         }
                       }
                     ),

@@ -22,7 +22,7 @@ class ToDo{
     _task = task;
     _startDate = TimeFunctions.nowToNearestSecond();
     _success = false;
-    _completionDate = TimeFunctions.nowToNearestSecond();
+    _completionDate = TimeFunctions.nowToNearestSecond().add(Duration(days: 1));
     _forfeit = false;
   }
   
