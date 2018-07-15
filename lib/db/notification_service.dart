@@ -33,14 +33,14 @@ class NotificationService {
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
 
   }
-  
+
   createNotification(ToDo todo, int delayInHours) async {
 
 
     await flutterLocalNotificationsPlugin.cancel(todo.id);
 
     var scheduledNotificationDateTime =
-      todo.startDate.add(new Duration(hours: delayInHours));
+      todo.startDate.add(new Duration(days: 1)).subtract(new Duration(hours: delayInHours));
 
     if(scheduledNotificationDateTime.isAfter(DateTime.now())){
       String header = todo.task.icon+' deadline approaching!';
@@ -60,7 +60,7 @@ class NotificationService {
 
   cancelOpenNotifications(List<ToDo> todos, int delayInHours) async {
     for(int i = 0; i< todos.length; i++){
-      DateTime notificationTime = todos[i].startDate.add(Duration(hours:  delayInHours));
+      DateTime notificationTime = todos[i].startDate.add(new Duration(days: 1)).subtract(new Duration(hours:  delayInHours));
       if(notificationTime.isBefore(DateTime.now())){
         cancelNotification(todos[i]);
       }

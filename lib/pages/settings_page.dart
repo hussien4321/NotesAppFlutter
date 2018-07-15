@@ -24,6 +24,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Preferences preferences = new Preferences();
   NotificationService notificationService = new NotificationService();
   List<ToDo> existingTodos = [];
+  DBHelper dbHelper = new DBHelper();
 
   @override
   void initState() {
@@ -33,7 +34,6 @@ class _SettingsPageState extends State<SettingsPage> {
       _updateValues();
     });
     notificationService.initService();
-    DBHelper dbHelper = new DBHelper();
     dbHelper.getActiveToDos().then((todos){
       existingTodos = todos;
       notificationService.cancelOpenNotifications(todos, preferences.getNotificationSliderValue());
@@ -53,18 +53,20 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(10.0),
-      child: loading ? LoadingScreen() : ListView(
-        scrollDirection: Axis.vertical,
-        children: <Widget>[
-          Column(
+    return  loading ? LoadingScreen() : SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(10.0),
+        child:Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               settingsHeader('App settings'),
               settingsOption('Reset data', RaisedButton(
                   onPressed: () {
-                    //Reset data function
+                    loading = true;
+                    dbHelper.resetDb().then((res) {
+                      notificationService.cancelAllNotifications();
+                      loading = false;
+                    });
                   },
                   child: Text(
                     'RESET',
@@ -160,9 +162,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
               )),
             ],
-          )
-        ],
-      )
+          ),
+      ),
     );
   }
 

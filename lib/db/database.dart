@@ -34,12 +34,20 @@ class DBHelper{
 
   initDb() async {
     io.Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    // await deleteDatabase(documentsDirectory.path);
     String path = join(documentsDirectory.path, "test.db");
     var theDb = await openDatabase(path, version: 1, onCreate: _onCreate);
     return theDb;
   }
 
+  resetDb() async {
+    var database = await db;
+    
+    await database
+      .rawDelete('DELETE FROM Task WHERE recommended = "false"');
+    await database
+      .rawDelete('DELETE FROM Todo');
+      
+  }
 
   String _generateRecommnendedTasksScript(){
 
@@ -153,7 +161,6 @@ class DBHelper{
 
     List<Map> usedTasksList = await dbClient.rawQuery('SELECT task_id, name, icon, recommended, creation_date FROM task, todo WHERE task.task_id = todo.task_fid AND deleted = "false" GROUP BY task_id ORDER BY datetime(start_date) DESC');
     
-    //could be updated to sort by creation date instead of id
     List<Map> unusedDefaultTasksList= await dbClient.rawQuery('SELECT * FROM task WHERE (SELECT COUNT(todo.task_fid) FROM todo WHERE todo.task_fid == task.task_id) = 0 AND deleted = "false" AND recommended = "true" ORDER BY task_id DESC;');
     
     List<Task> tasks = new List();
