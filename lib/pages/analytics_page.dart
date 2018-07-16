@@ -6,6 +6,7 @@ import '../utils/views/task_view.dart';
 import '../model/task.dart';
 import '../model/graph_data.dart';
 import '../utils/views/line_graph.dart';
+import '../utils/helpers/time_functions.dart';
 
 class AnalyticsPage extends StatefulWidget {
   @override
@@ -21,6 +22,11 @@ class AnalyticsPageState extends State<AnalyticsPage> {
 
   List<GraphData> successPlotData = [];
   List<GraphData> failurePlotData = [];
+  
+  int avgTimeInSeconds;
+
+  Task mostSuccessfulTask;
+  Task leastSuccessfulTask;
 
   @override
   void initState() {
@@ -29,50 +35,34 @@ class AnalyticsPageState extends State<AnalyticsPage> {
       loading = true;
       _numOfSuccesses = 0;
       _numOfFailures = 0;
+      successPlotData = [];
+      failurePlotData = [];
+      avgTimeInSeconds = 0;
+      mostSuccessfulTask = null;
+      leastSuccessfulTask = null;
   }
   
-  dbSetUp() async {
+  dbSetUp() {
     updateAnalytics();
   }
 
 
-  updateAnalytics(){
-    dbHelper.getNumberOfSuccesses().then((res) {
-      if(mounted){
-        this.setState(() {
-        if(_numOfSuccesses != res || loading) {
-          setState(() {
-              loading = false;
-              _numOfSuccesses = res;
-          });
-        }
+  updateAnalytics() async {
+    _numOfSuccesses = await dbHelper.getNumberOfSuccesses();
+    _numOfFailures = await dbHelper.getNumberOfFailures();
+    successPlotData = await dbHelper.getNumberOfSuccessesPerDay();
+    failurePlotData = await dbHelper.getNumberOfFailuresPerDay();
+    avgTimeInSeconds = await dbHelper.getAverageTimeToComplete();
+    mostSuccessfulTask = await dbHelper.getMostSuccessfulTask();
+    leastSuccessfulTask = await dbHelper.getLeastSuccessfulTask();
+    
+    if(mounted){
+      if(loading) {
+        setState(() {
+            loading = false;
         });
       }
     }
-    );
-    dbHelper.getNumberOfFailures().then((res) {
-      if(mounted){
-          this.setState(() {
-            if(_numOfFailures != res || loading) {
-            setState(() {
-                _numOfFailures = res;
-            });
-            }
-          });
-      }
-    });
-    dbHelper.getNumberOfSuccessesPerDay().then((listOfPoints){
-      setState(() {
-        successPlotData = listOfPoints;
-        loading = false;
-      });
-    });
-    dbHelper.getNumberOfFailuresPerDay().then((listOfPoints){
-      setState(() {
-        failurePlotData = listOfPoints;
-        loading = false;
-      });
-    });
 
   }
 
@@ -85,51 +75,82 @@ class AnalyticsPageState extends State<AnalyticsPage> {
 
     Widget pageLayout(BuildContext context){
       return Container(
-        padding: EdgeInsets.all(10.0),
+        padding: EdgeInsets.all(0.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             header('All time stats',true),
-            showNumSuccessesAndFailures(),
             Container(
-              padding: EdgeInsets.only(bottom: 5.0),
-              child: Center(
-                child: Text(
-                  ((_numOfFailures + _numOfSuccesses != 0) ? ((_numOfSuccesses/(_numOfFailures+_numOfSuccesses))*100).round().toString():'0')+'% success rate',
-                  style: TextStyle(fontSize: 13.0, color: Colors.grey[800], fontStyle: FontStyle.italic),
-                ),
-              )
+              decoration: new BoxDecoration(
+                border: new Border(bottom: BorderSide(color: Colors.grey[800], width: 0.5), top: BorderSide(color: Colors.grey[800], width: 0.5)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Expanded(
+                    child: header('Total success/fails'),
+                  ),   
+                  Expanded(
+                    child:showNumSuccessesAndFailures(),    
+                  ),
+                ],
+              ),
             ),
-            Row(
-              children: <Widget>[
-                header('Most successful'),
-                Expanded(
-                  child:SimpleTaskView(Task(1,'aaaa','🤔'), Colors.green[900]),    
-                ),
-              ],
+            Container(
+              decoration: new BoxDecoration(
+                border: new Border(bottom: BorderSide(color: Colors.grey[800], width: 0.5)),
+              ),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: header('Most successful task'),
+                  ),
+                  Expanded( 
+                    child: (mostSuccessfulTask != null) ? 
+                      SimpleTaskView(mostSuccessfulTask, Colors.green[900]) : 
+                      Text('Not enough data', style: TextStyle(fontSize: 18.0), textAlign: TextAlign.end,overflow: TextOverflow.clip,),    
+                  ),
+                ],
+              ),
             ),
-            Row(
-              children: <Widget>[
-                header('Least successful'),
-                Expanded(
-                  child:SimpleTaskView(Task(1,'nooo','🙈'), Colors.red[900]),    
-                ),
-              ],
+            Container(
+              decoration: new BoxDecoration(
+                border: new Border(bottom: BorderSide(color: Colors.grey[800], width: 0.5)),
+              ),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: header('Least successful task'),
+                  ),
+                  Expanded(
+                    child: (leastSuccessfulTask != null) ? 
+                      SimpleTaskView(leastSuccessfulTask, Colors.red[900]) : 
+                      Text('Not enough data', style: TextStyle(fontSize: 18.0), textAlign: TextAlign.end,),    
+                  ),
+                ],
+              ),
             ),
-            Row(
-              children: <Widget>[
-                header('Average time to finish tasks'),
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0, top: 10.0),
-                    child: Text(
-                      '2h 30m 21s',
-                      style: TextStyle(fontSize: 16.0,),
-                      textAlign: TextAlign.end,
+            Container(
+              decoration: new BoxDecoration(
+                border: new Border(bottom: BorderSide(color: Colors.grey[800], width: 0.5)),
+              ),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: header('Average time to complete'),
+                  ),
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0, top: 10.0),
+                      child: Text(
+                      TimeFunctions.getTimeInHMSFormatNoTrailingZeros(avgTimeInSeconds),
+                        style: TextStyle(fontSize: 16.0, color: Colors.grey[800], fontStyle: FontStyle.italic),
+                        textAlign: TextAlign.end,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             header('Last 7 days',true),
             Expanded(
@@ -143,44 +164,40 @@ class AnalyticsPageState extends State<AnalyticsPage> {
     
   Widget header(String headerText, [bool bold = false]){
     return Container(
-      padding: EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0, top: 10.0),
+      padding: bold ? EdgeInsets.all(15.0) : EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0, top: 10.0),
       child: Text(
         headerText,
-        style: TextStyle(color: Colors.black,fontWeight: bold? FontWeight.bold: FontWeight.normal, fontSize: bold ? 20.0:16.0,),
+        style: TextStyle(color: bold ? Colors.orange[900] : Colors.black,fontWeight: bold? FontWeight.bold: FontWeight.normal, fontSize: bold ? 20.0:16.0,),
       ),
     );
   }
 
   Widget showNumSuccessesAndFailures(){
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: <Widget>[
-        Expanded(
-          child: Text(
-            'Success',
-            style: TextStyle(fontSize: 17.0,color: Colors.green[900]), 
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Text(
+              _numOfSuccesses.toString(),
+              style: TextStyle(fontSize: 25.0, color: Colors.green[900], fontWeight: FontWeight.bold),
+            ),
+            Text(
+              '/',
+              style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              _numOfFailures.toString(),
+              style: TextStyle(fontSize: 25.0, color: Colors.red[900], fontWeight: FontWeight.bold),
+            ),
+            Text(
+            '('+((_numOfFailures + _numOfSuccesses != 0) ? ((_numOfSuccesses/(_numOfFailures+_numOfSuccesses))*100).round().toString():'0')+'%)',
+              style: TextStyle(fontSize: 13.0, color: Colors.grey[800], fontStyle: FontStyle.italic),
+            )
+          ],
         ),
-        Text(
-          _numOfSuccesses.toString(),
-          style: TextStyle(fontSize: 25.0, color: Colors.green[900], fontWeight: FontWeight.bold),
-        ),
-        Text(
-          '/',
-          style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          _numOfFailures.toString(),
-          style: TextStyle(fontSize: 25.0, color: Colors.red[900], fontWeight: FontWeight.bold),
-        ),
-        Expanded(
-          child: Text(
-            'Failures',
-            style: TextStyle(fontSize: 17.0,color: Colors.red[900]),
-            
-            textAlign: TextAlign.end, 
-          ),
-        ),
-      ],
+      ], 
     );
   }
 

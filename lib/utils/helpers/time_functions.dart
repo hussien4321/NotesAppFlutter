@@ -22,6 +22,20 @@ class TimeFunctions {
     return hoursString + "h " + minutesString + "m " + secondsString + "s";
   }
 
+  static String getTimeInHMSFormatNoTrailingZeros(int timeInSeconds){
+
+    int hours = ((timeInSeconds/60).floor()/60).floor();
+    String hoursString = hours.toString();
+
+    int minutes = (timeInSeconds/60).floor() - hours * 60;
+    String minutesString = minutes.toString();
+
+    int seconds = timeInSeconds -  minutes * 60 - hours * 60 * 60;
+    String secondsString = seconds.toString();
+
+    return hoursString + "h " + minutesString + "m " + secondsString + "s";
+  }
+
   static DateTime nowToNearestSecond(){
     DateTime timeNow = DateTime.now();
     return timeNow.subtract(Duration(milliseconds: timeNow.millisecond, microseconds: timeNow.microsecond));

@@ -76,13 +76,12 @@ class SimpleTaskView extends StatelessWidget{
                   ),
                 ),
                 Expanded(
-                  flex: 1,
                   child: Padding(
-                  padding: EdgeInsets.all(5.0),
+                    padding: EdgeInsets.all(5.0),
                     child: Text(
-                    _task.name,
-                    style: TextStyle(fontSize: 18.0, color: color),
-                    textAlign: TextAlign.start,
+                      _task.name,
+                      style: TextStyle(fontSize: 17.0, color: color),
+                      textAlign: TextAlign.end,
                     ),
                   ),
                 ),

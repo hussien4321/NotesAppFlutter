@@ -244,19 +244,33 @@ class DBHelper{
     return todos;
   }
 
-  getMostSuccessfulTasks() async {
+  Future<Task> getMostSuccessfulTask() async {
     var dbClient = await db;
     String yesterdayTime = TimeFunctions.nowToNearestSecond().subtract(Duration(days: 1)).toIso8601String();
     
-    List<Map> successes = await dbClient.rawQuery('SELECT COUNT(*) AS "answer", creation_date FROM task, todo t2 WHERE t2.task_fid = task.task_id AND t2.success = "true" GROUP BY date(completion_date)');
-    List<Map> failures = await dbClient.rawQuery('SELECT COUNT(*) AS "answer", creation_date FROM task, todo t3 WHERE t3.task_fid = task.task_id AND (t3.forfeit = "true" OR ((datetime(t3.start_date) < datetime("'+yesterdayTime+'")) AND t3.success = "false")) GROUP BY date(start_date)');
-    for (int i = 0; i < successes.length; i++) {
-      Map answer = successes[i];
-      print('successes per day : '+answer['answer'].toString()+' / day :'+answer['creation_date']);
+    List<Map> successes = await dbClient.rawQuery('SELECT COUNT(*) AS "count", task_id, name, icon, recommended, creation_date FROM task, todo WHERE task_fid = task_id AND success = "true" GROUP BY task_id ORDER BY COUNT(*) DESC, start_date ASC LIMIT 1');
+
+    if(successes.isNotEmpty){
+      Task task = new Task.fromJson(successes[0]);
+      return task;
     }
-    for (int i = 0; i < failures.length; i++) {
-      Map answer = failures[i];
-      print('failures per day : '+answer['answer'].toString()+' / day :'+answer['creation_date']);
+    else{
+      return null;
+    }
+  }
+
+  Future<Task> getLeastSuccessfulTask() async {
+    var dbClient = await db;
+    String yesterdayTime = TimeFunctions.nowToNearestSecond().subtract(Duration(days: 1)).toIso8601String();
+    
+    List<Map> failures = await dbClient.rawQuery('SELECT COUNT(*) AS "count", task_id, name, icon, recommended, creation_date FROM task, todo WHERE task_fid = task_id AND (forfeit = "true" OR ((datetime(start_date) < datetime("'+yesterdayTime+'")) AND success = "false")) GROUP BY task_id ORDER BY COUNT(*) DESC, start_date ASC LIMIT 1');
+    
+    if(failures.isNotEmpty){
+      Task task = new Task.fromJson(failures[0]);
+      return task;
+    }
+    else{
+      return null;
     }
   }
 
@@ -276,7 +290,6 @@ class DBHelper{
 
     for (int i = 0; i < successes.length; i++) {
       Map answer = successes[i];
-      print('per day '+answer['completion_date']+' / '+answer['successPerDay'].toString());
       DateTime tempDate = DateTime.parse(answer['completion_date']);
       
       if(tempDate.isBefore(todaysDate) && tempDate.isAfter(endDate)){
@@ -318,6 +331,20 @@ class DBHelper{
     }
     
     return plot;
+  }
+
+
+  Future<int> getAverageTimeToComplete() async {
+    var dbClient = await db;
+    int seconds = 0;
+
+    List<Map> list = await dbClient.rawQuery('SELECT AVG(julianday(completion_date) - julianday(start_date)) AS "difference" FROM todo WHERE success = "true"');
+
+    if(list.isNotEmpty){
+      double difference = list[0]['difference'];
+      seconds = (difference * 86400).round();
+    }
+    return seconds;
   }
 
   // getNumberOfFailuresPerDay();
