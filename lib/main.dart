@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './pages/home_page.dart';
+import './pages/new_tabs_page.dart';
 
 void main() => runApp(new MyApp());
 
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.orange,
       ),
-      home: HomePage(),
+      home: NewTabsPage(),
     );
   }
 }

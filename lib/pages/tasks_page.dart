@@ -5,7 +5,7 @@ import '../model/todo.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/task_view.dart';
-import './home_page.dart';
+import './new_tabs_page.dart';
 import '../db/notification_service.dart';
 import '../db/preferences.dart';
 import '../utils/views/yes_no_dialog.dart';
@@ -91,20 +91,6 @@ class TasksPageState extends State<TasksPage> {
     Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text("Select a task 💭"),
-        centerTitle: true,
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              setState(() {
-               _isEditMode = _isEditMode == false;               
-              });
-            },
-            icon: Icon(_isEditMode ? Icons.check : Icons.edit),
-          )
-        ],
-      ),
       body: fadedBackground(
         child: _loadingPage ? LoadingScreen() : _recommendedTasksView(),
       ), 
@@ -116,18 +102,26 @@ class TasksPageState extends State<TasksPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         createTaskWidget(context),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: Container(
-                decoration: new BoxDecoration(
-                  border: new Border(bottom: BorderSide(color: Colors.grey)),
-                ),
-                padding: EdgeInsets.only(top: 15.0, left: 5.0, bottom: 5.0),
+        Container(
+          decoration: new BoxDecoration(
+            border: new Border(bottom: BorderSide(color: Colors.grey)),
+          ),
+          padding: EdgeInsets.only(top: 5.0, left: 10.0, bottom: 5.0),
+          child: Row(
+            children: <Widget>[  
+              Expanded(
                 child: Text('Saved tasks', style: TextStyle(fontSize: 23.0, fontWeight: FontWeight.bold), textAlign: TextAlign.start,),
               ),
-            ),
-          ],
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                  _isEditMode = _isEditMode == false;               
+                  });
+                },
+                icon: Icon(_isEditMode ? Icons.check : Icons.edit),
+              ),
+            ],
+          ),
         ),
         Expanded(
           child: ListView.builder(
@@ -140,7 +134,7 @@ class TasksPageState extends State<TasksPage> {
                           notificationService.createNotification(ToDo(taskId, _tasks[i]),notificationsDelayValue);
                         }
                       });                      
-                      Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => HomePage()),
+                      Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => NewTabsPage()),
                         (Route route) => route == null
                       );
                     }
@@ -321,7 +315,7 @@ class TasksPageState extends State<TasksPage> {
                               }
                               Navigator.pop(context);
                               Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => 
-                                HomePage()),
+                                NewTabsPage()),
                                 (Route route) => route == null
                               );
                             });

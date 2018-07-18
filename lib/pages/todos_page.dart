@@ -222,7 +222,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
                 children: <Widget>[
                   Text(
                     todo.task.name,
-                    style: TextStyle(fontSize: 20.0,),
+                    style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w300),
                   ),
                   Container(
                     padding: EdgeInsets.only(top: 10.0),
