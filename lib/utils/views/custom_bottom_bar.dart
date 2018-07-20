@@ -167,7 +167,7 @@ class _BottomNavigationTile extends StatelessWidget {
       child: new Container(
         margin: new EdgeInsets.only(
           top: new Tween<double>(
-            begin: tweenStart,
+            begin: _kTopMargin,
             end: _kTopMargin,
           ).evaluate(animation),
         ),
@@ -200,7 +200,7 @@ class _BottomNavigationTile extends StatelessWidget {
             transform: new Matrix4.diagonal3(
               new Vector3.all(
                 new Tween<double>(
-                  begin: _kInactiveFontSize / _kActiveFontSize,
+                  begin: 1.0,
                   end: 1.0,
                 ).evaluate(animation),
               ),

@@ -16,7 +16,7 @@ class NewTabsPage extends StatefulWidget {
 
 class _NewTabsPageState extends State<NewTabsPage> {
 
-  final Color _iconColor = Colors.orangeAccent;
+  final Color _iconColor = Colors.grey;
   final Color _textColor = Colors.black;
 
   int index = 0;
@@ -28,7 +28,7 @@ class _NewTabsPageState extends State<NewTabsPage> {
         child: Stack(
           children: <Widget>[
             offSetPage(ToDosPage(),0),
-            offSetPage(ToDosPage(),1),
+            offSetPage(Container(),1),
             offSetPage(AnalyticsPage(),3),
             offSetPage(SettingsPage(),4),
           ],

@@ -28,7 +28,6 @@ class LineGraph extends StatelessWidget {
         new charts.Series<GraphData, DateTime>(
           id: 'Succcesses',
           colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
-
           domainFn: (GraphData data, _) => data.startDate,
           measureFn: (GraphData data, _) => data.value,
           data: successDataPoints,
@@ -45,12 +44,8 @@ class LineGraph extends StatelessWidget {
       animate: animate,
       animationDuration: Duration(milliseconds: 500),
       behaviors: [new LinePointHighlighter(defaultRadiusPx: 0.0, radiusPaddingPx: 0.0, showHorizontalFollowLine: false, showVerticalFollowLine: false)],
-      // Optionally pass in a [DateTimeFactory] used by the chart. The factory
-      // should create the same type of [DateTime] as the data provided. If none
-      // specified, the default creates local date time.
       dateTimeFactory: const charts.LocalDateTimeFactory(),
     );
   }
-
 
 }

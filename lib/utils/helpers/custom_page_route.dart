@@ -18,17 +18,20 @@ class CustomPageRoute<T> extends MaterialPageRoute<T> {
     if (settings.isInitialRoute)
       return child;
 
-    return SlideTransition(
-      position: new Tween<Offset>(
-        begin: const Offset(0.0, 1.0),
-        end: Offset.zero,
-      ).animate(animation),
-      child: new SlideTransition(
+    return Opacity(
+      opacity: animation.value,
+      child: SlideTransition(
         position: new Tween<Offset>(
-          begin: Offset.zero,
-          end: const Offset(0.0, 1.0),
-        ).animate(secondaryAnimation),
-      child: child,
+          begin: const Offset(0.0, 1.0),
+          end: Offset.zero,
+        ).animate(animation),
+        child: new SlideTransition(
+          position: new Tween<Offset>(
+            begin: Offset.zero,
+            end: const Offset(0.0, 1.0),
+          ).animate(secondaryAnimation),
+        child: child,
+        ),
       ),
     );
 
