@@ -194,6 +194,20 @@ class DBHelper{
     return todos;
   }
 
+  Future<List<ToDo>> getHistoryToDos() async {
+    var dbClient = await db;
+
+    String dateRange = TimeFunctions.nowToNearestSecond().subtract(Duration(days: 1)).toIso8601String();
+
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE task.task_id = todo.task_fid AND (forfeit = "true" OR success = "true" OR datetime(start_date) < datetime("'+dateRange+'")) ORDER BY datetime(completion_date) DESC LIMIT 30');
+    List<ToDo> todos = new List();
+    for (int i = 0; i < list.length; i++) {
+      todos.add(new ToDo.fromJson(list[i]));
+    }
+    return todos;
+  }
+
+
   Future<List<Task>> getAllTasks() async {
     var dbClient = await db;
 

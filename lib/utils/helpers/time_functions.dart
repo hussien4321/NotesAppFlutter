@@ -36,6 +36,47 @@ class TimeFunctions {
     return hoursString + "h " + minutesString + "m " + secondsString + "s";
   }
 
+  static String getDayOfWeek(DateTime date){
+    switch (date.weekday) {
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
+      case 7:
+        return 'Sun';
+      default:
+        return '';
+    };
+  }
+
+  static String getDateAsShortString(DateTime date){
+
+    String dayOfWeek = getDayOfWeek(date);
+    
+    int months = date.month;
+    String monthsAsString = ((months < 10) ? '0' : '') + months.toString();
+
+    int days = date.day;
+    String daysAsString = ((days < 10) ? '0' : '') + days.toString();
+
+    int hours = date.hour;
+    String hoursAsString = hours < 10 ? '0'+hours.toString() : hours.toString();
+
+    int minutes = date.minute;
+    String minutesAsString = minutes < 10 ? '0'+minutes.toString() : minutes.toString();
+
+
+    return dayOfWeek +' '+ monthsAsString + '/' + daysAsString + ' (' +hoursAsString+':' +minutesAsString+ ')';
+  }
+
   static DateTime nowToNearestSecond(){
     DateTime timeNow = DateTime.now();
     return timeNow.subtract(Duration(milliseconds: timeNow.millisecond, microseconds: timeNow.microsecond));

@@ -105,7 +105,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
           ),
           Padding(padding: EdgeInsets.only(top:10.0),),
           Text(
-            'press + button above to add a new task',
+            'press + button below to add a new task',
             style: TextStyle(fontSize: 13.0, color: Colors.grey, fontWeight: FontWeight.bold),
           ),
         ],

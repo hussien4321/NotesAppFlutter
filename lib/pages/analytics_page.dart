@@ -137,7 +137,7 @@ class AnalyticsPageState extends State<AnalyticsPage> {
               child: Row(
                 children: <Widget>[
                   Expanded(
-                    child: header('Average time to complete'),
+                    child: header('Average time to complete tasks'),
                   ),
                   Expanded(
                     child: Container(
