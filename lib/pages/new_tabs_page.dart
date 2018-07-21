@@ -3,6 +3,7 @@ import './todos_page.dart';
 import './analytics_page.dart';
 import './tasks_page.dart';
 import './history_page.dart';
+import './emoji_selector_page.dart';
 import './settings_page.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/custom_bottom_bar.dart' as customBar;
@@ -29,7 +30,7 @@ class _NewTabsPageState extends State<NewTabsPage> {
         child: Stack(
           children: <Widget>[
             offSetPage(ToDosPage(),0),
-            offSetPage(HistoryPage(),1),
+            offSetPage(EmojiSelectorPage(),1),
             offSetPage(AnalyticsPage(),3),
             offSetPage(SettingsPage(),4),
           ],
