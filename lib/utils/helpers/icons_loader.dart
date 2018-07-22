@@ -82,6 +82,7 @@ class EmojiLoader {
   }
   String drawIcon(int id, EmojiCategory category) {
 
+    print('id : '+id.toString()+ ' / '+category.toString());
     _EmojiData _emojiData = new _EmojiData.fromJson(_getCategoryDataFile(category)[id.toString()]);
 
     return _iconLocation+_emojiData.category+'/'+_emojiData.filename;
