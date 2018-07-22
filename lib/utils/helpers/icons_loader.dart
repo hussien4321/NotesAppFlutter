@@ -38,6 +38,17 @@ class EmojiLoader {
   Map<String, dynamic> symbols;
   Map<String, dynamic> travel;
 
+  final List<EmojiCategory> listOfCategories = [
+    EmojiCategory.PEOPLE,
+    EmojiCategory.NATURE,
+    EmojiCategory.FOOD,
+    EmojiCategory.ACTIVITIES,
+    EmojiCategory.TRAVEL,
+    EmojiCategory.OBJECTS,
+    EmojiCategory.SYMBOLS,
+    EmojiCategory.FLAGS
+  ];
+
   initialise(BuildContext context) async {
     activities = json.decode(await DefaultAssetBundle.of(context).loadString('assets/data/activity_data.json'));
     flags = json.decode(await DefaultAssetBundle.of(context).loadString('assets/data/flags_data.json'));
@@ -72,20 +83,24 @@ class EmojiLoader {
     }
   }
 
-  String _categoryToString(EmojiCategory category){
-    switch (category) {
-      case EmojiCategory.ACTIVITIES:
-        return 'activity';
-      default:
-        return '';
-    }
-  }
-  String drawIcon(int id, EmojiCategory category) {
+  String drawIcon(String id, EmojiCategory category) {
 
-    print('id : '+id.toString()+ ' / '+category.toString());
-    _EmojiData _emojiData = new _EmojiData.fromJson(_getCategoryDataFile(category)[id.toString()]);
+    _EmojiData _emojiData = new _EmojiData.fromJson(_getCategoryDataFile(category)[id]);
 
     return _iconLocation+_emojiData.category+'/'+_emojiData.filename;
+  }
+
+  List<String> searchIcon(String term) {
+    List<String> results = [];
+    
+    listOfCategories.forEach((cat){
+      _getCategoryDataFile(cat).forEach((key, value){
+        if(value['keywords'].toString().contains(term)){
+          results.add(drawIcon(key ,cat));
+        }
+      });
+    });
+    return results;
   }
 }
 

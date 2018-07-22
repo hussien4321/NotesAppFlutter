@@ -36,7 +36,7 @@ class _HistoryPageState extends State<HistoryPage> {
     await preferencesService.initService();
     notificationsDelayValue = preferencesService.getNotificationSliderValue();
     notificationsEnabled = preferencesService.isNotificationsEnabled();
-    loading = true;
+    loading = false;
   }
 
   @override

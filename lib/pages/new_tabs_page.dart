@@ -30,7 +30,7 @@ class _NewTabsPageState extends State<NewTabsPage> {
         child: Stack(
           children: <Widget>[
             offSetPage(ToDosPage(),0),
-            offSetPage(EmojiSelectorPage(),1),
+            offSetPage(HistoryPage(),1),
             offSetPage(AnalyticsPage(),3),
             offSetPage(SettingsPage(),4),
           ],
@@ -38,15 +38,23 @@ class _NewTabsPageState extends State<NewTabsPage> {
       ),
       bottomNavigationBar: new customBar.CustomBottomNavigationBar(
         currentIndex: index,
-        onTap: (int index) { setState((){ 
+        onTap: (int index) async { 
             if(index==2){
-              Navigator.push(context, CustomPageRoute(
-                builder: (BuildContext context) => TasksPage()),
+              // Navigator.push(context, CustomPageRoute(
+              //   builder: (BuildContext context) => TasksPage()),
+              // );    
+              final result = await Navigator.push(context, CustomPageRoute(
+                builder: (BuildContext context) => EmojiSelectorPage()),
               );
+
+              print('returned '+result.toString());
+
             }else{
-              this.index = index;
+              setState(() {              
+                this.index = index;
+              });
             }
-          }); 
+
         },
         type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem>[

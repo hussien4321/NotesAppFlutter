@@ -356,7 +356,9 @@ class DBHelper{
 
     if(list.isNotEmpty){
       double difference = list[0]['difference'];
-      seconds = (difference * 86400).round();
+      if(difference != null){
+        seconds = (difference * 86400).round();
+      }
     }
     return seconds;
   }

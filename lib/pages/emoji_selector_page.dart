@@ -13,21 +13,27 @@ class EmojiSelectorPage extends StatefulWidget {
 class EmojiSelectorPageState extends State<EmojiSelectorPage> {
 
   EmojiLoader emojiLoader = new EmojiLoader();
-  ScrollController controller;
+  TextEditingController controller;
 
   bool loading = true;
   EmojiCategory currentCategory = EmojiCategory.PEOPLE;
   
+  String searchText;
+  List<String> searchResults;
+
   @override
   initState(){
     initialise();
-    controller = new ScrollController()..addListener(_scrollListener);
+    controller = new TextEditingController()..addListener(_textListener);
     super.initState();
   }
 
   initialise() async {
 
     loading = true;
+
+    searchText = "";
+    searchResults = [];
     currentCategory = EmojiCategory.PEOPLE;
     await emojiLoader.initialise(context);
     setState(() {
@@ -38,7 +44,7 @@ class EmojiSelectorPageState extends State<EmojiSelectorPage> {
   
   @override
   void dispose() {
-    controller.removeListener(_scrollListener);
+    controller.removeListener(_textListener);
     super.dispose();
   }
 
@@ -53,11 +59,9 @@ class EmojiSelectorPageState extends State<EmojiSelectorPage> {
     );
   }
 
-
-  //todo: ADD LAZY LOADING (SILVERGRIDVIEW LISTS?) (SCROLL CONTROLLERS?)
   Widget buildGrids() {
     return  Container( 
-        padding: EdgeInsets.all(10.0),
+        padding: EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -89,57 +93,59 @@ class EmojiSelectorPageState extends State<EmojiSelectorPage> {
               categoryButton(name: '🎌', category: EmojiCategory.FLAGS, radius: BorderRadius.only(bottomRight: Radius.circular(10.0))),
             ],
           ),
-          (currentCategory == EmojiCategory.PEOPLE) ? 
-          CustomGridView(emojiLoader, EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE, show: currentCategory == EmojiCategory.PEOPLE) : Container(),
-          (currentCategory == EmojiCategory.NATURE) ? 
-          CustomGridView(emojiLoader, EmojiLoader.NATURE_SIZE, EmojiCategory.NATURE, show: currentCategory == EmojiCategory.NATURE,) : Container(),
-          (currentCategory == EmojiCategory.FOOD) ? 
-          CustomGridView(emojiLoader, EmojiLoader.FOOD_SIZE, EmojiCategory.FOOD, show: currentCategory == EmojiCategory.FOOD,) : Container(),
-          (currentCategory == EmojiCategory.ACTIVITIES) ? 
-          CustomGridView(emojiLoader, EmojiLoader.ACTIVITIES_SIZE, EmojiCategory.ACTIVITIES, show: currentCategory == EmojiCategory.ACTIVITIES,) : Container(),
-          (currentCategory == EmojiCategory.TRAVEL) ? 
-          CustomGridView(emojiLoader, EmojiLoader.TRAVEL_SIZE, EmojiCategory.TRAVEL, show: currentCategory == EmojiCategory.TRAVEL,) : Container(),
-          (currentCategory == EmojiCategory.OBJECTS) ? 
-          CustomGridView(emojiLoader, EmojiLoader.OBJECTS_SIZE, EmojiCategory.OBJECTS, show: currentCategory == EmojiCategory.OBJECTS,) : Container(),
-          (currentCategory == EmojiCategory.SYMBOLS) ? 
-          CustomGridView(emojiLoader, EmojiLoader.SYMBOLS_SIZE, EmojiCategory.SYMBOLS, show: currentCategory == EmojiCategory.SYMBOLS,) : Container(),
-          (currentCategory == EmojiCategory.FLAGS) ? 
-          CustomGridView(emojiLoader, EmojiLoader.FLAGS_SIZE, EmojiCategory.FLAGS, show: currentCategory == EmojiCategory.FLAGS,) : Container(),
-          // SizedBox(
-          //   height: 400.0,
-          //  child: CustomScrollView(
-          //    controller: controller,
-          //   slivers: <Widget>[
-          //     // subHeader('Smileys & People'),
-          //     justGridSliver(EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE),
-          //     justGridSliver(EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE),
-          //     justGridSliver(EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE),
-          //     justGridSliver(EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE),
-          //     justGridSliver(EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE),
-          //     justGridSliver(EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE),
-          //     justGridSliver(EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE),
-          //     justGridSliver(EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE),
-          //     justGridSliver(EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE),
-          //     justGridSliver(EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE),
-          //   ],
-          // ),
-          // )
-          // subHeader('Smileys & People'),
-          // _buildGridTileList(EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE),
-          // subHeader('Animals & Nature'),
-          // _buildGridTileList(EmojiLoader.NATURE_SIZE, EmojiCategory.NATURE),
-          // subHeader('Food & Drink'),
-          // listImplementation(EmojiLoader.FOOD_SIZE, EmojiCategory.FOOD),
-          // subHeader('Activity'),
-          // _buildGridTileList(EmojiLoader.ACTIVITIES_SIZE, EmojiCategory.ACTIVITIES),
-          // subHeader('Travel & Places'),
-          // _buildGridTileList(EmojiLoader.TRAVEL_SIZE, EmojiCategory.TRAVEL),
-          // subHeader('Objects'),
-          // _buildGridTileList(EmojiLoader.OBJECTS_SIZE, EmojiCategory.OBJECTS),
-          // subHeader('Symbols'),
-          // _buildGridTileList(EmojiLoader.SYMBOLS_SIZE, EmojiCategory.SYMBOLS),
-          // subHeader('Flags'),
-          // _buildGridTileList(EmojiLoader.FLAGS_SIZE, EmojiCategory.FLAGS),
+          Container(
+            padding: EdgeInsets.all(5.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    decoration: InputDecoration(
+                      hintText: 'Search here'
+                    ),
+                    style: TextStyle(color: Colors.orange[800]),
+                  ),
+                ),
+                IconButton(
+                  onPressed: (){
+                    controller.clear();
+                    setState(() {
+                      searchText = '';
+                    });
+                  },
+                  icon: Icon(searchText.length ==0 ? Icons.search : Icons.backspace),
+                )
+              ],
+            ),
+          ),
+          (searchText.length == 0) ?
+          Expanded(
+            child: Container(
+              child: Column(
+                children: <Widget>[
+                  (currentCategory == EmojiCategory.PEOPLE) ? 
+                  CustomGridView(emojiLoader, EmojiLoader.PEOPLE_SIZE, EmojiCategory.PEOPLE, show: currentCategory == EmojiCategory.PEOPLE) : Container(),
+                  (currentCategory == EmojiCategory.NATURE) ? 
+                  CustomGridView(emojiLoader, EmojiLoader.NATURE_SIZE, EmojiCategory.NATURE, show: currentCategory == EmojiCategory.NATURE,) : Container(),
+                  (currentCategory == EmojiCategory.FOOD) ? 
+                  CustomGridView(emojiLoader, EmojiLoader.FOOD_SIZE, EmojiCategory.FOOD, show: currentCategory == EmojiCategory.FOOD,) : Container(),
+                  (currentCategory == EmojiCategory.ACTIVITIES) ? 
+                  CustomGridView(emojiLoader, EmojiLoader.ACTIVITIES_SIZE, EmojiCategory.ACTIVITIES, show: currentCategory == EmojiCategory.ACTIVITIES,) : Container(),
+                  (currentCategory == EmojiCategory.TRAVEL) ? 
+                  CustomGridView(emojiLoader, EmojiLoader.TRAVEL_SIZE, EmojiCategory.TRAVEL, show: currentCategory == EmojiCategory.TRAVEL,) : Container(),
+                  (currentCategory == EmojiCategory.OBJECTS) ? 
+                  CustomGridView(emojiLoader, EmojiLoader.OBJECTS_SIZE, EmojiCategory.OBJECTS, show: currentCategory == EmojiCategory.OBJECTS,) : Container(),
+                  (currentCategory == EmojiCategory.SYMBOLS) ? 
+                  CustomGridView(emojiLoader, EmojiLoader.SYMBOLS_SIZE, EmojiCategory.SYMBOLS, show: currentCategory == EmojiCategory.SYMBOLS,) : Container(),
+                  (currentCategory == EmojiCategory.FLAGS) ? 
+                  CustomGridView(emojiLoader, EmojiLoader.FLAGS_SIZE, EmojiCategory.FLAGS, show: currentCategory == EmojiCategory.FLAGS,) : Container(),
+                ],
+              ),
+            ),
+          ):
+          (searchText.length < 3) ? Center(child: Text('Search is too short, keep typing ⌨️'),) :
+          (searchResults.length == 0 ) ? Center(child: Text('No results found 😭'),) :
+          CustomGridView(emojiLoader, searchResults.length, null, show: searchText.length > 0 , preLoadedData: searchResults,),
         ], 
       ),
     );
@@ -152,7 +158,7 @@ class EmojiSelectorPageState extends State<EmojiSelectorPage> {
         shape: RoundedRectangleBorder(
           borderRadius: radius == null ? BorderRadius.circular(0.0) : radius
         ), 
-        onPressed: isCurrentCat ? null : () {
+        onPressed: (searchText.length > 0 || isCurrentCat) ? null : () {
           setState(() {
             currentCategory = category;         
           });
@@ -162,111 +168,34 @@ class EmojiSelectorPageState extends State<EmojiSelectorPage> {
       ),
     );
   }
+
   Widget subHeader(String text){
     return Container(
       padding: EdgeInsets.only(left: 10.0, bottom: 10.0),
       child: Text(
         text,
-        style: TextStyle(fontSize: 18.0, color: Colors.orange[800], fontWeight: FontWeight.bold),
+        style: TextStyle(fontSize: 18.0, color: Colors.orange[800]),
         textAlign: TextAlign.start,
       ),
     );
   }
 
-  Widget _buildGridTileList(int count, EmojiCategory category) {
-   return Center(
-    child: wrapImplementation(count, category),
-   );
-  }
-
-  Widget listImplementation(int count, EmojiCategory category){
-    return SizedBox(
-      height: 300.0,
-      child: CustomScrollView(
-      slivers:<Widget>[ SliverGrid.extent(
-      // Create a grid with 2 columns. If you change the scrollDirection to
-      // horizontal, this would produce 2 rows.
-      maxCrossAxisExtent: 32.0,
-      mainAxisSpacing: 15.0,
-      // Generate 100 Widgets that display their index in the List
-      children: List.generate(count, (index) {
-        return Container(
-          child: Material(
-            color: Colors.transparent,
-            child: new InkWell(
-              splashColor: Colors.grey,
-              onTap: () => print(index.toString()+' selected! '+category.toString()),
-              child: Image.asset (
-                  emojiLoader.drawIcon(index + 1, category),
-                  height: 32.0,
-                  width: 32.0,
-                ),
-            )
-          )
-        );
-      }),
-    )
-      ])
-    );
-
-  }
-
-  Widget justGridSliver(int count, EmojiCategory category){
-    return SliverGrid.extent(
-      // Create a grid with 2 columns. If you change the scrollDirection to
-      // horizontal, this would produce 2 rows.
-      maxCrossAxisExtent: 32.0,
-      mainAxisSpacing: 15.0,
-      // Generate 100 Widgets that display their index in the List
-      children: List.generate(count, (index) {
-        return Container(
-          // child: Material(
-          //   color: Colors.transparent,
-          //   child: new InkWell(
-          //     splashColor: Colors.grey,
-          //     onTap: () => print(index.toString()+' selected! '+category.toString()),
-          //     child: Image.asset (
-          //         emojiLoader.drawIcon(index + 1, category),
-          //         height: 32.0,
-          //         width: 32.0,
-          //       ),
-          //   )
-          // )
-        );
-      }),
-    );
-  }
 
   
-  void _scrollListener() {
-    print('P = '+controller.position.extentAfter.toString() + ' : ' + controller.position.extentInside.toString() + ' : ' + controller.position.extentBefore.toString());
-    print('O = '+controller.position.maxScrollExtent.toString() + ' : ' + controller.position.minScrollExtent.toString()+ ' : ' + controller.position.viewportDimension .toString() + ' : ' + controller.offset.toString() +' : '+ controller.initialScrollOffset.toString());
-    // if (controller.position.extentAfter < 500) {
-    //   //add stuff
-    // }
+  void _textListener() {
+    String newText = controller.text;
+    List<String> newResutls = []; 
+    if(newText.length > 2){
+      newResutls= emojiLoader.searchIcon(newText.toLowerCase());
+    }
+    else{
+      newResutls = [];
+    }
+
+    setState(() {
+      searchText = newText;
+      searchResults = newResutls;
+    });
   }
 
-  Widget wrapImplementation(int count, EmojiCategory category){
-    return Wrap(
-      spacing: 15.0,
-      runSpacing: 15.0,
-      direction: Axis.horizontal, 
-      children: List<Widget>.generate(
-        count,
-        (int index) =>
-          Material(
-            color: Colors.transparent,
-            child: new InkWell(
-              splashColor: Colors.grey,
-              onTap: () => print(index.toString()+' selected! '+category.toString()),
-              child: Image.asset (
-                  emojiLoader.drawIcon(index + 1, category),
-                  height: 32.0,
-                  width: 32.0,
-                ),
-            )
-          )
-      )
-    );
-  }
 }

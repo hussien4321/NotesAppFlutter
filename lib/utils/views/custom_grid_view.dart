@@ -7,8 +7,10 @@ class CustomGridView extends StatefulWidget {
   int _count;
   EmojiCategory _category;
   bool show;
+  List<String> preLoadedData;
 
-  CustomGridView(this._emojiLoader, this._count, this._category, {this.show = true});
+
+  CustomGridView(this._emojiLoader, this._count, this._category, {this.show = true, this.preLoadedData});
   
   @override
   _CustomGridViewState createState() => _CustomGridViewState();
@@ -28,7 +30,6 @@ class _CustomGridViewState extends State<CustomGridView> {
 
   @override
   initState(){
-    print('imited');
     if(startIndex == null && endIndex == null){
       startIndex = 0;
       endIndex = 100;
@@ -51,8 +52,8 @@ class _CustomGridViewState extends State<CustomGridView> {
     double scrollSize = controller.position.extentInside;
     double maxSize = controller.position.maxScrollExtent + scrollSize;
 
-    double startPercentage = spaceBefore / maxSize;
-    double endPercentage = (spaceBefore + scrollSize) / maxSize;
+    double startPercentage = spaceBefore == 0 ? 0.0 :spaceBefore / maxSize;
+    double endPercentage = (spaceBefore + scrollSize) == 0 ? 0.0 : (spaceBefore + scrollSize) / maxSize;
 
     int sizeOfList = widget._count - 1;
     int newStartIndex = (startPercentage * sizeOfList).floor() - renderingBuffer;
@@ -92,11 +93,11 @@ class _CustomGridViewState extends State<CustomGridView> {
                   color: Colors.transparent,
                   child: new InkWell(
                     splashColor: Colors.grey,
-                    onTap: () => print(index.toString()+' selected! '+widget._category.toString()),
+                    onTap: () => Navigator.of(context).pop(widget.preLoadedData == null ? widget._emojiLoader.drawIcon((index + 1).toString(), widget._category) : widget.preLoadedData[index]),
                     child:  Container(
                       padding: EdgeInsets.all(itemSpacing),
                       child: Image.asset (
-                        widget._emojiLoader.drawIcon(index + 1, widget._category),
+                        widget.preLoadedData == null ? widget._emojiLoader.drawIcon((index + 1).toString(), widget._category) : widget.preLoadedData[index],
                         height: itemSize,
                         width: itemSize,
                       ),
