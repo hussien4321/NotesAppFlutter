@@ -12,18 +12,17 @@ import '../utils/helpers/time_functions.dart';
 class DBHelper{
 
   static List<Task> _recommendedTasks = [
-      new Task(1, 'Read 1 chapter of a book', '📕', true),
-      new Task(2, 'Pay bills', '💰', true),
-      new Task(3, 'Go to the bank', '🏦', true),
-      new Task(4, 'Take a walk', '🏞️', true),
-      new Task(5, 'Check email', '📧', true),
-      new Task(6, 'Make reservation', '📞', true),
-      new Task(7, 'Take medicine', '💊', true),
-      new Task(8, 'Get Haircut', '💇🏻', true),
-      new Task(9, 'Cook dinner', '🍽️', true),
-      new Task(10,'Go grocery shopping', '🛒', true),
-      new Task(11,'Finish homework', '📝', true),
-      new Task(12,'Exercise', '🏋️', true),
+      new Task(1, 'Read 1 chapter of a book', 'assets/icons/objects/1f4d5.png', true),
+      new Task(2, 'Pay bills', 'assets/icons/objects/1f4b0.png', true),
+      new Task(3, 'Go to the bank', 'assets/icons/travel/1f3e6.png', true),
+      new Task(4, 'Take a walk', 'assets/icons/travel/1f3de.png', true),
+      new Task(5, 'Check email', 'assets/icons/objects/1f4e7.png', true),
+      new Task(6, 'Take medicine', 'assets/icons/objects/1f48a.png', true),
+      new Task(7, 'Get Haircut', 'assets/icons/people/1f487-2642.png', true),
+      new Task(8, 'Cook dinner', 'assets/icons/food/1f37d.png', true),
+      new Task(9,'Go grocery shopping', 'assets/icons/objects/1f6d2.png', true),
+      new Task(10,'Finish homework', 'assets/icons/objects/1f4dd.png', true),
+      new Task(11,'Exercise', 'assets/icons/people/1f4aa.png', true),
     ];
   static Database _db;
 

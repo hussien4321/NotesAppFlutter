@@ -96,7 +96,11 @@ class _HistoryPageState extends State<HistoryPage> {
         children: <Widget>[
           Container(
             padding: EdgeInsets.only(right: 5.0),
-            child: Text(todo.task.icon, style: TextStyle(fontSize: 30.0),),
+            child:  Image.asset(
+              todo.task.icon,
+              width: 32.0,
+              height: 32.0,
+            ),
           ),
           Expanded(
             child: Column(

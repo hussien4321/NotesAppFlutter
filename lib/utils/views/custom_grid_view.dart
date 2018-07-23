@@ -93,7 +93,10 @@ class _CustomGridViewState extends State<CustomGridView> {
                   color: Colors.transparent,
                   child: new InkWell(
                     splashColor: Colors.grey,
-                    onTap: () => Navigator.of(context).pop(widget.preLoadedData == null ? widget._emojiLoader.drawIcon((index + 1).toString(), widget._category) : widget.preLoadedData[index]),
+                    onTap: () {
+                      String resultToBe = widget.preLoadedData == null ? widget._emojiLoader.drawIcon((index + 1).toString(), widget._category) : widget.preLoadedData[index];
+                      return Navigator.of(context).pop(resultToBe);
+                    },
                     child:  Container(
                       padding: EdgeInsets.all(itemSpacing),
                       child: Image.asset (

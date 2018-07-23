@@ -23,9 +23,10 @@ class TaskView extends StatelessWidget{
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.all(5.0),
-                  child: Text(
+                  child: Image.asset(
                     _task.icon,
-                    style: TextStyle(fontSize: 30.0, ),
+                    width: 32.0,
+                    height: 32.0,
                   ),
                 ),
                 Expanded(
@@ -70,9 +71,10 @@ class SimpleTaskView extends StatelessWidget{
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.all(5.0),
-                  child: Text(
+                  child: Image.asset(
                     _task.icon,
-                    style: TextStyle(fontSize: 25.0),
+                    width: 32.0,
+                    height: 32.0,
                   ),
                 ),
                 Expanded(

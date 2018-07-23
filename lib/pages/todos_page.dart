@@ -225,9 +225,10 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
             ),
             Container(
               padding: EdgeInsets.all(10.0),
-              child: Text(
+              child: Image.asset(
                 todo.task.icon,
-                style: TextStyle(fontSize: 50.0),
+                width: 32.0,
+                height: 32.0,
               ),
             ),
             Expanded(

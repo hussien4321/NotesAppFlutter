@@ -9,6 +9,8 @@ import './new_tabs_page.dart';
 import '../db/notification_service.dart';
 import '../db/preferences.dart';
 import '../utils/views/yes_no_dialog.dart';
+import '../utils/helpers/custom_page_route.dart';
+import './emoji_selector_page.dart';
 
 class TasksPage extends StatefulWidget {
     @override
@@ -27,9 +29,10 @@ class TasksPageState extends State<TasksPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
 
-  String previousIcon = "";
+  String iconText = "";
+  bool iconError = false;
   final taskNameController = TextEditingController();
-  final taskIconController = TextEditingController();
+  
 
   NotificationService notificationService = new NotificationService();
   Preferences preferencesService = new Preferences();
@@ -39,19 +42,8 @@ class TasksPageState extends State<TasksPage> {
   @override
   void dispose() {
     // Clean up the controller when the Widget is disposed
-    taskIconController.removeListener(_iconRealtimeValidation);
     taskNameController.dispose();
-    taskIconController.dispose();
     super.dispose();
-  }
-
-  _iconRealtimeValidation(){
-    RegExp exp = new RegExp(r"(\w+|\s)");
-    if(exp.hasMatch(taskIconController.text)){
-      taskIconController.clear();
-      taskIconController.text = "";
-    }
-    previousIcon = taskIconController.text;
   }
 
 
@@ -66,8 +58,7 @@ class TasksPageState extends State<TasksPage> {
 
       _isEditMode = false;
 
-      previousIcon = "";
-      taskIconController.addListener(_iconRealtimeValidation);
+      iconText = "";
       updateTasks();
   }
 
@@ -163,9 +154,10 @@ class TasksPageState extends State<TasksPage> {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.all(5.0),
-                  child: Text(
-                    '💡',
-                    style: TextStyle(fontSize: 30.0, ),
+                  child: Image.asset(
+                    'assets/icons/objects/1f4a1.png',
+                    width: 32.0,
+                    height: 32.0,
                   ),
                 ),
                 Expanded(
@@ -192,16 +184,17 @@ class TasksPageState extends State<TasksPage> {
         );
     }
 
-  _newTaskDialog([Task dialogTask]) async {
-    if(dialogTask == null){
-      taskNameController.clear();
-      taskIconController.clear();
-      previousIcon = "";
-    }
-    else{
-      taskNameController.text= dialogTask.name;
-      taskIconController.text = dialogTask.icon;
-      previousIcon = dialogTask.icon;
+  _newTaskDialog([Task dialogTask, bool update = true]) async {
+    iconError = false;
+    if(update){
+      if(dialogTask == null){
+        taskNameController.clear();
+        iconText = "";
+      }
+      else{
+        taskNameController.text= dialogTask.name;
+        iconText = dialogTask.icon;
+      }
     }
     await showDialog(
       context: context,
@@ -213,43 +206,76 @@ class TasksPageState extends State<TasksPage> {
           child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(padding: EdgeInsets.only(top :30.0),),
-                Expanded(
-                  flex: 2,
-                  child: TextFormField(
-                    validator: (value) {
-                      if (previousIcon.isEmpty) {
-                        return 'Invalid\nemoji';
-                      }
-                    },
-                    controller: taskIconController,
-                    style: TextStyle(fontSize: 17.0,),
-                    textAlign: TextAlign.center,
-                    autofocus: false,
-                    decoration: InputDecoration(
-                        labelText: 'Emoji', hintText: 'eg. 😀', contentPadding: EdgeInsets.only(bottom: 5.0),),
+            
+            Container(
+              padding: EdgeInsets.all(5.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  
+                  Expanded(
+                    child: Row(
+                      children: <Widget>[
+                        Text(
+                          'Icon:',
+                          style: TextStyle(fontSize: 20.0),
+                        ),
+                        FormField(
+                          validator: (value) {
+                            setState((){
+                              iconError = true;
+                            });
+                            return 'selct emoji';
+                          },
+                          builder: (state) {
+                            return Expanded(
+                              child: iconText == '' ? 
+                                Center(child:Text("?", style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold, color: iconError ? Colors.red: Colors.black),)) : 
+                                Image.asset(
+                                  iconText,
+                                  width: 32.0,
+                                  height: 32.0,
+                                ),
+                            );
+                          },
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                Padding(padding: EdgeInsets.only(left: 10.0),),
-                Expanded(
-                  flex: 7,
-                  child: TextFormField(
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Please enter a task name';
-                      }
-                    },
-                    controller: taskNameController,
-                    style: TextStyle(fontSize: 17.0,color: Colors.black),
-                    autofocus: dialogTask == null,
-                    decoration: InputDecoration(
-                        labelText: 'Task name', hintText: 'eg. Do 10 push ups', contentPadding: EdgeInsets.only(bottom: 5.0),),
+                  Padding( padding: EdgeInsets.all(5.0)),
+                  Expanded(
+                    child: RaisedButton(
+                      onPressed: () async {
+                        final result = await Navigator.push(context, CustomPageRoute(
+                          builder: (BuildContext context) => EmojiSelectorPage()),
+                        );
+                        if(result != null){
+                          setState(() {
+                            iconText = result.toString();
+                          });                        
+                          Navigator.pop(context);
+                          _newTaskDialog(dialogTask, false);
+                        }
+                      },
+                      child: Text(iconText == '' ? 'SELECT' : 'CHANGE'),
+                      color: Colors.orange,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
+            ),
+            TextFormField(
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter a task name';
+                }
+              },
+              controller: taskNameController,
+              style: TextStyle(fontSize: 17.0,color: Colors.black),
+              autofocus: dialogTask == null,
+              decoration: InputDecoration(
+                  labelText: 'Task name', hintText: 'eg. Do 10 push ups', contentPadding: EdgeInsets.only(bottom: 5.0),),
             ),
             Padding(padding: EdgeInsets.all(10.0),),
             Container(
@@ -289,8 +315,7 @@ class TasksPageState extends State<TasksPage> {
                           );
                         }else{
                           taskNameController.clear();
-                          taskIconController.clear();
-                          previousIcon = '';
+                          iconText = '';
                           Navigator.pop(context);
                         }
                       }
@@ -303,9 +328,9 @@ class TasksPageState extends State<TasksPage> {
                       color: Colors.greenAccent,
                       child: Text(dialogTask == null ? 'ADD' : 'SAVE', style: TextStyle(color: Colors.black),),
                       onPressed: () async {
-                        if(_formKey.currentState.validate()){
+                        if(_formKey.currentState.validate() && iconText != ''){
                           if(dialogTask == null){
-                            Task newTask = new Task(0, taskNameController.text, taskIconController.text);
+                            Task newTask = new Task(0, taskNameController.text, iconText);
 
                             int newId = await _dbHelper.createTask(newTask);
                             newTask.setId(newId);
@@ -321,8 +346,8 @@ class TasksPageState extends State<TasksPage> {
                             });
                           }
                           else{
-                            if(taskNameController.text != dialogTask.name || taskIconController.text != dialogTask.icon){
-                              dialogTask.update(taskNameController.text, taskIconController.text);
+                            if(taskNameController.text != dialogTask.name || iconText != dialogTask.icon){
+                              dialogTask.update(taskNameController.text, iconText);
                               _dbHelper.updateTask(dialogTask).then((res){
                                 updateTasks();
                                 _scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -331,8 +356,7 @@ class TasksPageState extends State<TasksPage> {
                               });
                             }
                             taskNameController.clear();
-                            taskIconController.clear();
-                            previousIcon = '';
+                            iconText = '';
                             Navigator.pop(context);
                           }
                         }

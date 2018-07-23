@@ -40,15 +40,9 @@ class _NewTabsPageState extends State<NewTabsPage> {
         currentIndex: index,
         onTap: (int index) async { 
             if(index==2){
-              // Navigator.push(context, CustomPageRoute(
-              //   builder: (BuildContext context) => TasksPage()),
-              // );    
-              final result = await Navigator.push(context, CustomPageRoute(
-                builder: (BuildContext context) => EmojiSelectorPage()),
-              );
-
-              print('returned '+result.toString());
-
+              Navigator.push(context, CustomPageRoute(
+                builder: (BuildContext context) => TasksPage()),
+              );    
             }else{
               setState(() {              
                 this.index = index;
