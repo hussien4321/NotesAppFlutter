@@ -65,12 +65,12 @@ class SimpleTaskView extends StatelessWidget{
   @override
   Widget build(BuildContext context){
     return Container(
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.all(5.0),
+                  padding: EdgeInsets.only(right:5.0),
                   child: Image.asset(
                     _task.icon,
                     width: 32.0,
@@ -79,7 +79,7 @@ class SimpleTaskView extends StatelessWidget{
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.all(5.0),
+                    padding: EdgeInsets.only(right: 5.0),
                     child: Text(
                       _task.name,
                       style: TextStyle(fontSize: 17.0, color: color),

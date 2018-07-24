@@ -29,10 +29,10 @@ class _NewTabsPageState extends State<NewTabsPage> {
       body: fadedBackground(
         child: Stack(
           children: <Widget>[
-            offSetPage(ToDosPage(),0),
-            offSetPage(HistoryPage(),1),
-            offSetPage(AnalyticsPage(),3),
-            offSetPage(SettingsPage(),4),
+            index == 0 ? offSetPage(ToDosPage(),0) : Container(),
+            index == 1 ? offSetPage(HistoryPage(),1) : Container(),
+            index == 3 ? offSetPage(AnalyticsPage(),3) : Container(),
+            index == 4 ? offSetPage(SettingsPage(),4) : Container(),
           ],
         ),
       ),

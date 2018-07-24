@@ -79,6 +79,16 @@ class AnalyticsPageState extends State<AnalyticsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(top: 10.0),
+              child: Center(
+                child: Text('Analytics', 
+                  style: TextStyle(
+                    fontWeight: FontWeight.w300, fontSize: 30.0,
+                  ),
+                ),
+              ),
+            ),
             header('All time stats',true),
             Container(
               decoration: new BoxDecoration(
@@ -141,7 +151,7 @@ class AnalyticsPageState extends State<AnalyticsPage> {
                   ),
                   Expanded(
                     child: Container(
-                      padding: EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0, top: 10.0),
+                      padding: EdgeInsets.only(right: 5.0),
                       child: Text(
                       TimeFunctions.getTimeInHMSFormatNoTrailingZeros(avgTimeInSeconds),
                         style: TextStyle(fontSize: 16.0, color: Colors.grey[800], fontStyle: FontStyle.italic),
@@ -164,19 +174,18 @@ class AnalyticsPageState extends State<AnalyticsPage> {
     
   Widget header(String headerText, [bool bold = false]){
     return Container(
-      padding: bold ? EdgeInsets.all(15.0) : EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0, top: 10.0),
+      padding: EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0, top: 10.0),
       child: Text(
         headerText,
-        style: TextStyle(color: bold ? Colors.orange[900] : Colors.black,fontWeight: bold? FontWeight.bold: FontWeight.normal, fontSize: bold ? 20.0:16.0,),
+        style: TextStyle(color: bold ? Colors.orange[900] : Colors.black,fontWeight: bold? FontWeight.bold: FontWeight.w300, fontSize: bold ? 20.0:16.0,),
       ),
     );
   }
 
   Widget showNumSuccessesAndFailures(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: <Widget>[
-        Row(
+    return Container(
+      padding: EdgeInsets.only(right: 5.0),
+      child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             Text(
@@ -197,7 +206,6 @@ class AnalyticsPageState extends State<AnalyticsPage> {
             )
           ],
         ),
-      ], 
     );
   }
 

@@ -27,7 +27,7 @@ class TasksPageState extends State<TasksPage> {
   List<Task> _tasks = [];
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  final _formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String iconText = "";
   bool iconError = false;
@@ -223,10 +223,12 @@ class TasksPageState extends State<TasksPage> {
                         ),
                         FormField(
                           validator: (value) {
-                            setState((){
-                              iconError = true;
-                            });
-                            return 'selct emoji';
+                              if(iconText == ''){
+                              setState((){
+                                iconError = true;
+                              });
+                              return 'select emoji';
+                            }
                           },
                           builder: (state) {
                             return Expanded(
@@ -255,6 +257,7 @@ class TasksPageState extends State<TasksPage> {
                             iconText = result.toString();
                           });                        
                           Navigator.pop(context);
+                          _formKey = GlobalKey<FormState>();
                           _newTaskDialog(dialogTask, false);
                         }
                       },
@@ -328,7 +331,7 @@ class TasksPageState extends State<TasksPage> {
                       color: Colors.greenAccent,
                       child: Text(dialogTask == null ? 'ADD' : 'SAVE', style: TextStyle(color: Colors.black),),
                       onPressed: () async {
-                        if(_formKey.currentState.validate() && iconText != ''){
+                        if(_formKey.currentState.validate()){
                           if(dialogTask == null){
                             Task newTask = new Task(0, taskNameController.text, iconText);
 
@@ -355,9 +358,9 @@ class TasksPageState extends State<TasksPage> {
                                 ));
                               });
                             }
+                            Navigator.pop(context);
                             taskNameController.clear();
                             iconText = '';
-                            Navigator.pop(context);
                           }
                         }
                       }),

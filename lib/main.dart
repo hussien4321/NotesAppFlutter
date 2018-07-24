@@ -13,6 +13,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false, 
       theme: new ThemeData(
         primarySwatch: Colors.orange,
+        textTheme: TextTheme(
+          body1: TextStyle(fontWeight: FontWeight.w300),
+        ),
       ),
       home: NewTabsPage(),
     );

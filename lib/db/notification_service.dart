@@ -43,8 +43,8 @@ class NotificationService {
       todo.startDate.add(new Duration(days: 1)).subtract(new Duration(hours: delayInHours));
 
     if(scheduledNotificationDateTime.isAfter(DateTime.now())){
-      String header = todo.task.icon+' deadline approaching!';
-      String message = '"'+todo.task.name+'" only has '+delayInHours.toString()+' hour'+(delayInHours == 1 ? '' : 's')+' remaining. Dont forget to complete it!';
+      String header = 'Deadline approaching!';
+      String message = (delayInHours == 1 ? 'hour' : 'hours')+' left to "'+todo.task.name+'". Dont forget to complete it!';
       await flutterLocalNotificationsPlugin.schedule(
           todo.id,
           header,

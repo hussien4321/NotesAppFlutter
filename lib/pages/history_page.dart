@@ -36,7 +36,9 @@ class _HistoryPageState extends State<HistoryPage> {
     await preferencesService.initService();
     notificationsDelayValue = preferencesService.getNotificationSliderValue();
     notificationsEnabled = preferencesService.isNotificationsEnabled();
-    loading = false;
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
@@ -67,7 +69,7 @@ class _HistoryPageState extends State<HistoryPage> {
     return Column(
       children: <Widget>[
         Container(
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.only(top: 10.0),
           child: Text('History', 
             style: TextStyle(
               fontWeight: FontWeight.w300, fontSize: 30.0,

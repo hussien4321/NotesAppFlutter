@@ -55,10 +55,20 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return  loading ? LoadingScreen() : SingleChildScrollView(
       child: Container(
-        padding: EdgeInsets.all(10.0),
+        padding: EdgeInsets.all(5.0),
         child:Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              Container(
+                padding: EdgeInsets.only(top: 5.0),
+                child: Center(
+                  child: Text('Settings', 
+                    style: TextStyle(
+                      fontWeight: FontWeight.w300, fontSize: 30.0,
+                    ),
+                  ),
+                ),
+              ),
               settingsHeader('App settings'),
               settingsOption('Reset data', RaisedButton(
                   onPressed: () {
@@ -177,7 +187,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   //LINK TO TWITTER
                 },
               )),
-              settingsOption('Share this to friends', IconButton(
+              settingsOption('Share with friends', IconButton(
                 icon: Icon(Icons.share),
                 iconSize: 20.0,
                 onPressed: () {
@@ -196,7 +206,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget settingsHeader(String headerText){
     return Container(
-      padding: EdgeInsets.only(left: 5.0, right: 5.0, bottom: 5.0, top: 10.0),
+      padding: EdgeInsets.only(left: 0.0, right: 0.0, bottom: 5.0, top: 10.0),
       child: Text(
         headerText,
         style: TextStyle(color: Colors.orange[900],fontWeight: FontWeight.bold, fontSize: 20.0,),
