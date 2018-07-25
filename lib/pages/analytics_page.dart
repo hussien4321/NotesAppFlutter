@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import '../services/database.dart';
+import '../services/preferences.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/task_view.dart';
 import '../model/task.dart';
@@ -16,7 +17,7 @@ class AnalyticsPage extends StatefulWidget {
 class AnalyticsPageState extends State<AnalyticsPage> { 
   DBHelper dbHelper = new DBHelper();
   bool loading;
-  bool showStats;
+  bool showStats = true;
 
   int _numOfSuccesses;
   int _numOfFailures;
@@ -29,12 +30,18 @@ class AnalyticsPageState extends State<AnalyticsPage> {
   Task mostSuccessfulTask;
   Task leastSuccessfulTask;
 
+  Preferences preferences;
+
   @override
   void initState() {
       super.initState();
-      dbSetUp();
+      updateAnalytics();
+
       loading = true;
-      showStats = true;
+
+      preferences = new Preferences();
+      showStats = !preferences.isGraphExapnded();
+
       _numOfSuccesses = 0;
       _numOfFailures = 0;
       successPlotData = [];
@@ -43,11 +50,6 @@ class AnalyticsPageState extends State<AnalyticsPage> {
       mostSuccessfulTask = null;
       leastSuccessfulTask = null;
   }
-  
-  dbSetUp() {
-    updateAnalytics();
-  }
-
 
   updateAnalytics() async {
     _numOfSuccesses = await dbHelper.getNumberOfSuccesses();
@@ -91,21 +93,7 @@ class AnalyticsPageState extends State<AnalyticsPage> {
                 ),
               ),
             ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: header('All time stats',true),
-                ),
-                FlatButton(
-                  onPressed: (){
-                    setState(() {
-                      showStats = !showStats;
-                    });
-                  },                  
-                  child: Text(showStats ? 'Hide' : 'Show', style: TextStyle(color: Colors.orange[900], fontWeight: FontWeight.bold),),
-                )
-              ],
-            ),
+            header('All time stats',true),
             showStats ? Container(
               child: Column(
                 children: <Widget>[
@@ -184,7 +172,22 @@ class AnalyticsPageState extends State<AnalyticsPage> {
                 ],
               ),
             ) : Container(),
-            header('Last 7 days',true),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: header('Last 7 days',true),
+                ),
+                FlatButton(
+                  onPressed: (){
+                    preferences.updatePreference(Preferences.GRAPH_EXPANDED, showStats);
+                    setState(() {
+                      showStats = !showStats;
+                    });
+                  },                  
+                  child: Text(showStats ? 'Expand' : 'Shrink', style: TextStyle(color: Colors.orange[900], fontWeight: FontWeight.bold),),
+                )
+              ],
+            ),
             Expanded(
               child: successPlotData.isNotEmpty ? new LineGraph(successPlotData, failurePlotData, animate: false) : Center( child: Text('not enough data')),
             ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import './pages/emoji_selector_page.dart';
-import './pages/new_tabs_page.dart';
+import './pages/home_page.dart';
 import './services/database.dart';
 import './services/notifications.dart';
 import './services/preferences.dart';
@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
           body1: TextStyle(fontWeight: FontWeight.w300),
         ),
       ),
-      home: NewTabsPage(),
+      home: HomePage(),
     );
   }
 

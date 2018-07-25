@@ -3,7 +3,7 @@ import '../utils/views/loading_screen.dart';
 import '../services/database.dart';
 import '../model/todo.dart';
 import '../services/notifications.dart';
-import './new_tabs_page.dart';
+import './home_page.dart';
 import '../services/preferences.dart';
 import '../utils/helpers/time_functions.dart';
 import '../utils/helpers/custom_page_routes.dart';
@@ -121,7 +121,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
                 Container(
                   padding: EdgeInsets.only(right: 5.0),
-                  child: Text('Completed: '+TimeFunctions.getDateAsShortString(todo.completionDate), style: TextStyle(fontSize: 10.0, color: Colors.grey[800]),),
+                  child: Text((todo.success ? 'Passed':'Failed') +' on '+TimeFunctions.getDateAsShortString(todo.completionDate), style: TextStyle(fontSize: 10.0, color: Colors.grey[800]),),
                 ),        
               ],
             ),
@@ -136,7 +136,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   notificationService.createNotification(ToDo(taskId, todo.task), notificationsDelayValue);
                 }
               });                      
-              Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => NewTabsPage()),
+              Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()),
                 (Route route) => route == null
               );            
             },

@@ -8,12 +8,16 @@ import 'package:path/path.dart';
 class Preferences {
 
 
+  static final String GRAPH_EXPANDED = 'graphExpanded';
+  static final String GRAPH_RANGE = 'graphRange';
   static final String LANGUAGE = 'notificationsEnabled';
   static final String NOTIFICATIONS_ENABLED = 'notificationsEnabled';
   static final String NOTIFICATIONS_DELAY = 'notificationDelay';
   static final String ADS_PAID_STATUS = 'adsPaidStatus';
 
   final Map<String, dynamic> initialPreferences = {
+    'graphExpanded' : false,
+    'graphRange' : 7,
     'language' : 'GB',
     'notificationsEnabled' : false,
     'notificationDelay' : 12,
@@ -46,10 +50,6 @@ class Preferences {
     });
   }
 
-  updatePreferences() async {
-    currentPreferences = JSON.decode(_jsonFile.readAsStringSync());
-  }
-
   void _createPreferencesFile(Map<String, dynamic> content) {
     _jsonFile.createSync();
     _jsonFile.writeAsStringSync(JSON.encode(content));
@@ -63,6 +63,14 @@ class Preferences {
     _jsonFile.writeAsStringSync(JSON.encode(jsonFileContent));
   }
 
+
+  bool isGraphExapnded(){
+    return currentPreferences['graphExpanded'];
+  }
+
+  int getGraphRange(){
+    return currentPreferences['graphRange'];
+  }
 
   bool isNotificationsEnabled(){
     return currentPreferences['notificationsEnabled'];

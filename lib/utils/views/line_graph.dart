@@ -1,6 +1,7 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:charts_flutter/src/behaviors/chart_behavior.dart' show ChartBehavior;
 import 'package:charts_flutter/src/behaviors/line_point_highlighter.dart' show LinePointHighlighter;
+import 'package:charts_common/src/common/color.dart' show Color;
 
 import 'package:flutter/material.dart';
 import '../../model/graph_data.dart';
@@ -15,8 +16,7 @@ class LineGraph extends StatelessWidget {
       seriesList.add(
         new charts.Series<GraphData, DateTime>(
           id: 'Failures',
-          colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-          dashPattern: [8,4],
+          colorFn: (_, __) => Color(r: 255, g: 0, b: 0, a: 125),
           domainFn: (GraphData data, _) => data.startDate,
           measureFn: (GraphData data, _) => data.value,
           data: failureDataPoints,
@@ -27,7 +27,7 @@ class LineGraph extends StatelessWidget {
       seriesList.add(
         new charts.Series<GraphData, DateTime>(
           id: 'Succcesses',
-          colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
+          colorFn: (_, __) => Color(r: 0, g: 170, b: 0, a: 125),
           domainFn: (GraphData data, _) => data.startDate,
           measureFn: (GraphData data, _) => data.value,
           data: successDataPoints,

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomPageRoute<T> extends MaterialPageRoute<T> {
-  CustomPageRoute({ WidgetBuilder builder, RouteSettings settings })
+  CustomPageRoute({ WidgetBuilder builder, RouteSettings settings})
       : super(builder: builder, settings: settings);
 
   @override
-  Duration get transitionDuration => Duration(milliseconds: 500);
+  Duration get transitionDuration => Duration(milliseconds: 300);
 
 
   //TODO: Update to get desired transition circle expanding to show behind layer
@@ -16,7 +16,7 @@ class CustomPageRoute<T> extends MaterialPageRoute<T> {
       Widget child) {
     if (settings.isInitialRoute)
       return child;
-
+    
     return Opacity(
       opacity: animation.value,
       child: SlideTransition(
@@ -36,6 +36,8 @@ class CustomPageRoute<T> extends MaterialPageRoute<T> {
 
   }
 }
+
+
 class NoAnimationPageRoute<T> extends MaterialPageRoute<T> {
   NoAnimationPageRoute({ WidgetBuilder builder, RouteSettings settings })
       : super(builder: builder, settings: settings);

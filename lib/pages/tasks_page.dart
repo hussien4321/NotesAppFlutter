@@ -5,7 +5,7 @@ import '../model/todo.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/task_view.dart';
-import './new_tabs_page.dart';
+import './home_page.dart';
 import '../services/notifications.dart';
 import '../services/preferences.dart';
 import '../utils/views/yes_no_dialog.dart';
@@ -127,7 +127,7 @@ class TasksPageState extends State<TasksPage> {
                           notificationService.createNotification(ToDo(taskId, _tasks[i]),notificationsDelayValue);
                         }
                       });                      
-                      Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => NewTabsPage()),
+                      Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()),
                         (Route route) => route == null
                       );
                     }
@@ -306,7 +306,7 @@ class TasksPageState extends State<TasksPage> {
                                 onYes: (){
                                   _dbHelper.deleteTask(dialogTask);
                                   updatePage();
-                                  Scaffold.of(context).hideCurrentSnackBar();
+                                  _scaffoldKey.currentState.hideCurrentSnackBar();
                                   _scaffoldKey.currentState.showSnackBar(SnackBar(
                                     content: new Text('Task deleted ☠️️'),
                                   ));
@@ -345,8 +345,8 @@ class TasksPageState extends State<TasksPage> {
                                 notificationService.createNotification(new ToDo(todoId, newTask), notificationsDelayValue);
                               }
                               Navigator.pop(context);
-                              Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => 
-                                NewTabsPage()),
+                              Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => 
+                                HomePage()),
                                 (Route route) => route == null
                               );
                             });
@@ -356,7 +356,7 @@ class TasksPageState extends State<TasksPage> {
                               dialogTask.update(taskNameController.text, iconText);
                               _dbHelper.updateTask(dialogTask).then((res){
                                 updatePage();
-                                Scaffold.of(context).hideCurrentSnackBar();
+                                _scaffoldKey.currentState.hideCurrentSnackBar();
                                 _scaffoldKey.currentState.showSnackBar(SnackBar(
                                   content: Text('Task updated 👌'),
                                 ));
