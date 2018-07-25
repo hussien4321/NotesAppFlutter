@@ -49,16 +49,26 @@ class EmojiLoader {
     EmojiCategory.FLAGS
   ];
 
-  initialise(BuildContext context) async {
-    activities = json.decode(await DefaultAssetBundle.of(context).loadString('assets/data/activity_data.json'));
-    flags = json.decode(await DefaultAssetBundle.of(context).loadString('assets/data/flags_data.json'));
-    food = json.decode(await DefaultAssetBundle.of(context).loadString('assets/data/food_data.json'));
-    nature = json.decode(await DefaultAssetBundle.of(context).loadString('assets/data/nature_data.json'));
-    objects = json.decode(await DefaultAssetBundle.of(context).loadString('assets/data/objects_data.json'));
-    people = json.decode(await DefaultAssetBundle.of(context).loadString('assets/data/people_data.json'));
-    symbols = json.decode(await DefaultAssetBundle.of(context).loadString('assets/data/symbols_data.json'));
-    travel = json.decode(await DefaultAssetBundle.of(context).loadString('assets/data/travel_data.json'));
+  static final EmojiLoader _singleton = new EmojiLoader._internal();
+  static BuildContext _context;
+
+  factory EmojiLoader(BuildContext context) {
+    _context = context;
+    return _singleton;
+    
   }
+
+  EmojiLoader._internal() {
+    DefaultAssetBundle.of(_context).loadString('assets/data/activity_data.json').then((res) => activities = json.decode(res));
+    DefaultAssetBundle.of(_context).loadString('assets/data/flags_data.json').then((res) => flags = json.decode(res));
+    DefaultAssetBundle.of(_context).loadString('assets/data/food_data.json').then((res) => food = json.decode(res));
+    DefaultAssetBundle.of(_context).loadString('assets/data/nature_data.json').then((res) => nature = json.decode(res));
+    DefaultAssetBundle.of(_context).loadString('assets/data/objects_data.json').then((res) => objects = json.decode(res));
+    DefaultAssetBundle.of(_context).loadString('assets/data/people_data.json').then((res) => people = json.decode(res));
+    DefaultAssetBundle.of(_context).loadString('assets/data/symbols_data.json').then((res) => symbols = json.decode(res));
+    DefaultAssetBundle.of(_context).loadString('assets/data/travel_data.json').then((res) => travel = json.decode(res));
+  }
+
 
   Map<String, dynamic> _getCategoryDataFile(EmojiCategory category){
     switch (category) {

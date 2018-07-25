@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../model/task.dart';
 import '../../model/todo.dart';
-import '../../db/database.dart';
+import '../../services/database.dart';
 import 'dart:async';
 
 class TaskView extends StatelessWidget{
@@ -17,7 +17,7 @@ class TaskView extends StatelessWidget{
   @override
   Widget build(BuildContext context){
     return Container(
-          padding: EdgeInsets.all(15.0),
+          padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 25.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[

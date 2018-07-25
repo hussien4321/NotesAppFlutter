@@ -26,18 +26,29 @@ class DBHelper{
     ];
   static Database _db;
 
+
+  static final DBHelper _singleton = new DBHelper._internal();
+
+  factory DBHelper() {
+    return _singleton;
+  }
+
+  DBHelper._internal() {
+    initDb().then((resDB) => _db = resDB);
+  }
+
   Future<Database> get db async {
     if(_db != null)
       return _db;
-    _db = await initDb();
+    _db = await initDb() ;
     return _db;
   }
 
   initDb() async {
     io.Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "test.db");
-    var theDb = await openDatabase(path, version: 1, onCreate: _onCreate);
-    return theDb;
+    Database theDB = await openDatabase(path, version: 1, onCreate: _onCreate);
+    return theDB;
   }
 
   resetDb() async {
@@ -78,8 +89,6 @@ class DBHelper{
         await txn.rawInsert(
           'INSERT INTO task(name, icon, recommended, creation_date, deleted) VALUES '+_generateRecommnendedTasksScript());
     });
-
-    print("Created tables");
   }
 
 

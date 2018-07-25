@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../utils/views/loading_screen.dart';
-import '../db/database.dart';
+import '../services/database.dart';
 import '../model/todo.dart';
-import '../db/notification_service.dart';
+import '../services/notifications.dart';
 import './new_tabs_page.dart';
-import '../db/preferences.dart';
+import '../services/preferences.dart';
 import '../utils/helpers/time_functions.dart';
+import '../utils/helpers/custom_page_routes.dart';
 
 class HistoryPage extends StatefulWidget {
   @override
@@ -15,27 +16,30 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   
   bool loading = true;
-  DBHelper dbHelper = new DBHelper();
+  DBHelper dbHelper;
+  NotificationService notificationService;
+  Preferences preferences;
+  
   List<ToDo> todos = [];
 
-  NotificationService notificationService = new NotificationService();
-  Preferences preferencesService = new Preferences();
   bool notificationsEnabled;
   int notificationsDelayValue;
 
   @override  
   void initState() {
     super.initState();
-    initialiseServices();
+    loading = true;
+    dbHelper = new DBHelper();
+    notificationService = new NotificationService();
+    preferences = new Preferences();
+    updatePage();
   }
 
-  initialiseServices() async {
-    loading = true;
+  updatePage() async {
+
     todos = await dbHelper.getHistoryToDos();
-    await notificationService.initService();
-    await preferencesService.initService();
-    notificationsDelayValue = preferencesService.getNotificationSliderValue();
-    notificationsEnabled = preferencesService.isNotificationsEnabled();
+    notificationsDelayValue = preferences.getNotificationSliderValue();
+    notificationsEnabled = preferences.isNotificationsEnabled();
     setState(() {
       loading = false;
     });
@@ -123,15 +127,16 @@ class _HistoryPageState extends State<HistoryPage> {
             ),
           ),
           RaisedButton(
-            child: Text('Redo'),
+            child: Text('Restart'),
             color: Colors.orange,
             onPressed: (){
+              //TODO: Add snackbar when new task is created
               dbHelper.createToDo(ToDo(0, todo.task)).then((taskId) {
                 if(notificationsEnabled){
                   notificationService.createNotification(ToDo(taskId, todo.task), notificationsDelayValue);
                 }
               });                      
-              Navigator.of(context).pushAndRemoveUntil(new MaterialPageRoute(builder: (BuildContext context) => NewTabsPage()),
+              Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => NewTabsPage()),
                 (Route route) => route == null
               );            
             },

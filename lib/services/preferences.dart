@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 
 class Preferences {
 
+
   static final String LANGUAGE = 'notificationsEnabled';
   static final String NOTIFICATIONS_ENABLED = 'notificationsEnabled';
   static final String NOTIFICATIONS_DELAY = 'notificationDelay';
@@ -21,17 +22,23 @@ class Preferences {
 
   Map<String, dynamic> currentPreferences = {};
 
-  final String fileName = 'preferences.json';
-  File jsonFile;
+  final String _fileName = 'preferences.json';
+  static File _jsonFile;
   
-  initService() async {
+  
+  static final Preferences _singleton = new Preferences._internal();
 
-    await getApplicationDocumentsDirectory().then((Directory directory) {
+  factory Preferences() {
+    return _singleton;
+  }
+
+  Preferences._internal(){
+    getApplicationDocumentsDirectory().then((Directory directory) {
       Directory dir = directory;
-      jsonFile = new File(dir.path + "/" + fileName);
-      bool fileExists = jsonFile.existsSync();
+      _jsonFile = new File(dir.path + "/" + _fileName);
+      bool fileExists = _jsonFile.existsSync();
       if (fileExists){
-        currentPreferences = JSON.decode(jsonFile.readAsStringSync());
+        currentPreferences = JSON.decode(_jsonFile.readAsStringSync());
       } else {
         currentPreferences = initialPreferences;
         _createPreferencesFile(currentPreferences);
@@ -40,20 +47,20 @@ class Preferences {
   }
 
   updatePreferences() async {
-    currentPreferences = JSON.decode(jsonFile.readAsStringSync());
+    currentPreferences = JSON.decode(_jsonFile.readAsStringSync());
   }
 
   void _createPreferencesFile(Map<String, dynamic> content) {
-    jsonFile.createSync();
-    jsonFile.writeAsStringSync(JSON.encode(content));
+    _jsonFile.createSync();
+    _jsonFile.writeAsStringSync(JSON.encode(content));
   }
 
   void updatePreference(String key, dynamic value) {
     Map<String, dynamic> content = {key: value};
-    Map<String, dynamic> jsonFileContent = json.decode(jsonFile.readAsStringSync());
+    Map<String, dynamic> jsonFileContent = json.decode(_jsonFile.readAsStringSync());
     jsonFileContent.addAll(content);
     currentPreferences = jsonFileContent;
-    jsonFile.writeAsStringSync(JSON.encode(jsonFileContent));
+    _jsonFile.writeAsStringSync(JSON.encode(jsonFileContent));
   }
 
 

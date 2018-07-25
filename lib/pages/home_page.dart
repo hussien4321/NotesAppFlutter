@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../db/database.dart';
+import '../services/database.dart';
 import '../model/todo.dart';
 import '../model/task.dart';
 import './analytics_page.dart';
@@ -8,7 +8,7 @@ import './todos_page.dart';
 import '../utils/helpers/time_functions.dart';
 import '../utils/views/countdown.dart';
 import '../utils/views/progress_bar.dart';
-import '../utils/helpers/custom_page_route.dart';
+import '../utils/helpers/custom_page_routes.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/loading_screen.dart';
 import './tasks_page.dart';

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import '../db/database.dart';
+import '../services/database.dart';
 import '../model/task.dart';
 import '../model/todo.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/task_view.dart';
 import './new_tabs_page.dart';
-import '../db/notification_service.dart';
-import '../db/preferences.dart';
+import '../services/notifications.dart';
+import '../services/preferences.dart';
 import '../utils/views/yes_no_dialog.dart';
-import '../utils/helpers/custom_page_route.dart';
+import '../utils/helpers/custom_page_routes.dart';
 import './emoji_selector_page.dart';
 
 class TasksPage extends StatefulWidget {
@@ -21,9 +21,8 @@ class TasksPage extends StatefulWidget {
 class TasksPageState extends State<TasksPage> {
 
   bool _isEditMode = false;
-  DBHelper _dbHelper = new DBHelper();
-
-  bool _loadingPage = true;
+  bool loading  = true;
+  
   List<Task> _tasks = [];
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -33,9 +32,10 @@ class TasksPageState extends State<TasksPage> {
   bool iconError = false;
   final taskNameController = TextEditingController();
   
+  DBHelper _dbHelper;
+  NotificationService notificationService;
+  Preferences preferences;
 
-  NotificationService notificationService = new NotificationService();
-  Preferences preferencesService = new Preferences();
   bool notificationsEnabled;
   int notificationsDelayValue;
 
@@ -50,31 +50,32 @@ class TasksPageState extends State<TasksPage> {
   @override
   void initState() {
       super.initState();
-      notificationService.initService();
-      preferencesService.initService().then((res){
-        notificationsDelayValue = preferencesService.getNotificationSliderValue();
-        notificationsEnabled = preferencesService.isNotificationsEnabled();
-      });
 
+      loading = true;
       _isEditMode = false;
-
+      notificationService = new NotificationService();
+      preferences = new Preferences();
+      _dbHelper = new DBHelper();
+      notificationsDelayValue = preferences.getNotificationSliderValue();
+      notificationsEnabled = preferences.isNotificationsEnabled();
       iconText = "";
-      updateTasks();
+      updatePage();
   }
 
-
-  updateTasks(){
-    _dbHelper.getAllTasks().then((res) => this.setState(() {
-      _tasks = res; 
-      _loadingPage = false;
-    }));
-    _dbHelper.getActiveToDos().then((todos) => notificationService.cancelOpenNotifications(todos, preferencesService.getNotificationSliderValue()));
+  updatePage() async {
+    List<Task> allTasks = await _dbHelper.getAllTasks();
+    List<ToDo> todosToKil = await _dbHelper.getActiveToDos();
+    notificationService.cancelOpenNotifications(todosToKil, preferences.getNotificationSliderValue());
+    setState(() {
+       _tasks = allTasks; 
+       loading = false;
+    });
   }
 
   @override
   void didUpdateWidget(TasksPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    updateTasks();
+    updatePage();
   }
 
 
@@ -83,13 +84,14 @@ class TasksPageState extends State<TasksPage> {
     return Scaffold(
       key: _scaffoldKey,
       body: fadedBackground(
-        child: _loadingPage ? LoadingScreen() : _recommendedTasksView(),
+        child: loading ? LoadingScreen() : _recommendedTasksView(),
       ), 
     );
   }  
 
   Widget _recommendedTasksView(){
     return Column(
+      
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         createTaskWidget(context),
@@ -200,7 +202,7 @@ class TasksPageState extends State<TasksPage> {
       context: context,
       child: new AlertDialog(
         contentPadding: const EdgeInsets.all(16.0),
-        title: Text(dialogTask == null ? 'Create task 🌟' : 'Edit task ✏️',textAlign: TextAlign.center, style: TextStyle(fontSize: 22.0),),
+        title: Text(dialogTask == null ? 'Create task' : 'Edit task',textAlign: TextAlign.center, style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w300),),
         content: Form(
           key: _formKey,
           child: Column(
@@ -219,7 +221,7 @@ class TasksPageState extends State<TasksPage> {
                       children: <Widget>[
                         Text(
                           'Icon:',
-                          style: TextStyle(fontSize: 20.0),
+                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w300),
                         ),
                         FormField(
                           validator: (value) {
@@ -275,7 +277,7 @@ class TasksPageState extends State<TasksPage> {
                 }
               },
               controller: taskNameController,
-              style: TextStyle(fontSize: 17.0,color: Colors.black),
+              style: TextStyle(fontSize: 17.0,color: Colors.black, fontWeight: FontWeight.w300),
               autofocus: dialogTask == null,
               decoration: InputDecoration(
                   labelText: 'Task name', hintText: 'eg. Do 10 push ups', contentPadding: EdgeInsets.only(bottom: 5.0),),
@@ -303,7 +305,8 @@ class TasksPageState extends State<TasksPage> {
                                 noText: 'No',
                                 onYes: (){
                                   _dbHelper.deleteTask(dialogTask);
-                                  updateTasks();
+                                  updatePage();
+                                  Scaffold.of(context).hideCurrentSnackBar();
                                   _scaffoldKey.currentState.showSnackBar(SnackBar(
                                     content: new Text('Task deleted ☠️️'),
                                   ));
@@ -352,15 +355,14 @@ class TasksPageState extends State<TasksPage> {
                             if(taskNameController.text != dialogTask.name || iconText != dialogTask.icon){
                               dialogTask.update(taskNameController.text, iconText);
                               _dbHelper.updateTask(dialogTask).then((res){
-                                updateTasks();
+                                updatePage();
+                                Scaffold.of(context).hideCurrentSnackBar();
                                 _scaffoldKey.currentState.showSnackBar(SnackBar(
                                   content: Text('Task updated 👌'),
                                 ));
                               });
                             }
                             Navigator.pop(context);
-                            taskNameController.clear();
-                            iconText = '';
                           }
                         }
                       }),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
-import '../db/database.dart';
+import '../services/database.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/task_view.dart';
 import '../model/task.dart';
@@ -16,6 +16,7 @@ class AnalyticsPage extends StatefulWidget {
 class AnalyticsPageState extends State<AnalyticsPage> { 
   DBHelper dbHelper = new DBHelper();
   bool loading;
+  bool showStats;
 
   int _numOfSuccesses;
   int _numOfFailures;
@@ -33,6 +34,7 @@ class AnalyticsPageState extends State<AnalyticsPage> {
       super.initState();
       dbSetUp();
       loading = true;
+      showStats = true;
       _numOfSuccesses = 0;
       _numOfFailures = 0;
       successPlotData = [];
@@ -75,7 +77,7 @@ class AnalyticsPageState extends State<AnalyticsPage> {
 
     Widget pageLayout(BuildContext context){
       return Container(
-        padding: EdgeInsets.all(0.0),
+        padding: EdgeInsets.only(bottom: 5.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -89,82 +91,102 @@ class AnalyticsPageState extends State<AnalyticsPage> {
                 ),
               ),
             ),
-            header('All time stats',true),
-            Container(
-              decoration: new BoxDecoration(
-                border: new Border(bottom: BorderSide(color: Colors.grey[800], width: 0.5), top: BorderSide(color: Colors.grey[800], width: 0.5)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Expanded(
-                    child: header('Total success/fails'),
-                  ),   
-                  Expanded(
-                    child:showNumSuccessesAndFailures(),    
-                  ),
-                ],
-              ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: header('All time stats',true),
+                ),
+                FlatButton(
+                  onPressed: (){
+                    setState(() {
+                      showStats = !showStats;
+                    });
+                  },                  
+                  child: Text(showStats ? 'Hide' : 'Show', style: TextStyle(color: Colors.orange[900], fontWeight: FontWeight.bold),),
+                )
+              ],
             ),
-            Container(
-              decoration: new BoxDecoration(
-                border: new Border(bottom: BorderSide(color: Colors.grey[800], width: 0.5)),
-              ),
-              child: Row(
+            showStats ? Container(
+              child: Column(
                 children: <Widget>[
-                  Expanded(
-                    child: header('Most successful task'),
+                   Container(
+                  decoration: new BoxDecoration(
+                    border: new Border(bottom: BorderSide(color: Colors.grey[800], width: 0.5), top: BorderSide(color: Colors.grey[800], width: 0.5)),
                   ),
-                  Expanded( 
-                    child: (mostSuccessfulTask != null) ? 
-                      SimpleTaskView(mostSuccessfulTask, Colors.green[900]) : 
-                      Text('Not enough data', style: TextStyle(fontSize: 18.0), textAlign: TextAlign.end,overflow: TextOverflow.clip,),    
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              decoration: new BoxDecoration(
-                border: new Border(bottom: BorderSide(color: Colors.grey[800], width: 0.5)),
-              ),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: header('Least successful task'),
-                  ),
-                  Expanded(
-                    child: (leastSuccessfulTask != null) ? 
-                      SimpleTaskView(leastSuccessfulTask, Colors.red[900]) : 
-                      Text('Not enough data', style: TextStyle(fontSize: 18.0), textAlign: TextAlign.end,),    
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              decoration: new BoxDecoration(
-                border: new Border(bottom: BorderSide(color: Colors.grey[800], width: 0.5)),
-              ),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: header('Average time to complete tasks'),
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.only(right: 5.0),
-                      child: Text(
-                      TimeFunctions.getTimeInHMSFormatNoTrailingZeros(avgTimeInSeconds),
-                        style: TextStyle(fontSize: 16.0, color: Colors.grey[800], fontStyle: FontStyle.italic),
-                        textAlign: TextAlign.end,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Expanded(
+                        child: header('Total success/fails'),
+                      ),   
+                      Expanded(
+                        child:showNumSuccessesAndFailures(),    
                       ),
-                    ),
+                    ],
                   ),
+                ),
+                Container(
+                  decoration: new BoxDecoration(
+                    border: new Border(bottom: BorderSide(color: Colors.grey[800], width: 0.5)),
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: header('Most successful task'),
+                      ),
+                      Expanded( 
+                        child: (mostSuccessfulTask != null) ? 
+                          SimpleTaskView(mostSuccessfulTask, Colors.green[900]) : 
+                          Text('Not enough data', style: TextStyle(fontSize: 18.0), textAlign: TextAlign.end,overflow: TextOverflow.clip,),    
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  decoration: new BoxDecoration(
+                    border: new Border(bottom: BorderSide(color: Colors.grey[800], width: 0.5)),
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: header('Least successful task'),
+                      ),
+                      Expanded(
+                        child: (leastSuccessfulTask != null) ? 
+                          SimpleTaskView(leastSuccessfulTask, Colors.red[900]) : 
+                          Text('Not enough data', style: TextStyle(fontSize: 18.0), textAlign: TextAlign.end,),    
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  decoration: new BoxDecoration(
+                    border: new Border(bottom: BorderSide(color: Colors.grey[800], width: 0.5)),
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: header('Average time to complete tasks'),
+                      ),
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.only(right: 5.0),
+                          child: Text(
+                          TimeFunctions.getTimeInHMSFormatNoTrailingZeros(avgTimeInSeconds),
+                            style: TextStyle(fontSize: 16.0, color: Colors.grey[800], fontStyle: FontStyle.italic),
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 ],
               ),
-            ),
+            ) : Container(),
             header('Last 7 days',true),
             Expanded(
-              child: successPlotData.isNotEmpty ? new LineGraph(successPlotData, failurePlotData, animate: true) : Center( child: Text('not enough data')),
+              child: successPlotData.isNotEmpty ? new LineGraph(successPlotData, failurePlotData, animate: false) : Center( child: Text('not enough data')),
             ),
           ],
         ),

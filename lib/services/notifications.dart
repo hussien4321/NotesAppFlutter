@@ -6,18 +6,23 @@ import '../model/todo.dart';
 //TODO: Make singleton
 class NotificationService {
 
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-  BuildContext context;
-  NotificationDetails platformChannelSpecifics;
+  static FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+  static NotificationDetails _platformChannelSpecifics;
 
-  initService(){
+  static final NotificationService _singleton = new NotificationService._internal();
+
+  factory NotificationService() {
+    return _singleton;
+  }
+
+  NotificationService._internal(){
     var initializationSettingsAndroid =
         new AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsIOS = new IOSInitializationSettings();
     var initializationSettings = new InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
-    flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    _flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+    _flutterLocalNotificationsPlugin.initialize(initializationSettings);
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
       '24h_tasks_channel_id',
       'Productivity',
@@ -29,15 +34,14 @@ class NotificationService {
       priority: Priority.Low);
     var iOSPlatformChannelSpecifics =
         new IOSNotificationDetails();
-    platformChannelSpecifics = new NotificationDetails(
+    _platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-
   }
 
   createNotification(ToDo todo, int delayInHours) async {
 
 
-    await flutterLocalNotificationsPlugin.cancel(todo.id);
+    await _flutterLocalNotificationsPlugin.cancel(todo.id);
 
     var scheduledNotificationDateTime =
       todo.startDate.add(new Duration(days: 1)).subtract(new Duration(hours: delayInHours));
@@ -45,17 +49,17 @@ class NotificationService {
     if(scheduledNotificationDateTime.isAfter(DateTime.now())){
       String header = 'Deadline approaching!';
       String message = (delayInHours == 1 ? 'hour' : 'hours')+' left to "'+todo.task.name+'". Dont forget to complete it!';
-      await flutterLocalNotificationsPlugin.schedule(
+      await _flutterLocalNotificationsPlugin.schedule(
           todo.id,
           header,
           message,
           scheduledNotificationDateTime,
-          platformChannelSpecifics);
+          _platformChannelSpecifics);
     }
   }
 
   cancelNotification(ToDo todo) async {
-    await flutterLocalNotificationsPlugin.cancel(todo.id);
+    await _flutterLocalNotificationsPlugin.cancel(todo.id);
   }
 
   cancelOpenNotifications(List<ToDo> todos, int delayInHours) async {
@@ -68,7 +72,7 @@ class NotificationService {
   }
 
   cancelAllNotifications() async{
-    await flutterLocalNotificationsPlugin.cancelAll();
+    await _flutterLocalNotificationsPlugin.cancelAll();
   }
 
   updateNotifications(List<ToDo> todos, int newDelayInHours){    

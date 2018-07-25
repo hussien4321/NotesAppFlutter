@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/helpers/icons_loader.dart';
+import '../services/emoji_loader.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/custom_grid_view.dart';
@@ -12,7 +12,7 @@ class EmojiSelectorPage extends StatefulWidget {
 
 class EmojiSelectorPageState extends State<EmojiSelectorPage> {
 
-  EmojiLoader emojiLoader = new EmojiLoader();
+  EmojiLoader emojiLoader;
   TextEditingController controller;
 
   bool loading = true;
@@ -31,11 +31,10 @@ class EmojiSelectorPageState extends State<EmojiSelectorPage> {
   initialise() async {
 
     loading = true;
-
+    emojiLoader = new EmojiLoader(context);
     searchText = "";
     searchResults = [];
     currentCategory = EmojiCategory.PEOPLE;
-    await emojiLoader.initialise(context);
     setState(() {
       loading= false;
     });

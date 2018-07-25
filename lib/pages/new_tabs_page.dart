@@ -7,7 +7,7 @@ import './emoji_selector_page.dart';
 import './settings_page.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/custom_bottom_bar.dart' as customBar;
-import '../utils/helpers/custom_page_route.dart';
+import '../utils/helpers/custom_page_routes.dart';
 
 class NewTabsPage extends StatefulWidget {
 
@@ -29,10 +29,10 @@ class _NewTabsPageState extends State<NewTabsPage> {
       body: fadedBackground(
         child: Stack(
           children: <Widget>[
-            index == 0 ? offSetPage(ToDosPage(),0) : Container(),
-            index == 1 ? offSetPage(HistoryPage(),1) : Container(),
-            index == 3 ? offSetPage(AnalyticsPage(),3) : Container(),
-            index == 4 ? offSetPage(SettingsPage(),4) : Container(),
+            index == 0 ? ToDosPage() : Container(),
+            index == 1 ? HistoryPage() : Container(),
+            index == 3 ? AnalyticsPage() : Container(),
+            index == 4 ? SettingsPage() : Container(),
           ],
         ),
       ),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:share/share.dart';
-import '../db/preferences.dart';
+import '../services/preferences.dart';
 import '../utils/views/loading_screen.dart';
-import '../db/notification_service.dart';
-import '../db/database.dart';
+import '../services/notifications.dart';
+import '../services/database.dart';
 import '../model/todo.dart';
 import '../utils/views/yes_no_dialog.dart';
 
@@ -30,10 +30,9 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     loading = true;
-    preferences.initService().then((res){
-      _updateValues();
-    });
-    notificationService.initService();
+    isNotificationsEnabled = preferences.isNotificationsEnabled();
+    notificationSliderValue = preferences.getNotificationSliderValue();
+    savedNotificationSliderValue = notificationSliderValue;
     dbHelper.getActiveToDos().then((todos){
       existingTodos = todos;
       notificationService.cancelOpenNotifications(todos, preferences.getNotificationSliderValue());
@@ -84,6 +83,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             dbHelper.resetDb().then((res) {
                               notificationService.cancelAllNotifications();
                               loading = false;
+                              Scaffold.of(context).hideCurrentSnackBar();
                               Scaffold.of(context).showSnackBar(SnackBar(
                                 content: Text('Data reset successfully ✨'),
                               ));
@@ -116,12 +116,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   preferences.updatePreference(Preferences.NOTIFICATIONS_ENABLED, status);
                   _updateValues();
                   if(isNotificationsEnabled){                    
+                    Scaffold.of(context).hideCurrentSnackBar();
                     Scaffold.of(context).showSnackBar(SnackBar(
                       content: Text('Notifications enabled 🔔'),
                     ));
                     notificationService.updateNotifications(existingTodos, savedNotificationSliderValue);
                   }
                   else{
+                    Scaffold.of(context).hideCurrentSnackBar();
                     Scaffold.of(context).showSnackBar(SnackBar(
                       content: Text('Notifications disabled 🔕'),
                     ));
@@ -139,6 +141,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       preferences.updatePreference(Preferences.NOTIFICATIONS_DELAY, savedNotificationSliderValue);
                       _updateValues();
                       notificationService.updateNotifications(existingTodos, savedNotificationSliderValue);
+                      Scaffold.of(context).hideCurrentSnackBar();
                       Scaffold.of(context).showSnackBar(SnackBar(
                         content: Text('Timer updated ⏰'),
                       ));

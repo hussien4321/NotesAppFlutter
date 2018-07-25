@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../utils/helpers/icons_loader.dart';
+import '../../services/emoji_loader.dart';
 
 class CustomGridView extends StatefulWidget {
   

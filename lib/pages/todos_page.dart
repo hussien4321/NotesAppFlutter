@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import '../db/database.dart';
+import '../services/database.dart';
 import '../model/todo.dart';
 import '../model/task.dart';
 import '../utils/helpers/time_functions.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/progress_bar.dart';
 import '../utils/views/countdown.dart';
-import '../db/preferences.dart';
-import '../db/notification_service.dart';
+import '../services/preferences.dart';
+import '../services/notifications.dart';
 
 class ToDosPage extends StatefulWidget {
 
@@ -16,7 +16,7 @@ class ToDosPage extends StatefulWidget {
 }
 
 class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
-  DBHelper dbHelper = new DBHelper();
+  DBHelper dbHelper;
 
   List<ToDo> todos = [];
   List<AnimationController> _countdownControllers = [];
@@ -24,36 +24,32 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
 
   bool loading;  
 
-  Preferences preferences = new Preferences();
-  NotificationService notificationService = new NotificationService();
+  Preferences preferences;
+  NotificationService notificationService;
 
   @override
   void initState() {
       super.initState();
-      updateTodos();
-      preferences.initService();
-      notificationService.initService();
       loading = true;
+      dbHelper = new DBHelper();
+      notificationService = new NotificationService();
+      preferences = new Preferences();
+      updatePage();
   }
 
-  updateTodos(){
-    dbHelper.getActiveToDos().then((res) {
-      if(mounted){
-        this.setState(() {
-          if(todos != res){
-            notificationService.cancelOpenNotifications(res, preferences.getNotificationSliderValue());
-            initializeControllers(res);
-            todos = res;
-            setState(() {
-              loading = false;
-            });
-          }
+  updatePage() async {
+
+    List<ToDo> activeTodos = await dbHelper.getActiveToDos();
+    if(mounted){
+      if(todos != activeTodos){
+        notificationService.cancelOpenNotifications(activeTodos, preferences.getNotificationSliderValue());
+        initializeControllers(activeTodos);
+        setState(() {
+          todos = activeTodos;
+          loading = false;
         });
       }
-      else{
-        loading = false;
-      }
-    });
+    }
   }
   
   initializeControllers(List<ToDo> todos){
@@ -145,26 +141,28 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
         todos.removeAt(index);
         if(direction == DismissDirection.startToEnd){
           dbHelper.completeToDo(temp);
+          Scaffold.of(context).hideCurrentSnackBar();
           Scaffold.of(context).showSnackBar(new SnackBar(
             content: new Text("Task completed 😁"),
             action: SnackBarAction(
               label: 'Undo',
-              onPressed: () => dbHelper.undoCompleteToDo(temp).then((res) => updateTodos()),
+              onPressed: () => dbHelper.undoCompleteToDo(temp).then((res) => updatePage()),
             ),
           ));
         }else{
           dbHelper.giveUpToDo(temp);
+          Scaffold.of(context).hideCurrentSnackBar();
           Scaffold.of(context).showSnackBar(new SnackBar(
             content: new Text("Task failed 😞"),
             action: SnackBarAction(
               label: 'Undo',
-              onPressed: () => dbHelper.undoGiveUpToDo(temp).then((res) => updateTodos()),
+              onPressed: () => dbHelper.undoGiveUpToDo(temp).then((res) => updatePage()),
             ),
           ));
         }
         _countdownControllers[index].dispose();
         _countdownControllers.removeAt(index);
-        updateTodos();      
+        updatePage();      
         notificationService.cancelNotification(temp);
         notificationService.cancelOpenNotifications(todos, preferences.getNotificationSliderValue());
       },
