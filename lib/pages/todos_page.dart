@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import '../services/database.dart';
 import '../model/todo.dart';
-import '../model/task.dart';
+import '../utils/helpers/admob_snackbar.dart';
 import '../utils/helpers/time_functions.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/progress_bar.dart';
@@ -24,18 +25,51 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
 
   bool loading;  
 
+   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   Preferences preferences;
   NotificationService notificationService;
+
+  static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
+    testDevices: null,
+    keywords: <String>['foo', 'bar'],
+    contentUrl: 'http://foo.com/bar.html',
+    birthday: new DateTime.now(),
+    childDirected: true,
+    gender: MobileAdGender.male,
+  );
+  BannerAd _bannerAd;
 
   @override
   void initState() {
       super.initState();
+      
+      FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+      _bannerAd = createBannerAd()..load()..show(
+        anchorOffset: 56.0,
+        anchorType: AnchorType.bottom,
+
+      );
+
       loading = true;
       dbHelper = new DBHelper();
       notificationService = new NotificationService();
       preferences = new Preferences();
       updatePage();
   }
+
+
+  BannerAd createBannerAd() {
+    return new BannerAd(
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event $event");
+      },
+    );
+  }
+
 
   updatePage() async {
 
@@ -79,6 +113,8 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
     for(int i = 0; i < _colorControllers.length; i++){
       _colorControllers[i].dispose();
     }
+    _bannerAd?.dispose();
+    _bannerAd = null;
     super.dispose();
   }
 
@@ -111,23 +147,26 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
 
   Widget notesListView(List<ToDo> todos, DBHelper dbHelper){
     
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.all(10.0),
-          child: Text('Current Tasks', 
-            style: TextStyle(
-              fontWeight: FontWeight.w300, fontSize: 30.0,
+    return Container(
+      padding: EdgeInsets.only(bottom: 50.0),
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.all(10.0),
+            child: Text('Current Tasks', 
+              style: TextStyle(
+                fontWeight: FontWeight.w300, fontSize: 30.0,
+              ),
             ),
           ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemBuilder: (BuildContext context, int i) => taskDismassable(todos[i], dbHelper, i),
-            itemCount: todos.length,
+          Expanded(
+              child: ListView.builder(
+                itemBuilder: (BuildContext context, int i) => taskDismassable(todos[i], dbHelper, i),
+                itemCount: todos.length,
+              ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

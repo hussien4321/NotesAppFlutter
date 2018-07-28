@@ -25,6 +25,7 @@ class _HomePageState extends State<HomePage> {
 
   int index = 0;
 
+
   @override
   initState(){
     index = widget._index;
@@ -48,10 +49,16 @@ class _HomePageState extends State<HomePage> {
         currentIndex: index,
         onTap: (int ind) async { 
             if(ind==2){
+
+              int temp = index;
+              setState(() {              
+                this.index = 2;
+              });
+
               await Navigator.push(context, CustomPageRoute(
                 builder: (BuildContext context) => TasksPage()),
               );  
-              Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage(index)),
+              Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage(temp)),
                 (Route route) => route == null
               );
             }else{

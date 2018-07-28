@@ -17,7 +17,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
   bool isNotificationsEnabled = false;
   int notificationSliderValue = 12;
-  int savedNotificationSliderValue = 12;
 
   bool loading = true;
 
@@ -32,7 +31,6 @@ class _SettingsPageState extends State<SettingsPage> {
     loading = true;
     isNotificationsEnabled = preferences.isNotificationsEnabled();
     notificationSliderValue = preferences.getNotificationSliderValue();
-    savedNotificationSliderValue = notificationSliderValue;
     dbHelper.getActiveToDos().then((todos){
       existingTodos = todos;
       notificationService.cancelOpenNotifications(todos, preferences.getNotificationSliderValue());
@@ -46,7 +44,6 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {
       isNotificationsEnabled = preferences.isNotificationsEnabled();
       notificationSliderValue = preferences.getNotificationSliderValue();
-      savedNotificationSliderValue = notificationSliderValue;
     }); 
   }
 
@@ -120,7 +117,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Scaffold.of(context).showSnackBar(SnackBar(
                       content: Text('Notifications enabled 🔔'),
                     ));
-                    notificationService.updateNotifications(existingTodos, savedNotificationSliderValue);
+                    notificationService.updateNotifications(existingTodos, notificationSliderValue);
                   }
                   else{
                     Scaffold.of(context).hideCurrentSnackBar();
@@ -132,30 +129,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
                 ),
               ),
-              settingsOptionWithNull('Notify '+notificationSliderValue.round().toString()+' hours before each deadline', 
-                 Opacity(
-                   opacity: (savedNotificationSliderValue != notificationSliderValue) ? 1.0 : 0.0,
-                   child: RaisedButton(
-                    onPressed: (savedNotificationSliderValue != notificationSliderValue) ? () {
-                      savedNotificationSliderValue = notificationSliderValue;
-                      preferences.updatePreference(Preferences.NOTIFICATIONS_DELAY, savedNotificationSliderValue);
-                      _updateValues();
-                      notificationService.updateNotifications(existingTodos, savedNotificationSliderValue);
-                      Scaffold.of(context).hideCurrentSnackBar();
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                        content: Text('Timer updated ⏰'),
-                      ));
-                    } : null,
-                    child: Text(
-                      'Update',
-                      style: TextStyle(color: Colors.white), 
-                    ),
-                    color: Colors.orangeAccent,
-                  ),
-                ),
-                isNotificationsEnabled
-              ),
-              
+              settingsOptionNoItem('Notify '+notificationSliderValue.round().toString()+' hours before each deadline', isNotificationsEnabled),
               Slider(
                 value: notificationSliderValue.toDouble(),
                 activeColor: isNotificationsEnabled ? SliderTheme.of(context).activeTrackColor : Colors.grey,
@@ -165,7 +139,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 divisions: 22,
                 onChanged: (newValue) {
                   if(isNotificationsEnabled){
-                    setState(() => notificationSliderValue = newValue.round());
+                    int newDelay = newValue.round();
+                    setState(() => notificationSliderValue = newDelay);
+                    preferences.updatePreference(Preferences.NOTIFICATIONS_DELAY, newDelay);
+                    notificationService.updateNotifications(existingTodos, newDelay);
                   }
                 },
                 
@@ -217,8 +194,8 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-    Widget settingsOptionWithNull(String optionText, Widget button, [bool enabled = true]){
-    return (button==null) ? Row(
+    Widget settingsOptionNoItem(String optionText, [bool enabled = true]){
+    return Row(
       children: <Widget>[
         Expanded(
           child: Text(
@@ -227,7 +204,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
       ],
-    ) : settingsOption(optionText, button, enabled);
+    );
   }
 
 

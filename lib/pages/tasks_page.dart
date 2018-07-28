@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import '../services/database.dart';
 import '../model/task.dart';
 import '../model/todo.dart';
@@ -39,17 +40,27 @@ class TasksPageState extends State<TasksPage> {
   bool notificationsEnabled;
   int notificationsDelayValue;
 
-  @override
-  void dispose() {
-    // Clean up the controller when the Widget is disposed
-    taskNameController.dispose();
-    super.dispose();
-  }
+  static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
+    testDevices: null,
+    keywords: <String>['foo', 'bar'],
+    contentUrl: 'http://foo.com/bar.html',
+    birthday: new DateTime.now(),
+    childDirected: true,
+    gender: MobileAdGender.male,
+  );
+  BannerAd _bannerAd;
 
 
   @override
   void initState() {
       super.initState();
+
+      FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+      _bannerAd = createBannerAd()..load()..show(
+        anchorOffset: 0.0,
+        anchorType: AnchorType.bottom,
+
+      );
 
       loading = true;
       _isEditMode = false;
@@ -70,6 +81,25 @@ class TasksPageState extends State<TasksPage> {
        _tasks = allTasks; 
        loading = false;
     });
+  }
+
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    taskNameController.dispose();
+    super.dispose();
+  }
+
+  BannerAd createBannerAd() {
+    return new BannerAd(
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event $event");
+      },
+    );
   }
 
   @override

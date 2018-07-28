@@ -7,7 +7,6 @@ class PageHeader extends StatelessWidget {
 
   PageHeader({this.headerText, this.onClose, this.onInfo});
   
-  
   @override
   Widget build(BuildContext context) {
     return Container(
