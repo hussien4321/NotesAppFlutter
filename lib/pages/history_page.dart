@@ -132,13 +132,19 @@ class _HistoryPageState extends State<HistoryPage> {
             onPressed: (){
               //TODO: Add snackbar when new task is created
               dbHelper.createToDo(ToDo(0, todo.task)).then((taskId) {
-                if(notificationsEnabled){
-                  notificationService.createNotification(ToDo(taskId, todo.task), notificationsDelayValue);
-                }
+                if(taskId != null){
+                  if(notificationsEnabled){
+                    notificationService.createNotification(ToDo(taskId, todo.task), notificationsDelayValue);
+                  }
+                  Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()),
+                    (Route route) => route == null
+                  );
+                }            
+                Scaffold.of(context).hideCurrentSnackBar();
+                Scaffold.of(context).showSnackBar(SnackBar(
+                  content: Text('Task is already active'),
+                ));
               });                      
-              Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()),
-                (Route route) => route == null
-              );            
             },
           )
         ],

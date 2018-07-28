@@ -96,6 +96,15 @@ class DBHelper{
   Future<int> createToDo(ToDo todo) async {
   var database = await db;
 
+    String dateRange = TimeFunctions.nowToNearestSecond().subtract(Duration(days: 1)).toIso8601String();
+
+    List<Map> check = await database.rawQuery('SELECT EXISTS (SELECT * FROM todo, task WHERE task.task_id = todo.task_fid AND forfeit = "false" AND success = "false" AND datetime(start_date) > datetime("'+dateRange+'") AND task.task_id = "'+todo.task.id.toString()+'" LIMIT 1) AS "check"');
+
+    bool currentlyExists = check[0]['check'] == 1;
+
+    if(currentlyExists){
+      return null;
+    }
     return await database.transaction((txn) async {
       return await txn.rawInsert(
           'INSERT INTO todo(task_fid, start_date, success, completion_date, forfeit) VALUES('+todo.task.id.toString()+', "'+todo.startDate.toIso8601String()+'", "'+todo.success.toString()+'", "'+todo.completionDate.toIso8601String()+'", "'+todo.forfeit.toString()+'")');
@@ -115,9 +124,16 @@ class DBHelper{
 
 
   //TODO: Check if task exists with same name and icon
-  createTask(Task task) async {
+  Future<int> createTask(Task task) async {
   var database = await db;
   
+  
+    List<Map> check = await database.rawQuery('SELECT task_id AS "check" FROM task WHERE name = "'+task.name+'" AND icon = "'+task.icon+'" LIMIT 1');
+
+    if(check.length > 0){
+      return (check[0]['check']);
+    }
+
   return await database.transaction((txn) async {
       return await txn.rawInsert(
           'INSERT INTO task(name, icon, recommended, creation_date, deleted) VALUES("'+task.name+'","'+task.icon+'","'+task.recommended.toString()+'","'+task.creationDate.toIso8601String()+'", "false")');

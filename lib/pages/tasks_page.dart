@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_admob/firebase_admob.dart';
 import '../services/database.dart';
 import '../model/task.dart';
 import '../model/todo.dart';
@@ -40,27 +39,10 @@ class TasksPageState extends State<TasksPage> {
   bool notificationsEnabled;
   int notificationsDelayValue;
 
-  static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
-    testDevices: null,
-    keywords: <String>['foo', 'bar'],
-    contentUrl: 'http://foo.com/bar.html',
-    birthday: new DateTime.now(),
-    childDirected: true,
-    gender: MobileAdGender.male,
-  );
-  BannerAd _bannerAd;
-
 
   @override
   void initState() {
       super.initState();
-
-      FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
-      _bannerAd = createBannerAd()..load()..show(
-        anchorOffset: 0.0,
-        anchorType: AnchorType.bottom,
-
-      );
 
       loading = true;
       _isEditMode = false;
@@ -86,20 +68,8 @@ class TasksPageState extends State<TasksPage> {
 
   @override
   void dispose() {
-    _bannerAd?.dispose();
     taskNameController.dispose();
     super.dispose();
-  }
-
-  BannerAd createBannerAd() {
-    return new BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
-      size: AdSize.banner,
-      targetingInfo: targetingInfo,
-      listener: (MobileAdEvent event) {
-        print("BannerAd event $event");
-      },
-    );
   }
 
   @override
@@ -153,13 +123,20 @@ class TasksPageState extends State<TasksPage> {
                   () {
                     if(!_isEditMode){
                       _dbHelper.createToDo(ToDo(0, _tasks[i])).then((taskId) {
-                        if(notificationsEnabled){
-                          notificationService.createNotification(ToDo(taskId, _tasks[i]),notificationsDelayValue);
+                        if(taskId != null){
+                          if(notificationsEnabled){
+                            notificationService.createNotification(ToDo(taskId, _tasks[i]),notificationsDelayValue);
+                          }                      
+                          Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()),
+                            (Route route) => route == null
+                          );
+                        }else{
+                          _scaffoldKey.currentState.hideCurrentSnackBar();
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: Text('Task is already active'),
+                          ));
                         }
-                      });                      
-                      Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()),
-                        (Route route) => route == null
-                      );
+                      });
                     }
                     else{
                       _newTaskDialog(_tasks[i]);
@@ -371,14 +348,22 @@ class TasksPageState extends State<TasksPage> {
                             int newId = await _dbHelper.createTask(newTask);
                             newTask.setId(newId);
                             _dbHelper.createToDo(new ToDo(0, newTask)).then((todoId){
-                              if(notificationsEnabled){
-                                notificationService.createNotification(new ToDo(todoId, newTask), notificationsDelayValue);
+                              if(todoId != null){
+                                if(notificationsEnabled){
+                                  notificationService.createNotification(new ToDo(todoId, newTask), notificationsDelayValue);
+                                }
+                                Navigator.pop(context);
+                                Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => 
+                                  HomePage()),
+                                  (Route route) => route == null
+                                );
+                              }else{
+                                _scaffoldKey.currentState.hideCurrentSnackBar();
+                                _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                  content: Text('Task is already active'),
+                                ));
+                                Navigator.pop(context);
                               }
-                              Navigator.pop(context);
-                              Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => 
-                                HomePage()),
-                                (Route route) => route == null
-                              );
                             });
                           }
                           else{
