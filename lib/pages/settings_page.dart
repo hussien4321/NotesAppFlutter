@@ -57,16 +57,6 @@ class _SettingsPageState extends State<SettingsPage> {
         child:Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(top: 5.0),
-                child: Center(
-                  child: Text('Settings', 
-                    style: TextStyle(
-                      fontWeight: FontWeight.w300, fontSize: 30.0,
-                    ),
-                  ),
-                ),
-              ),
               settingsHeader('App settings'),
               settingsOption('Reset data', RaisedButton(
                   onPressed: () {

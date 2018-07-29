@@ -146,25 +146,9 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
   }
 
   Widget notesListView(List<ToDo> todos, DBHelper dbHelper){
-    
-    return Container(
-      padding: EdgeInsets.only(bottom: 50.0),
-      child: Column(
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(10.0),
-            child: Text('Current tasks', 
-              style: Theme.of(context).textTheme.headline
-            ),
-          ),
-          Expanded(
-              child: ListView.builder(
-                itemBuilder: (BuildContext context, int i) => taskDismassable(todos[i], dbHelper, i),
-                itemCount: todos.length,
-              ),
-          ),
-        ],
-      ),
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int i) => taskDismassable(todos[i], dbHelper, i),
+      itemCount: todos.length,
     );
   }
 

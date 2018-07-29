@@ -70,23 +70,9 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Widget historyTodosView(){
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.only(top: 10.0),
-          child: Text('History', 
-            style: TextStyle(
-              fontWeight: FontWeight.w300, fontSize: 30.0,
-            ),
-          ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemBuilder: (BuildContext context, int i) => taskHistoryView(todos[i]),
-            itemCount: todos.length,
-          ),
-        ),
-      ],
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int i) => taskHistoryView(todos[i]),
+      itemCount: todos.length,
     );
   }
 

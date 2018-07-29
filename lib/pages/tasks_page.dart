@@ -91,9 +91,33 @@ class TasksPageState extends State<TasksPage> {
 
   Widget _recommendedTasksView(){
     return Column(
-      
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
+        Container(
+          padding: EdgeInsets.only(top: 35.0, left: 5.0, right: 5.0),
+            child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: Icon(Icons.close, size: 30.0,),
+              ),Expanded(
+                child: Text(
+                  'SELECT TASK', 
+                  style: Theme.of(context).textTheme.headline,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Opacity(
+                opacity: 0.0,
+                child: IconButton(
+                  onPressed: () {},
+                  icon: Icon(Icons.close, size: 30.0,),
+                ),
+              ),
+            ], 
+          ),
+        ),
         createTaskWidget(context),
         Container(
           decoration: new BoxDecoration(

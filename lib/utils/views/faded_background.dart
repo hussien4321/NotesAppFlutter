@@ -7,7 +7,6 @@ Widget fadedBackground({Widget child}) {
   final Color _bottomColor = Colors.orange[300]; 
   
   return Container(
-    padding: EdgeInsets.only(top: 25.0),
     decoration: BoxDecoration(
       gradient: new LinearGradient(
         begin: Alignment.topCenter,

@@ -29,25 +29,27 @@ class Preferences {
   final String _fileName = 'preferences.json';
   static File _jsonFile;
   
-  
   static final Preferences _singleton = new Preferences._internal();
 
   factory Preferences() {
     return _singleton;
   }
 
-  Preferences._internal(){
-    getApplicationDocumentsDirectory().then((Directory directory) {
-      Directory dir = directory;
-      _jsonFile = new File(dir.path + "/" + _fileName);
-      bool fileExists = _jsonFile.existsSync();
-      if (fileExists){
-        currentPreferences = JSON.decode(_jsonFile.readAsStringSync());
-      } else {
-        currentPreferences = initialPreferences;
-        _createPreferencesFile(currentPreferences);
-      }
-    });
+  Preferences._internal() {
+    reInitiliaze();
+  }
+
+  reInitiliaze() async {
+    Directory directory = await getApplicationDocumentsDirectory();
+    Directory dir = directory;
+    _jsonFile = new File(dir.path + "/" + _fileName);
+    bool fileExists = _jsonFile.existsSync();
+    if (fileExists){
+      currentPreferences = JSON.decode(_jsonFile.readAsStringSync());
+    } else {
+      currentPreferences = initialPreferences;
+      _createPreferencesFile(currentPreferences);
+    }
   }
 
   void _createPreferencesFile(Map<String, dynamic> content) {
@@ -63,6 +65,7 @@ class Preferences {
     _jsonFile.writeAsStringSync(JSON.encode(jsonFileContent));
   }
 
+//make async
 
   bool isGraphExapnded(){
     return currentPreferences['graphExpanded'];
@@ -74,6 +77,13 @@ class Preferences {
 
   bool isNotificationsEnabled(){
     return currentPreferences['notificationsEnabled'];
+  }
+
+  bool getAdsPaidStatus(){
+    return currentPreferences['adsPaidStatus'];
+  }
+  Map<String, dynamic> getCurrentPreferences(){
+    return currentPreferences;
   }
 
   int getNotificationSliderValue(){

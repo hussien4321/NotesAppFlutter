@@ -60,17 +60,33 @@ class EmojiSelectorPageState extends State<EmojiSelectorPage> {
 
   Widget buildGrids() {
     return  Container( 
-        padding: EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
+      padding: EdgeInsets.only(top: 10.0, left: 5.0, right: 5.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
-            padding: EdgeInsets.only(bottom: 15.0),
-            child: Center(
-              child: Text(
-                'Select an Emoji', 
-                style: Theme.of(context).textTheme.headline,
-              ),
+            padding: EdgeInsets.only(top: 5.0, bottom: 15.0),
+              child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: Icon(Icons.close, size: 30.0,),
+                ),Expanded(
+                  child: Text(
+                    'SELECT EMOJI', 
+                    style: Theme.of(context).textTheme.headline,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Opacity(
+                  opacity: 0.0,
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.close, size: 30.0,),
+                  ),
+                ),
+              ], 
             ),
           ),
           subHeader('Categories:'),

@@ -19,6 +19,8 @@ class AnalyticsPageState extends State<AnalyticsPage> {
   bool loading;
   bool showStats = true;
 
+  int graphRange = 7;
+
   int _numOfSuccesses;
   int _numOfFailures;
 
@@ -41,6 +43,7 @@ class AnalyticsPageState extends State<AnalyticsPage> {
 
       preferences = new Preferences();
       showStats = !preferences.isGraphExapnded();
+      graphRange = preferences.getGraphRange();
 
       _numOfSuccesses = 0;
       _numOfFailures = 0;
@@ -54,8 +57,8 @@ class AnalyticsPageState extends State<AnalyticsPage> {
   updateAnalytics() async {
     _numOfSuccesses = await dbHelper.getNumberOfSuccesses();
     _numOfFailures = await dbHelper.getNumberOfFailures();
-    successPlotData = await dbHelper.getNumberOfSuccessesPerDay();
-    failurePlotData = await dbHelper.getNumberOfFailuresPerDay();
+    successPlotData = await dbHelper.getNumberOfSuccessesPerDay(graphRange);
+    failurePlotData = await dbHelper.getNumberOfFailuresPerDay(graphRange);
     avgTimeInSeconds = await dbHelper.getAverageTimeToComplete();
     mostSuccessfulTask = await dbHelper.getMostSuccessfulTask();
     leastSuccessfulTask = await dbHelper.getLeastSuccessfulTask();
@@ -67,7 +70,16 @@ class AnalyticsPageState extends State<AnalyticsPage> {
         });
       }
     }
+  }
 
+  updateGraph() async {
+    List<GraphData> newSuccessPlotData = await dbHelper.getNumberOfSuccessesPerDay(graphRange);
+    List<GraphData> newFailurePlotData = await dbHelper.getNumberOfFailuresPerDay(graphRange);
+
+    setState(() {
+       successPlotData = newSuccessPlotData;
+       failurePlotData = newFailurePlotData;   
+    });
   }
 
   @override
@@ -83,17 +95,24 @@ class AnalyticsPageState extends State<AnalyticsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(top: 10.0),
-              child: Center(
-                child: Text('Analytics', 
-                  style: TextStyle(
-                    fontWeight: FontWeight.w300, fontSize: 30.0,
-                  ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: header('All time stats',true),
                 ),
-              ),
+                RaisedButton(
+                  color: Colors.orange,
+                  onPressed: (){
+                    preferences.updatePreference(Preferences.GRAPH_EXPANDED, showStats);
+                    setState(() {
+                      showStats = !showStats;
+                    });
+                  },                  
+                  child: Text(showStats ? 'Hide data' : 'Show data',),
+                ),
+                Padding(padding: EdgeInsets.only(right: 5.0),),
+              ],
             ),
-            header('All time stats',true),
             showStats ? Container(
               child: Column(
                 children: <Widget>[
@@ -175,17 +194,18 @@ class AnalyticsPageState extends State<AnalyticsPage> {
             Row(
               children: <Widget>[
                 Expanded(
-                  child: header('Last 7 days',true),
+                  child: header(((graphRange == 7) ? 'Last week' : 'Last month'),true),
                 ),
-                FlatButton(
+                RaisedButton(
+                  color: Colors.orange,
                   onPressed: (){
-                    preferences.updatePreference(Preferences.GRAPH_EXPANDED, showStats);
-                    setState(() {
-                      showStats = !showStats;
-                    });
+                    graphRange = (graphRange == 7) ? 30 : 7;
+                    preferences.updatePreference(Preferences.GRAPH_RANGE, graphRange);
+                    updateGraph();
                   },                  
-                  child: Text(showStats ? 'Expand' : 'Shrink', style: TextStyle(color: Colors.orange[900], fontWeight: FontWeight.bold),),
-                )
+                  child: Text('Change time',),
+                ),
+                Padding(padding: EdgeInsets.only(right: 5.0),),
               ],
             ),
             Expanded(
@@ -226,8 +246,8 @@ class AnalyticsPageState extends State<AnalyticsPage> {
               style: TextStyle(fontSize: 25.0, color: Colors.red[900], fontWeight: FontWeight.bold),
             ),
             Text(
-            '('+((_numOfFailures + _numOfSuccesses != 0) ? ((_numOfSuccesses/(_numOfFailures+_numOfSuccesses))*100).round().toString():'0')+'%)',
-              style: TextStyle(fontSize: 13.0, color: Colors.grey[800], fontStyle: FontStyle.italic),
+            ' ('+((_numOfFailures + _numOfSuccesses != 0) ? ((_numOfSuccesses/(_numOfFailures+_numOfSuccesses))*100).round().toString():'0')+'%)',
+              style: TextStyle(fontSize: 13.0, color: Colors.grey[800]),
             )
           ],
         ),

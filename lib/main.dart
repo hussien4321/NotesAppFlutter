@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import './pages/emoji_selector_page.dart';
 import './pages/home_page.dart';
 import './services/database.dart';
 import './services/notifications.dart';
@@ -19,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.orange,
         textTheme: TextTheme(
-          headline: TextStyle(fontFamily: 'Quicksand', fontSize: 30.0),
+          headline: TextStyle(fontFamily: 'Quicksand', fontSize: 30.0, letterSpacing: 2.0, fontWeight: FontWeight.bold),
           display1: TextStyle(fontFamily: 'Quicksand', fontSize: 23.0, color: Colors.black),
           body1: TextStyle(fontWeight: FontWeight.w300, fontFamily: 'Quicksand'),
           body2: TextStyle(fontWeight: FontWeight.w300, fontFamily: 'Quicksand', fontSize: 20.0),
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  void _initializeServices(BuildContext context){
+  void _initializeServices(BuildContext context) async {
     new DBHelper();
     new NotificationService();
     new Preferences();

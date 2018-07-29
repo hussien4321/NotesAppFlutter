@@ -3,7 +3,7 @@ import './todos_page.dart';
 import './analytics_page.dart';
 import './tasks_page.dart';
 import './history_page.dart';
-import './emoji_selector_page.dart';
+import '../services/preferences.dart';
 import './settings_page.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/custom_bottom_bar.dart' as customBar;
@@ -25,15 +25,56 @@ class _HomePageState extends State<HomePage> {
 
   int index = 0;
 
+  bool adsPaidStatus = false;
+  Preferences preferences;
 
   @override
   initState(){
     index = widget._index;
+    preferences = new Preferences();
+    print('==========================');
+    print(preferences.getAdsPaidStatus());
+    // adsPaidStatus = preferences.getAdsPaidStatus();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        padding: EdgeInsets.only(top: 25.0),
+        color: Colors.orange[300],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(top: 10.0),
+              child: Center(
+                child: Text(_generateHeaderText(), 
+                  style: Theme.of(context).textTheme.headline
+                ),
+              ),
+            ),
+            Expanded(
+              child: buildScaffold(),
+            ),
+            adsPaidStatus ? Material(
+              color: Colors.white,
+              child: Container(
+                padding: EdgeInsets.only(top: 50.0),
+              ),
+            ) : Container(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _generateHeaderText(){
+    return (index == 0 ? 'TASKS' : (index == 1 ? 'HISTORY' : (index == 3 ? 'ANALYTICS' : (index == 4 ? 'SETTINGS' : ''))));
+  }
+
+  Widget buildScaffold(){
     return Scaffold(
       body: fadedBackground(
         child: Stack(
@@ -49,12 +90,10 @@ class _HomePageState extends State<HomePage> {
         currentIndex: index,
         onTap: (int ind) async { 
             if(ind==2){
-
               int temp = index;
               setState(() {              
                 this.index = 2;
               });
-
               await Navigator.push(context, CustomPageRoute(
                 builder: (BuildContext context) => TasksPage()),
               );  
