@@ -43,14 +43,18 @@ class TasksPageState extends State<TasksPage> {
   @override
   void initState() {
       super.initState();
-
       loading = true;
       _isEditMode = false;
       notificationService = new NotificationService();
       preferences = new Preferences();
       _dbHelper = new DBHelper();
-      notificationsDelayValue = preferences.getNotificationSliderValue();
-      notificationsEnabled = preferences.isNotificationsEnabled();
+
+      initPage();
+  }
+
+  initPage() async {
+      notificationsDelayValue = await preferences.getNotificationSliderValue();
+      notificationsEnabled = await preferences.isNotificationsEnabled();
       iconText = "";
       updatePage();
   }
@@ -58,7 +62,7 @@ class TasksPageState extends State<TasksPage> {
   updatePage() async {
     List<Task> allTasks = await _dbHelper.getAllTasks();
     List<ToDo> todosToKil = await _dbHelper.getActiveToDos();
-    notificationService.cancelOpenNotifications(todosToKil, preferences.getNotificationSliderValue());
+    notificationService.cancelOpenNotifications(todosToKil, notificationsDelayValue);
     setState(() {
        _tasks = allTasks; 
        loading = false;

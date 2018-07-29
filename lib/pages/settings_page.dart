@@ -30,22 +30,27 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     loading = true;
-    isNotificationsEnabled = preferences.isNotificationsEnabled();
-    notificationSliderValue = preferences.getNotificationSliderValue();
-    savedNotificationSliderValue = notificationSliderValue;
-    dbHelper.getActiveToDos().then((todos){
-      existingTodos = todos;
-      notificationService.cancelOpenNotifications(todos, preferences.getNotificationSliderValue());
-      setState(() {
-        loading = false;
-      }); 
-    });
   }
 
-  _updateValues(){
+  initPage() async {
+    isNotificationsEnabled = await preferences.isNotificationsEnabled();
+    notificationSliderValue = await preferences.getNotificationSliderValue();
+    savedNotificationSliderValue = notificationSliderValue;
+    List<ToDo> todos = await dbHelper.getActiveToDos();
+    existingTodos = todos;
+    notificationService.cancelOpenNotifications(todos, notificationSliderValue);
     setState(() {
-      isNotificationsEnabled = preferences.isNotificationsEnabled();
-      notificationSliderValue = preferences.getNotificationSliderValue();
+      loading = false;
+    }); 
+
+  }
+
+  _updateValues() async {
+    bool newIsNotificationsEnabled  = await preferences.isNotificationsEnabled();
+    int newNotificationSliderValue = await preferences.getNotificationSliderValue();
+    setState(() {
+      isNotificationsEnabled = newIsNotificationsEnabled;
+      notificationSliderValue = newNotificationSliderValue;
     }); 
   }
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import '../services/database.dart';
 import '../model/todo.dart';
-import '../utils/helpers/admob_snackbar.dart';
 import '../utils/helpers/time_functions.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/progress_bar.dart';
@@ -30,6 +29,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
   Preferences preferences;
   NotificationService notificationService;
 
+  int notificationDelayValue;
   static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
     testDevices: null,
     keywords: <String>['foo', 'bar'],
@@ -40,16 +40,16 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
   );
   BannerAd _bannerAd;
 
+
   @override
   void initState() {
       super.initState();
       
-      // FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
-      // _bannerAd = createBannerAd()..load()..show(
-      //   anchorOffset: 56.0,
-      //   anchorType: AnchorType.bottom,
-
-      // );
+      FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+      _bannerAd = createBannerAd()..load()..show(
+        anchorOffset: 56.0,
+        anchorType: AnchorType.bottom,
+      );
 
       loading = true;
       dbHelper = new DBHelper();
@@ -72,11 +72,11 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
 
 
   updatePage() async {
-
+    notificationDelayValue = await preferences.getNotificationSliderValue();
     List<ToDo> activeTodos = await dbHelper.getActiveToDos();
     if(mounted){
       if(todos != activeTodos){
-        notificationService.cancelOpenNotifications(activeTodos, preferences.getNotificationSliderValue());
+        notificationService.cancelOpenNotifications(activeTodos, notificationDelayValue);
         initializeControllers(activeTodos);
         setState(() {
           todos = activeTodos;
@@ -113,8 +113,8 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
     for(int i = 0; i < _colorControllers.length; i++){
       _colorControllers[i].dispose();
     }
-    // _bannerAd?.dispose();
-    // _bannerAd = null;
+    _bannerAd?.dispose();
+    _bannerAd = null;
     super.dispose();
   }
 
@@ -185,7 +185,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
         _countdownControllers.removeAt(index);
         updatePage();      
         notificationService.cancelNotification(temp);
-        notificationService.cancelOpenNotifications(todos, preferences.getNotificationSliderValue());
+        notificationService.cancelOpenNotifications(todos, notificationDelayValue);
       },
       secondaryBackground: Container(
         padding: EdgeInsets.all(20.0),

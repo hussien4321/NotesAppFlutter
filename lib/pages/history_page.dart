@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import '../utils/views/loading_screen.dart';
 import '../services/database.dart';
 import '../model/todo.dart';
@@ -24,10 +25,26 @@ class _HistoryPageState extends State<HistoryPage> {
 
   bool notificationsEnabled;
   int notificationsDelayValue;
+  static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
+    testDevices: null,
+    keywords: <String>['foo', 'bar'],
+    contentUrl: 'http://foo.com/bar.html',
+    birthday: new DateTime.now(),
+    childDirected: true,
+    gender: MobileAdGender.male,
+  );
+  BannerAd _bannerAd;
 
   @override  
   void initState() {
     super.initState();
+    
+      FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+      _bannerAd = createBannerAd()..load()..show(
+        anchorOffset: 56.0,
+        anchorType: AnchorType.bottom,
+      );
+
     loading = true;
     dbHelper = new DBHelper();
     notificationService = new NotificationService();
@@ -38,11 +55,30 @@ class _HistoryPageState extends State<HistoryPage> {
   updatePage() async {
 
     todos = await dbHelper.getHistoryToDos();
-    notificationsDelayValue = preferences.getNotificationSliderValue();
-    notificationsEnabled = preferences.isNotificationsEnabled();
+    notificationsDelayValue = await preferences.getNotificationSliderValue();
+    notificationsEnabled = await preferences.isNotificationsEnabled();
     setState(() {
       loading = false;
     });
+  }
+
+  BannerAd createBannerAd() {
+    return new BannerAd(
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("BannerAd event $event");
+      },
+    );
+  }
+
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+    super.dispose();
   }
 
   @override

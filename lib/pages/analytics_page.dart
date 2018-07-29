@@ -42,8 +42,6 @@ class AnalyticsPageState extends State<AnalyticsPage> {
       loading = true;
 
       preferences = new Preferences();
-      showStats = !preferences.isGraphExapnded();
-      graphRange = preferences.getGraphRange();
 
       _numOfSuccesses = 0;
       _numOfFailures = 0;
@@ -55,6 +53,9 @@ class AnalyticsPageState extends State<AnalyticsPage> {
   }
 
   updateAnalytics() async {
+    showStats = !(await preferences.isGraphExapnded());
+    graphRange = await preferences.getGraphRange();
+
     _numOfSuccesses = await dbHelper.getNumberOfSuccesses();
     _numOfFailures = await dbHelper.getNumberOfFailures();
     successPlotData = await dbHelper.getNumberOfSuccessesPerDay(graphRange);

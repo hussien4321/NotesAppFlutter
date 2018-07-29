@@ -15,7 +15,7 @@ class Preferences {
   static final String NOTIFICATIONS_DELAY = 'notificationDelay';
   static final String ADS_PAID_STATUS = 'adsPaidStatus';
 
-  final Map<String, dynamic> initialPreferences = {
+  final Map<String, dynamic> _initialPreferences = {
     'graphExpanded' : false,
     'graphRange' : 7,
     'language' : 'GB',
@@ -24,8 +24,15 @@ class Preferences {
     'adsPaidStatus' : false,
   };
 
-  Map<String, dynamic> currentPreferences = {};
+  Map<String, dynamic> _currentPreferences = {};
 
+  Future<Map<String, dynamic>> get currentPreferences async {
+    if(_currentPreferences.length != 0){
+      return _currentPreferences;
+    }
+    await reInitiliaze();
+    return _currentPreferences;
+  }
   final String _fileName = 'preferences.json';
   static File _jsonFile;
   
@@ -45,10 +52,10 @@ class Preferences {
     _jsonFile = new File(dir.path + "/" + _fileName);
     bool fileExists = _jsonFile.existsSync();
     if (fileExists){
-      currentPreferences = JSON.decode(_jsonFile.readAsStringSync());
+      _currentPreferences = JSON.decode(_jsonFile.readAsStringSync());
     } else {
-      currentPreferences = initialPreferences;
-      _createPreferencesFile(currentPreferences);
+      _currentPreferences = _initialPreferences;
+      _createPreferencesFile(_currentPreferences);
     }
   }
 
@@ -61,32 +68,39 @@ class Preferences {
     Map<String, dynamic> content = {key: value};
     Map<String, dynamic> jsonFileContent = json.decode(_jsonFile.readAsStringSync());
     jsonFileContent.addAll(content);
-    currentPreferences = jsonFileContent;
+    _currentPreferences = jsonFileContent;
     _jsonFile.writeAsStringSync(JSON.encode(jsonFileContent));
   }
 
 //make async
 
-  bool isGraphExapnded(){
-    return currentPreferences['graphExpanded'];
+  Future<bool> isGraphExapnded() async {
+    var preferences = await currentPreferences;
+
+    return preferences['graphExpanded'];
   }
 
-  int getGraphRange(){
-    return currentPreferences['graphRange'];
+  Future<int> getGraphRange() async {
+    var preferences = await currentPreferences;
+
+    return preferences['graphRange'];
   }
 
-  bool isNotificationsEnabled(){
-    return currentPreferences['notificationsEnabled'];
+  Future<bool> isNotificationsEnabled() async {
+    var preferences = await currentPreferences;
+
+    return preferences['notificationsEnabled'];
   }
 
-  bool getAdsPaidStatus(){
-    return currentPreferences['adsPaidStatus'];
-  }
-  Map<String, dynamic> getCurrentPreferences(){
-    return currentPreferences;
+  Future<bool> getAdsPaidStatus() async {
+    var preferences = await currentPreferences;
+
+    return preferences['adsPaidStatus'];
   }
 
-  int getNotificationSliderValue(){
-    return currentPreferences['notificationDelay'];
+  Future<int> getNotificationSliderValue() async {
+    var preferences = await currentPreferences;
+
+    return preferences['notificationDelay'];
   }
 }

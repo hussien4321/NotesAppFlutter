@@ -32,10 +32,15 @@ class _HomePageState extends State<HomePage> {
   initState(){
     index = widget._index;
     preferences = new Preferences();
-    print('==========================');
-    print(preferences.getAdsPaidStatus());
-    // adsPaidStatus = preferences.getAdsPaidStatus();
+    initPage();
     super.initState();
+  }
+
+  initPage() async{
+    bool newAdsPaidStatus = await preferences.getAdsPaidStatus();
+    setState(() {
+      adsPaidStatus =  true;
+    });
   }
 
   @override
@@ -58,7 +63,7 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: buildScaffold(),
             ),
-            adsPaidStatus ? Material(
+            (adsPaidStatus && (index ==0 || index == 1)) ? Material(
               color: Colors.white,
               child: Container(
                 padding: EdgeInsets.only(top: 50.0),
@@ -67,25 +72,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-    );
-  }
-
-  String _generateHeaderText(){
-    return (index == 0 ? 'TASKS' : (index == 1 ? 'HISTORY' : (index == 3 ? 'ANALYTICS' : (index == 4 ? 'SETTINGS' : ''))));
-  }
-
-  Widget buildScaffold(){
-    return Scaffold(
-      body: fadedBackground(
-        child: Stack(
-          children: <Widget>[
-            index == 0 ? ToDosPage() : Container(),
-            index == 1 ? HistoryPage() : Container(),
-            index == 3 ? AnalyticsPage() : Container(),
-            index == 4 ? SettingsPage() : Container(),
-          ],
-        ),
-      ),
+      
       bottomNavigationBar: new customBar.CustomBottomNavigationBar(
         currentIndex: index,
         onTap: (int ind) async { 
@@ -121,6 +108,25 @@ class _HomePageState extends State<HomePage> {
           navigationBarItem(Icons.timeline, "Analytics", 3),
           navigationBarItem(Icons.settings, "Settings", 4),
         ],
+      ),
+    );
+  }
+
+  String _generateHeaderText(){
+    return (index == 0 ? 'TASKS' : (index == 1 ? 'HISTORY' : (index == 3 ? 'ANALYTICS' : (index == 4 ? 'SETTINGS' : ''))));
+  }
+
+  Widget buildScaffold(){
+    return Scaffold(
+      body: fadedBackground(
+        child: Stack(
+          children: <Widget>[
+            index == 0 ? ToDosPage() : Container(),
+            index == 1 ? HistoryPage() : Container(),
+            index == 3 ? AnalyticsPage() : Container(),
+            index == 4 ? SettingsPage() : Container(),
+          ],
+        ),
       ),
     );
   }
