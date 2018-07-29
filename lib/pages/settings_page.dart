@@ -30,6 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     loading = true;
+    initPage();
   }
 
   initPage() async {
@@ -167,7 +168,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     //LINK TO DISABLING ADS
                   },
                   child: Text(
-                    '£0.99',
+                    'Buy',
                   ),
                   color: Colors.orange,
                 ),

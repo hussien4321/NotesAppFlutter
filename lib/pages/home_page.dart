@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
   initPage() async{
     bool newAdsPaidStatus = await preferences.getAdsPaidStatus();
     setState(() {
-      adsPaidStatus =  true;
+      adsPaidStatus =  newAdsPaidStatus;
     });
   }
 
@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: buildScaffold(),
             ),
-            (adsPaidStatus && (index ==0 || index == 1)) ? Material(
+            (!adsPaidStatus && (index ==0 || index == 1)) ? Material(
               color: Colors.white,
               child: Container(
                 padding: EdgeInsets.only(top: 50.0),
