@@ -19,7 +19,12 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.orange,
         textTheme: TextTheme(
-          body1: TextStyle(fontWeight: FontWeight.w300),
+          headline: TextStyle(fontFamily: 'Quicksand', fontSize: 30.0),
+          display1: TextStyle(fontFamily: 'Quicksand', fontSize: 23.0, color: Colors.black),
+          body1: TextStyle(fontWeight: FontWeight.w300, fontFamily: 'Quicksand'),
+          body2: TextStyle(fontWeight: FontWeight.w300, fontFamily: 'Quicksand', fontSize: 20.0),
+          caption: TextStyle(fontFamily: 'Quicksand', fontSize: 17.0, color: Colors.black),
+          button: TextStyle(fontFamily: 'Quicksand'),
         ),
       ),
       home: HomePage(),

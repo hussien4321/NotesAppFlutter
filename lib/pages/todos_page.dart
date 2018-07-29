@@ -44,12 +44,12 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
   void initState() {
       super.initState();
       
-      FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
-      _bannerAd = createBannerAd()..load()..show(
-        anchorOffset: 56.0,
-        anchorType: AnchorType.bottom,
+      // FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+      // _bannerAd = createBannerAd()..load()..show(
+      //   anchorOffset: 56.0,
+      //   anchorType: AnchorType.bottom,
 
-      );
+      // );
 
       loading = true;
       dbHelper = new DBHelper();
@@ -113,8 +113,8 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
     for(int i = 0; i < _colorControllers.length; i++){
       _colorControllers[i].dispose();
     }
-    _bannerAd?.dispose();
-    _bannerAd = null;
+    // _bannerAd?.dispose();
+    // _bannerAd = null;
     super.dispose();
   }
 
@@ -153,10 +153,8 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
         children: <Widget>[
           Container(
             padding: EdgeInsets.all(10.0),
-            child: Text('Current Tasks', 
-              style: TextStyle(
-                fontWeight: FontWeight.w300, fontSize: 30.0,
-              ),
+            child: Text('Current tasks', 
+              style: Theme.of(context).textTheme.headline
             ),
           ),
           Expanded(

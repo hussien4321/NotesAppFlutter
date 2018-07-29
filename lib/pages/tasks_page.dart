@@ -209,7 +209,7 @@ class TasksPageState extends State<TasksPage> {
       context: context,
       child: new AlertDialog(
         contentPadding: const EdgeInsets.all(16.0),
-        title: Text(dialogTask == null ? 'Create task' : 'Edit task',textAlign: TextAlign.center, style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w300),),
+        title: Text(dialogTask == null ? 'Create task' : 'Edit task',textAlign: TextAlign.center, style: Theme.of(context).textTheme.display1,),
         content: Form(
           key: _formKey,
           child: Column(
@@ -228,7 +228,7 @@ class TasksPageState extends State<TasksPage> {
                       children: <Widget>[
                         Text(
                           'Icon:',
-                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w300),
+                          style: Theme.of(context).textTheme.body2,
                         ),
                         FormField(
                           validator: (value) {
@@ -284,7 +284,7 @@ class TasksPageState extends State<TasksPage> {
                 }
               },
               controller: taskNameController,
-              style: TextStyle(fontSize: 17.0,color: Colors.black, fontWeight: FontWeight.w300),
+              style: Theme.of(context).textTheme.caption,
               autofocus: dialogTask == null,
               decoration: InputDecoration(
                   labelText: 'Task name', hintText: 'eg. Do 10 push ups', contentPadding: EdgeInsets.only(bottom: 5.0),),

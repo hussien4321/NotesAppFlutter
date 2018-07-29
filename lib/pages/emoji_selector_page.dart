@@ -69,9 +69,7 @@ class EmojiSelectorPageState extends State<EmojiSelectorPage> {
             child: Center(
               child: Text(
                 'Select an Emoji', 
-                style: TextStyle(
-                  fontWeight: FontWeight.w300, fontSize: 30.0,
-                ),
+                style: Theme.of(context).textTheme.headline,
               ),
             ),
           ),
@@ -102,7 +100,7 @@ class EmojiSelectorPageState extends State<EmojiSelectorPage> {
                     decoration: InputDecoration(
                       hintText: 'Search here'
                     ),
-                    style: TextStyle(color: Colors.orange[800]),
+                    style: Theme.of(context).textTheme.caption,
                   ),
                 ),
                 IconButton(

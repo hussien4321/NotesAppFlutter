@@ -17,6 +17,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   bool isNotificationsEnabled = false;
   int notificationSliderValue = 12;
+  int savedNotificationSliderValue = 12;
 
   bool loading = true;
 
@@ -31,6 +32,7 @@ class _SettingsPageState extends State<SettingsPage> {
     loading = true;
     isNotificationsEnabled = preferences.isNotificationsEnabled();
     notificationSliderValue = preferences.getNotificationSliderValue();
+    savedNotificationSliderValue = notificationSliderValue;
     dbHelper.getActiveToDos().then((todos){
       existingTodos = todos;
       notificationService.cancelOpenNotifications(todos, preferences.getNotificationSliderValue());
@@ -94,10 +96,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     );
                   },
                   child: Text(
-                    'RESET',
-                    style: TextStyle(color: Colors.white), 
+                    'Reset',
                   ),
-                  color: Colors.orangeAccent,
+                  color: Colors.orange,
                 ),
               ),
               settingsOption('Change language', IconButton(
@@ -129,7 +130,28 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
                 ),
               ),
-              settingsOptionNoItem('Notify '+notificationSliderValue.round().toString()+' hours before each deadline', isNotificationsEnabled),
+              settingsOption('Notify '+notificationSliderValue.round().toString()+' hours before each deadline', 
+                Opacity(
+                  opacity: (savedNotificationSliderValue != notificationSliderValue) ? 1.0 : 0.0,
+                  child: RaisedButton(
+                  onPressed: (savedNotificationSliderValue != notificationSliderValue) ? () {
+                    savedNotificationSliderValue = notificationSliderValue;
+                    preferences.updatePreference(Preferences.NOTIFICATIONS_DELAY, savedNotificationSliderValue);
+                    _updateValues();
+                    notificationService.updateNotifications(existingTodos, savedNotificationSliderValue);
+                    Scaffold.of(context).hideCurrentSnackBar();
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text('Timer updated ⏰'),
+                    ));
+                  } : null,
+                  child: Text(
+                    'Update',
+                    style: TextStyle(color: Colors.white), 
+                  ),
+                  color: Colors.orangeAccent,
+                ),
+              ),
+              isNotificationsEnabled),
               Slider(
                 value: notificationSliderValue.toDouble(),
                 activeColor: isNotificationsEnabled ? SliderTheme.of(context).activeTrackColor : Colors.grey,
@@ -139,10 +161,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 divisions: 22,
                 onChanged: (newValue) {
                   if(isNotificationsEnabled){
-                    int newDelay = newValue.round();
-                    setState(() => notificationSliderValue = newDelay);
-                    preferences.updatePreference(Preferences.NOTIFICATIONS_DELAY, newDelay);
-                    notificationService.updateNotifications(existingTodos, newDelay);
+                    setState(() => notificationSliderValue = newValue.round());
                   }
                 },
                 
@@ -154,9 +173,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                   child: Text(
                     '£0.99',
-                    style: TextStyle(color: Colors.white), 
                   ),
-                  color: Colors.orangeAccent,
+                  color: Colors.orange,
                 ),
               ),
               settingsHeader('Social media'),
