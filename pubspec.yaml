@@ -17,6 +17,7 @@ dependencies:
   charts_flutter: 0.3.0
   firebase_admob: 0.5.6
   flutter_iap: 1.2.1
+  url_launcher: 3.0.3
 
 dev_dependencies:
   flutter_test:

@@ -223,7 +223,7 @@ class DBHelper{
 
     String dateRange = TimeFunctions.nowToNearestSecond().subtract(Duration(days: 1)).toIso8601String();
 
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE task.task_id = todo.task_fid AND (forfeit = "true" OR success = "true" OR datetime(start_date) < datetime("'+dateRange+'")) ORDER BY datetime(completion_date) DESC LIMIT 30');
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE task.task_id = todo.task_fid AND (forfeit = "true" OR success = "true" OR datetime(start_date) < datetime("'+dateRange+'")) ORDER BY datetime(completion_date) DESC');
     List<ToDo> todos = new List();
     for (int i = 0; i < list.length; i++) {
       todos.add(new ToDo.fromJson(list[i]));
@@ -265,7 +265,7 @@ class DBHelper{
     var dbClient = await db;
 
     String yesterdayTime = TimeFunctions.nowToNearestSecond().subtract(Duration(days: 1)).toIso8601String();
-    //TODO : (date < yesterday AND success = "false") OR forfeit = "true"
+
     List<Map> list = await dbClient.rawQuery('SELECT COUNT(*) AS "failures" FROM todo WHERE forfeit = "true" OR (datetime(start_date) < datetime("'+yesterdayTime+'") AND success = "false")');
     Map answer = list[0];
     

@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Container(
         padding: EdgeInsets.only(top: 25.0),
-        color: Colors.orange[300],
+        color: Colors.orange[200],
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[

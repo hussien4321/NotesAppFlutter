@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_iap/flutter_iap.dart';
 import 'package:share/share.dart';
+import 'package:flutter/services.dart';
 import '../services/preferences.dart';
 import '../utils/views/loading_screen.dart';
 import '../services/notifications.dart';
@@ -28,32 +29,37 @@ class _SettingsPageState extends State<SettingsPage> {
   List<ToDo> existingTodos = [];
   DBHelper dbHelper = new DBHelper();
 
+  final String _twitterURL = 'https://twitter.com/TodoToday2';
+
   List<String> _productIds = [];
+  List<String> _alreadyPurchased = [];
 
   @override
   void initState() {
     super.initState();
     loading = true;
-    init();
+    // initPaymentOption();
     initPage();
   }
 
   
-  init() async {
-    List<String> productIds = ["todo.today.iap.disable.ads"];
+  // initPaymentOption() async {
+  //   List<String> productIds = [""];
 
-    if (Platform.isIOS) {
-      IAPResponse response = await FlutterIap.fetchProducts(productIds);
-      productIds = response.products.map((IAPProduct product) => product.productIdentifier).toList();
-    }
 
-    if (!mounted)
-      return;
+  //   IAPResponse response = await FlutterIap.fetchProducts(productIds);
+  //   productIds = response.products
+  //       .map((IAPProduct product) => product.productIdentifier)
+  //       .toList();
 
-    setState(() {
-      _productIds = productIds;
-    });
-  }
+
+  //   if (!mounted)
+  //     return;
+
+  //   setState(() {
+  //     _productIds = productIds;
+  //   });
+  // }
 
   initPage() async {
     isNotificationsEnabled = await preferences.isNotificationsEnabled();
@@ -119,11 +125,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   color: Colors.orange,
                 ),
               ),
-              settingsOption('Change language', IconButton(
-                  icon: Icon(FontAwesomeIcons.globe),
-                  iconSize: 20.0,
-                ),
-              ),
+              // settingsOption('Change language', IconButton(
+              //     icon: Icon(FontAwesomeIcons.globe),
+              //     iconSize: 20.0,
+              //   ),
+              // ),
               settingsHeader('Notifications'),
               settingsOption('Enable notifications', Switch(
                 value: isNotificationsEnabled,
@@ -164,7 +170,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   } : null,
                   child: Text(
                     'Update',
-                    style: TextStyle(color: Colors.white), 
                   ),
                   color: Colors.orangeAccent,
                 ),
@@ -184,33 +189,37 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
                 
               ),
-              settingsHeader('In-app purchases'),
-              settingsOption('Disable ads', RaisedButton(
-                  onPressed: () async {
-                    IAPResponse response = await FlutterIap.buy(_productIds.first);
-                    print('RESPONSE : ');
-                    print(response);
-                  },
-                  child: Text(
-                    'Buy',
-                  ),
-                  color: Colors.orange,
-                ),
-              ),
+              // settingsHeader('In-app purchases'),
+              // settingsOption('Disable ads', RaisedButton(
+              //     onPressed: () async {
+              //       IAPResponse response = await FlutterIap.buy(_productIds.first);
+              //       print('RESPONSE : ');
+              //       print(response);
+              //     },
+              //     child: Text(
+              //       'Buy',
+              //     ),
+              //     color: Colors.orange,
+              //   ),
+              // ),
               settingsHeader('Social media'),
-              settingsOption('Follow us on twitter  @24h_tasks', IconButton(
+              settingsOption('Follow us on twitter  @TodoToday2', IconButton(
                 icon: Icon(FontAwesomeIcons.twitter),
                 iconSize: 20.0,
                 onPressed: () {
-                  //LINK TO TWITTER
+                  Clipboard.setData(new ClipboardData(text: _twitterURL));
+                  Scaffold.of(context).hideCurrentSnackBar();
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                    content: Text('Copied to Clipboard 📋'),
+                  ));
                 },
               )),
-              settingsOption('Share with friends', IconButton(
+              settingsOption('Share this app with friends', IconButton(
                 icon: Icon(Icons.share),
                 iconSize: 20.0,
                 onPressed: () {
                     final RenderBox box = context.findRenderObject();
-                    Share.share('Check out this great app that helps get your daily tasks done! WWW.WEBSITELINK.COM',
+                    Share.share('Check out this great app for completing daily tasks! Available now on the play store and coming soon to iOS. Look up app name \"Todo-Today\"',
                         sharePositionOrigin:
                             box.localToGlobal(Offset.zero) &
                                 box.size);
@@ -252,7 +261,7 @@ class _SettingsPageState extends State<SettingsPage> {
         Expanded(
           child: Text(
             optionText,
-            style: TextStyle(fontSize: 17.0, color: enabled ? Colors.black : Colors.grey),
+            style: TextStyle(fontSize: 17.0, color: enabled ? Colors.black : Colors.grey[700]),
           ),
         ),
         button,
