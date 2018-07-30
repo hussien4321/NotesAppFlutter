@@ -39,17 +39,19 @@ class _HistoryPageState extends State<HistoryPage> {
   void initState() {
     super.initState();
     
-      FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
-      _bannerAd = createBannerAd()..load()..show(
-        anchorOffset: 56.0,
-        anchorType: AnchorType.bottom,
-      );
+    initAds();
 
     loading = true;
     dbHelper = new DBHelper();
     notificationService = new NotificationService();
     preferences = new Preferences();
     updatePage();
+  }
+
+  
+  initAds() async {
+    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+    _bannerAd = createBannerAd()..load();    
   }
 
   updatePage() async {
@@ -68,7 +70,12 @@ class _HistoryPageState extends State<HistoryPage> {
       size: AdSize.banner,
       targetingInfo: targetingInfo,
       listener: (MobileAdEvent event) {
-        print("BannerAd event $event");
+        if(mounted){
+          _bannerAd..show(
+            anchorOffset: 56.0,
+            anchorType: AnchorType.bottom, 
+          );
+        }
       },
     );
   }

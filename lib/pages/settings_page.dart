@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_iap/flutter_iap.dart';
 import 'package:share/share.dart';
 import '../services/preferences.dart';
 import '../utils/views/loading_screen.dart';
@@ -7,6 +8,7 @@ import '../services/notifications.dart';
 import '../services/database.dart';
 import '../model/todo.dart';
 import '../utils/views/yes_no_dialog.dart';
+import 'dart:io';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -26,11 +28,31 @@ class _SettingsPageState extends State<SettingsPage> {
   List<ToDo> existingTodos = [];
   DBHelper dbHelper = new DBHelper();
 
+  List<String> _productIds = [];
+
   @override
   void initState() {
     super.initState();
     loading = true;
+    init();
     initPage();
+  }
+
+  
+  init() async {
+    List<String> productIds = ["todo.today.iap.disable.ads"];
+
+    if (Platform.isIOS) {
+      IAPResponse response = await FlutterIap.fetchProducts(productIds);
+      productIds = response.products.map((IAPProduct product) => product.productIdentifier).toList();
+    }
+
+    if (!mounted)
+      return;
+
+    setState(() {
+      _productIds = productIds;
+    });
   }
 
   initPage() async {
@@ -164,8 +186,10 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               settingsHeader('In-app purchases'),
               settingsOption('Disable ads', RaisedButton(
-                  onPressed: () {
-                    //LINK TO DISABLING ADS
+                  onPressed: () async {
+                    IAPResponse response = await FlutterIap.buy(_productIds.first);
+                    print('RESPONSE : ');
+                    print(response);
                   },
                   child: Text(
                     'Buy',

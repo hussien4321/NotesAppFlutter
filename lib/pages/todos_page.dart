@@ -44,12 +44,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
   @override
   void initState() {
       super.initState();
-      
-      FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
-      _bannerAd = createBannerAd()..load()..show(
-        anchorOffset: 56.0,
-        anchorType: AnchorType.bottom,
-      );
+      initAds();
 
       loading = true;
       dbHelper = new DBHelper();
@@ -58,6 +53,10 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
       updatePage();
   }
 
+  initAds() async {
+    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+    _bannerAd = createBannerAd()..load();    
+  }
 
   BannerAd createBannerAd() {
     return new BannerAd(
@@ -65,7 +64,12 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
       size: AdSize.banner,
       targetingInfo: targetingInfo,
       listener: (MobileAdEvent event) {
-        print("BannerAd event $event");
+        if(mounted){
+          _bannerAd..show(
+            anchorOffset: 56.0,
+            anchorType: AnchorType.bottom, 
+          );
+        }
       },
     );
   }
@@ -114,7 +118,6 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
       _colorControllers[i].dispose();
     }
     _bannerAd?.dispose();
-    _bannerAd = null;
     super.dispose();
   }
 
