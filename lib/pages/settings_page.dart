@@ -221,7 +221,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Clipboard.setData(new ClipboardData(text: _twitterURL));
                   Scaffold.of(context).hideCurrentSnackBar();
                   Scaffold.of(context).showSnackBar(SnackBar(
-                    content: Text('Copied to Clipboard 📋'),
+                    content: Text('Link copied to clipboard 📋'),
                   ));
                 },
               )),
@@ -241,6 +241,8 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
+
+  
 
   Widget settingsHeader(String headerText){
     return Container(

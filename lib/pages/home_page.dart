@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Opacity(
-                  opacity: index == 0 ? 1.0 : 0.0,
+                  opacity: index == 0 ? 0.0 : 0.0,
                   child: IconButton(
                     onPressed: () {},
                     icon: Icon(Icons.info, size: 30.0,),
