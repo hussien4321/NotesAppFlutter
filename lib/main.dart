@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_admob/firebase_admob.dart';
+import './utils/helpers/admob_tools.dart';
 import './pages/home_page.dart';
 import './services/database.dart';
 import './services/notifications.dart';
@@ -44,5 +46,6 @@ class MyApp extends StatelessWidget {
     new NotificationService();
     new Preferences();
     new EmojiLoader(context);
+    FirebaseAdMob.instance.initialize(appId: AdmobTools.appId);
   }
 }

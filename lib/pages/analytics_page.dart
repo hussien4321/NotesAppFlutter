@@ -8,6 +8,8 @@ import '../model/task.dart';
 import '../model/graph_data.dart';
 import '../utils/views/line_graph.dart';
 import '../utils/helpers/time_functions.dart';
+import '../utils/helpers/admob_tools.dart';
+import 'dart:io' show Platform;
 
 class AnalyticsPage extends StatefulWidget {
   @override
@@ -34,16 +36,7 @@ class AnalyticsPageState extends State<AnalyticsPage> {
 
   Preferences preferences;
 
-  static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
-    testDevices: null,
-    keywords: <String>['foo', 'bar'],
-    contentUrl: 'http://foo.com/bar.html',
-    birthday: new DateTime.now(),
-    childDirected: true,
-    gender: MobileAdGender.male,
-  );
   BannerAd _bannerAd;
-
 
   @override
   void initState() {
@@ -65,15 +58,14 @@ class AnalyticsPageState extends State<AnalyticsPage> {
 
   
   initAds() async {
-    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
     _bannerAd = createBannerAd()..load();    
   }
 
   BannerAd createBannerAd() {
     return new BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId: AdmobTools.adUnitId,
       size: AdSize.banner,
-      targetingInfo: targetingInfo,
+      targetingInfo: AdmobTools.targetingInfo,
       listener: (MobileAdEvent event) {
         if(mounted){
           _bannerAd..show(

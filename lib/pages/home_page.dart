@@ -8,6 +8,7 @@ import './settings_page.dart';
 import '../utils/views/faded_background.dart';
 import '../utils/views/custom_bottom_bar.dart' as customBar;
 import '../utils/helpers/custom_page_routes.dart';
+import '../utils/views/custom_dialogs.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -22,6 +23,7 @@ class _HomePageState extends State<HomePage> {
 
   final Color _iconColor = Colors.grey;
   final Color _textColor = Colors.black;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   int index = 0;
 
@@ -47,18 +49,34 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.only(top: 25.0),
+        padding: EdgeInsets.only(top: 35.0),
         color: Colors.orange[200],
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(top: 10.0),
-              child: Center(
-                child: Text(_generateHeaderText(), 
-                  style: Theme.of(context).textTheme.headline
+            Row(
+              children: <Widget>[
+                Opacity(
+                  opacity: 0.0,
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.info, size: 30.0,),
+                  ),
+                ),Expanded(
+                  child: Text(
+                    _generateHeaderText(), 
+                    style: Theme.of(context).textTheme.headline,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
+                Opacity(
+                  opacity: index == 0 ? 1.0 : 0.0,
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.info, size: 30.0,),
+                  ),
+                ),
+              ], 
             ),
             Expanded(
               child: buildScaffold(),
@@ -88,6 +106,7 @@ class _HomePageState extends State<HomePage> {
                 (Route route) => route == null
               );
             }else{
+              _scaffoldKey.currentState.removeCurrentSnackBar();
               setState(() {              
                 this.index = ind;
               });
@@ -118,6 +137,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildScaffold(){
     return Scaffold(
+      key: _scaffoldKey,
       body: fadedBackground(
         child: Stack(
           children: <Widget>[

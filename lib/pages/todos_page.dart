@@ -3,6 +3,7 @@ import 'package:firebase_admob/firebase_admob.dart';
 import '../services/database.dart';
 import '../model/todo.dart';
 import '../utils/helpers/time_functions.dart';
+import '../utils/helpers/admob_tools.dart';
 import '../utils/views/loading_screen.dart';
 import '../utils/views/progress_bar.dart';
 import '../utils/views/countdown.dart';
@@ -30,14 +31,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
   NotificationService notificationService;
 
   int notificationDelayValue;
-  static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
-    testDevices: null,
-    keywords: <String>['foo', 'bar'],
-    contentUrl: 'http://foo.com/bar.html',
-    birthday: new DateTime.now(),
-    childDirected: true,
-    gender: MobileAdGender.male,
-  );
+
   BannerAd _bannerAd;
 
 
@@ -54,15 +48,14 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
   }
 
   initAds() async {
-    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
     _bannerAd = createBannerAd()..load();    
   }
 
   BannerAd createBannerAd() {
     return new BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId: AdmobTools.adUnitId,
       size: AdSize.banner,
-      targetingInfo: targetingInfo,
+      targetingInfo: AdmobTools.targetingInfo,
       listener: (MobileAdEvent event) {
         if(mounted){
           _bannerAd..show(
@@ -73,6 +66,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
       },
     );
   }
+
 
 
   updatePage() async {
@@ -118,6 +112,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
       _colorControllers[i].dispose();
     }
     _bannerAd?.dispose();
+    _bannerAd = null;
     super.dispose();
   }
 

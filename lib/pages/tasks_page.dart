@@ -8,7 +8,7 @@ import '../utils/views/task_view.dart';
 import './home_page.dart';
 import '../services/notifications.dart';
 import '../services/preferences.dart';
-import '../utils/views/yes_no_dialog.dart';
+import '../utils/views/custom_dialogs.dart';
 import '../utils/helpers/custom_page_routes.dart';
 import './emoji_selector_page.dart';
 

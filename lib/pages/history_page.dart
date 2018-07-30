@@ -6,6 +6,7 @@ import '../model/todo.dart';
 import '../services/notifications.dart';
 import './home_page.dart';
 import '../services/preferences.dart';
+import '../utils/helpers/admob_tools.dart';
 import '../utils/helpers/time_functions.dart';
 import '../utils/helpers/custom_page_routes.dart';
 
@@ -26,15 +27,7 @@ class _HistoryPageState extends State<HistoryPage> {
   bool notificationsEnabled;
   int notificationsDelayValue;
 
-  
-  static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
-    testDevices: null,
-    keywords: <String>['foo', 'bar'],
-    contentUrl: 'http://foo.com/bar.html',
-    birthday: new DateTime.now(),
-    childDirected: true,
-    gender: MobileAdGender.male,
-  );
+
   BannerAd _bannerAd;
 
   @override  
@@ -52,25 +45,14 @@ class _HistoryPageState extends State<HistoryPage> {
 
   
   initAds() async {
-    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
     _bannerAd = createBannerAd()..load();    
-  }
-
-  updatePage() async {
-
-    todos = await dbHelper.getHistoryToDos();
-    notificationsDelayValue = await preferences.getNotificationSliderValue();
-    notificationsEnabled = await preferences.isNotificationsEnabled();
-    setState(() {
-      loading = false;
-    });
   }
 
   BannerAd createBannerAd() {
     return new BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId: AdmobTools.adUnitId,
       size: AdSize.banner,
-      targetingInfo: targetingInfo,
+      targetingInfo: AdmobTools.targetingInfo,
       listener: (MobileAdEvent event) {
         if(mounted){
           _bannerAd..show(
@@ -80,6 +62,17 @@ class _HistoryPageState extends State<HistoryPage> {
         }
       },
     );
+  }
+
+
+  updatePage() async {
+
+    todos = await dbHelper.getHistoryToDos();
+    notificationsDelayValue = await preferences.getNotificationSliderValue();
+    notificationsEnabled = await preferences.isNotificationsEnabled();
+    setState(() {
+      loading = false;
+    });
   }
 
 

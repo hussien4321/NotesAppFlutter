@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_iap/flutter_iap.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:share/share.dart';
 import 'package:flutter/services.dart';
 import '../services/preferences.dart';
+import '../utils/helpers/admob_tools.dart';
 import '../utils/views/loading_screen.dart';
 import '../services/notifications.dart';
 import '../services/database.dart';
 import '../model/todo.dart';
-import '../utils/views/yes_no_dialog.dart';
+import '../utils/views/custom_dialogs.dart';
 import 'dart:io';
 
 class SettingsPage extends StatefulWidget {
@@ -32,16 +32,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
   final String _twitterURL = 'https://twitter.com/TodoToday2';
 
-
-  
-  static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
-    testDevices: null,
-    keywords: <String>['foo', 'bar'],
-    contentUrl: 'http://foo.com/bar.html',
-    birthday: new DateTime.now(),
-    childDirected: true,
-    gender: MobileAdGender.male,
-  );
   BannerAd _bannerAd;
 
   List<String> _productIds = [];
@@ -52,35 +42,18 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     loading = true;
     initAds();
-    // initPaymentOption();
     initPage();
   }
 
-  
-  // initPaymentOption() async {
-  //   List<String> productIds = [""];
-  //   IAPResponse response = await FlutterIap.fetchProducts(productIds);
-  //   productIds = response.products
-  //       .map((IAPProduct product) => product.productIdentifier)
-  //       .toList();
-  //   if (!mounted)
-  //     return;
-  //   setState(() {
-  //     _productIds = productIds;
-  //   });
-  // }
-
-
   initAds() async {
-    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
     _bannerAd = createBannerAd()..load();    
   }
 
   BannerAd createBannerAd() {
     return new BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId: AdmobTools.adUnitId,
       size: AdSize.banner,
-      targetingInfo: targetingInfo,
+      targetingInfo: AdmobTools.targetingInfo,
       listener: (MobileAdEvent event) {
         if(mounted){
           _bannerAd..show(
