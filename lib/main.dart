@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import './pages/home_page.dart';
 import './services/database.dart';
 import './services/notifications.dart';
@@ -11,6 +12,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _lockOrientation();
     _initializeServices(context);
     return new MaterialApp(
       title: '24h Tasks',
@@ -30,6 +32,13 @@ class MyApp extends StatelessWidget {
     );
   }
 
+  void _lockOrientation(){
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+  
   void _initializeServices(BuildContext context) async {
     new DBHelper();
     new NotificationService();

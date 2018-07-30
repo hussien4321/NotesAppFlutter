@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_iap/flutter_iap.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:share/share.dart';
 import 'package:flutter/services.dart';
 import '../services/preferences.dart';
@@ -31,6 +32,18 @@ class _SettingsPageState extends State<SettingsPage> {
 
   final String _twitterURL = 'https://twitter.com/TodoToday2';
 
+
+  
+  static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
+    testDevices: null,
+    keywords: <String>['foo', 'bar'],
+    contentUrl: 'http://foo.com/bar.html',
+    birthday: new DateTime.now(),
+    childDirected: true,
+    gender: MobileAdGender.male,
+  );
+  BannerAd _bannerAd;
+
   List<String> _productIds = [];
   List<String> _alreadyPurchased = [];
 
@@ -38,6 +51,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     loading = true;
+    initAds();
     // initPaymentOption();
     initPage();
   }
@@ -45,21 +59,38 @@ class _SettingsPageState extends State<SettingsPage> {
   
   // initPaymentOption() async {
   //   List<String> productIds = [""];
-
-
   //   IAPResponse response = await FlutterIap.fetchProducts(productIds);
   //   productIds = response.products
   //       .map((IAPProduct product) => product.productIdentifier)
   //       .toList();
-
-
   //   if (!mounted)
   //     return;
-
   //   setState(() {
   //     _productIds = productIds;
   //   });
   // }
+
+
+  initAds() async {
+    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+    _bannerAd = createBannerAd()..load();    
+  }
+
+  BannerAd createBannerAd() {
+    return new BannerAd(
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        if(mounted){
+          _bannerAd..show(
+            anchorOffset: 56.0,
+            anchorType: AnchorType.bottom, 
+          );
+        }
+      },
+    );
+  }
 
   initPage() async {
     isNotificationsEnabled = await preferences.isNotificationsEnabled();
@@ -81,6 +112,13 @@ class _SettingsPageState extends State<SettingsPage> {
       isNotificationsEnabled = newIsNotificationsEnabled;
       notificationSliderValue = newNotificationSliderValue;
     }); 
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+    super.dispose();
   }
 
   @override

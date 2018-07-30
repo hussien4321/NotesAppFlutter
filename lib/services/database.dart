@@ -332,7 +332,7 @@ class DBHelper{
       
       if(tempDate.isBefore(todaysDate) && tempDate.isAfter(endDate)){
         plot.forEach((innerList) {
-          if(innerList.startDate.day == tempDate.day){
+          if(innerList.startDate.day == tempDate.day && tempDate.month == innerList.startDate.month && tempDate.year == innerList.startDate.year){
             innerList.setValue(answer['successPerDay']);
           }
         });
@@ -361,7 +361,7 @@ class DBHelper{
       
       if(tempDate.isBefore(todaysDate) && tempDate.isAfter(endDate)){
         plot.forEach((innerList) {
-          if(innerList.startDate.day == tempDate.day){
+          if(innerList.startDate.day == tempDate.day && tempDate.month == innerList.startDate.month && tempDate.year == innerList.startDate.year){
             innerList.setValue(answer['failuresPerDay']);
           }
         });

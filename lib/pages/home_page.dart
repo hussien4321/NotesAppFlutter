@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: buildScaffold(),
             ),
-            (!adsPaidStatus && (index ==0 || index == 1)) ? Material(
+            (!adsPaidStatus && (index !=2)) ? Material(
               color: Colors.white,
               child: Container(
                 padding: EdgeInsets.only(top: 50.0),

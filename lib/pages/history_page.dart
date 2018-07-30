@@ -25,6 +25,8 @@ class _HistoryPageState extends State<HistoryPage> {
 
   bool notificationsEnabled;
   int notificationsDelayValue;
+
+  
   static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
     testDevices: null,
     keywords: <String>['foo', 'bar'],

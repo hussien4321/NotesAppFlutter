@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:firebase_admob/firebase_admob.dart';
 import '../services/database.dart';
 import '../services/preferences.dart';
 import '../utils/views/loading_screen.dart';
@@ -34,15 +34,24 @@ class AnalyticsPageState extends State<AnalyticsPage> {
 
   Preferences preferences;
 
+  static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
+    testDevices: null,
+    keywords: <String>['foo', 'bar'],
+    contentUrl: 'http://foo.com/bar.html',
+    birthday: new DateTime.now(),
+    childDirected: true,
+    gender: MobileAdGender.male,
+  );
+  BannerAd _bannerAd;
+
+
   @override
   void initState() {
       super.initState();
-      updateAnalytics();
+      initAds();
 
       loading = true;
-
       preferences = new Preferences();
-
       _numOfSuccesses = 0;
       _numOfFailures = 0;
       successPlotData = [];
@@ -50,7 +59,40 @@ class AnalyticsPageState extends State<AnalyticsPage> {
       avgTimeInSeconds = 0;
       mostSuccessfulTask = null;
       leastSuccessfulTask = null;
+      updateAnalytics();
+      
   }
+
+  
+  initAds() async {
+    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+    _bannerAd = createBannerAd()..load();    
+  }
+
+  BannerAd createBannerAd() {
+    return new BannerAd(
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        if(mounted){
+          _bannerAd..show(
+            anchorOffset: 56.0,
+            anchorType: AnchorType.bottom, 
+          );
+        }
+      },
+    );
+  }
+
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+    super.dispose();
+  }
+
 
   updateAnalytics() async {
     showStats = !(await preferences.isGraphExapnded());
@@ -195,12 +237,13 @@ class AnalyticsPageState extends State<AnalyticsPage> {
             Row(
               children: <Widget>[
                 Expanded(
-                  child: header(((graphRange == 7) ? 'Last week' : 'Last month'),true),
+                  child: header(((graphRange == 7) ? 'Last week' : (graphRange == 30 ? 'Last month': 'Last Year')),true),
                 ),
                 RaisedButton(
                   color: Colors.orange,
                   onPressed: (){
-                    graphRange = (graphRange == 7) ? 30 : 7;
+                    graphRange = (graphRange == 7) ? 30 : (graphRange == 30 ? 365 : 7);
+                    print('new Graph range '+graphRange.toString());
                     preferences.updatePreference(Preferences.GRAPH_RANGE, graphRange);
                     updateGraph();
                   },                  
