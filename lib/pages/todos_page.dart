@@ -68,7 +68,6 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
   }
 
 
-
   updatePage() async {
     notificationDelayValue = await preferences.getNotificationSliderValue();
     List<ToDo> activeTodos = await dbHelper.getActiveToDos();
@@ -192,7 +191,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             Text(
-              'GIVE UP',
+              'FAILURE',
               style: TextStyle(fontSize: 20.0, letterSpacing: 2.0, fontWeight: FontWeight.bold),
               textAlign: TextAlign.right,
             ),
@@ -205,7 +204,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
         child: Row(
           children: <Widget>[
             Text(
-              'COMPLETE',
+              'SUCCESS',
               style: TextStyle(fontSize: 20.0, letterSpacing: 2.0, fontWeight: FontWeight.bold),
               textAlign: TextAlign.left,
             ),
