@@ -330,7 +330,7 @@ class DBHelper{
       Map answer = successes[i];
       DateTime tempDate = DateTime.parse(answer['completion_date']);
       
-      if(tempDate.isBefore(todaysDate) && tempDate.isAfter(endDate)){
+      if(!tempDate.isAfter(todaysDate) && !tempDate.isBefore(endDate)){
         plot.forEach((innerList) {
           if(innerList.startDate.day == tempDate.day && tempDate.month == innerList.startDate.month && tempDate.year == innerList.startDate.year){
             innerList.setValue(answer['successPerDay']);
@@ -359,7 +359,7 @@ class DBHelper{
       Map answer = failures[i];
       DateTime tempDate = DateTime.parse(answer['completion_date']);
       
-      if(tempDate.isBefore(todaysDate) && tempDate.isAfter(endDate)){
+      if(!tempDate.isAfter(todaysDate) && !tempDate.isBefore(endDate)){
         plot.forEach((innerList) {
           if(innerList.startDate.day == tempDate.day && tempDate.month == innerList.startDate.month && tempDate.year == innerList.startDate.year){
             innerList.setValue(answer['failuresPerDay']);

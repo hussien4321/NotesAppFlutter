@@ -78,18 +78,9 @@ class AnalyticsPageState extends State<AnalyticsPage> {
   }
 
 
-  @override
-  void dispose() {
-    _bannerAd?.dispose();
-    _bannerAd = null;
-    super.dispose();
-  }
-
-
   updateAnalytics() async {
     showStats = !(await preferences.isGraphExapnded());
     graphRange = await preferences.getGraphRange();
-
     _numOfSuccesses = await dbHelper.getNumberOfSuccesses();
     _numOfFailures = await dbHelper.getNumberOfFailures();
     successPlotData = await dbHelper.getNumberOfSuccessesPerDay(graphRange);
@@ -103,9 +94,17 @@ class AnalyticsPageState extends State<AnalyticsPage> {
         setState(() {
             loading = false;
         });
-      }
     }
   }
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+    super.dispose();
+  }
+
 
   updateGraph() async {
     List<GraphData> newSuccessPlotData = await dbHelper.getNumberOfSuccessesPerDay(graphRange);

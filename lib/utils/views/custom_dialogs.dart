@@ -64,7 +64,7 @@ class InfoDialog extends StatelessWidget {
             new Text('All tasks have a 24 hour time limit, if the time limit expires then it becomes a failed task.',style: TextStyle(fontSize: 11.0),),
             Padding(padding: EdgeInsets.only(bottom: 10.0)),
             new Image.asset(
-              'assets/guidance/task.png',
+              'assets/guidance/task_labelled.png',
             ),
             Padding(padding: EdgeInsets.only(bottom: 10.0)),
             new Text('To finish a task, you can:',style: TextStyle(fontSize: 11.0),),
