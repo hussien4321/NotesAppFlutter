@@ -88,11 +88,26 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: buildScaffold(),
             ),
-            (!adsPaidStatus && (index !=2)) ? Material(
+            (index !=2) ? Material(
               color: Colors.white,
               child: Container(
-                padding: EdgeInsets.only(top: 50.0),
-              ),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: Colors.black, width: 1.5),
+                  ),
+                ),
+                child: SizedBox(
+                height: 50.0,
+                child: 
+                Center(
+                      child: Text(
+                      'We hope you are enjoying our app.\nIf you have a minute, please leave us a review!',
+                      style: TextStyle(fontSize: 10.0, color: Colors.orange[800], fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    )
+                    ),
+              )
+              ), 
             ) : Container(),
           ],
         ),

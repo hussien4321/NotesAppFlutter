@@ -26,3 +26,5 @@ class Lang {
 // VBoxManage setextradata "macOS 10.13 High Sierra" "VBoxInternal/Devices/efi/0/Config/DmiBoardProduct" "Iloveapple"
 // VBoxManage setextradata "macOS 10.13 High Sierra" "VBoxInternal/Devices/smc/0/Config/DeviceKey" "ourhardworkbythesewordsguardedpleasedontsteal(c)AppleComputerInc"
 // VBoxManage setextradata "macOS 10.13 High Sierra" "VBoxInternal/Devices/smc/0/Config/GetKeyFromRealSMC" 1
+// VBoxManage setextradata "macOS 10.13 High Sierra" VBoxInternal2/EfiGraphicsResolution 1920×1080
+

@@ -234,7 +234,6 @@ class AnalyticsPageState extends State<AnalyticsPage> {
                   color: Colors.orange,
                   onPressed: (){
                     graphRange = (graphRange == 7) ? 30 : (graphRange == 30 ? 365 : 7);
-                    print('new Graph range '+graphRange.toString());
                     preferences.updatePreference(Preferences.GRAPH_RANGE, graphRange);
                     updateGraph();
                   },                  
