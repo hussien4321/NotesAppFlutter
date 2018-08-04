@@ -223,7 +223,7 @@ class DBHelper{
 
     String dateRange = TimeFunctions.nowToNearestSecond().subtract(Duration(days: 1)).toIso8601String();
 
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE task.task_id = todo.task_fid AND (forfeit = "true" OR success = "true" OR datetime(start_date) < datetime("'+dateRange+'")) ORDER BY datetime(completion_date) DESC');
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM todo, task WHERE task.deleted="false" AND task.task_id = todo.task_fid AND (forfeit = "true" OR success = "true" OR datetime(start_date) < datetime("'+dateRange+'")) ORDER BY datetime(completion_date) DESC');
     List<ToDo> todos = new List();
     for (int i = 0; i < list.length; i++) {
       todos.add(new ToDo.fromJson(list[i]));

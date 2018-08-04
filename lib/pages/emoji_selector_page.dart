@@ -51,9 +51,11 @@ class EmojiSelectorPageState extends State<EmojiSelectorPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: loading ? LoadingScreen() : Container(
-        padding: EdgeInsets.only(top: 20.0),
-        child: buildGrids(),
+      body: loading ? LoadingScreen() : fadedBackground(
+        child: Container(
+          padding: EdgeInsets.only(top: 20.0),
+          child: buildGrids(),
+        ),
       ),
     );
   }
@@ -187,7 +189,7 @@ class EmojiSelectorPageState extends State<EmojiSelectorPage> {
       padding: EdgeInsets.only(left: 10.0, bottom: 10.0),
       child: Text(
         text,
-        style: TextStyle(fontSize: 18.0, color: Colors.orange[800]),
+        style: TextStyle(fontSize: 18.0, color: Colors.orange[800], fontWeight: FontWeight.bold),
         textAlign: TextAlign.start,
       ),
     );

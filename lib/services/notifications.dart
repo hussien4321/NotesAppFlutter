@@ -47,8 +47,8 @@ class NotificationService {
       todo.startDate.add(new Duration(days: 1)).subtract(new Duration(hours: delayInHours));
 
     if(scheduledNotificationDateTime.isAfter(DateTime.now())){
-      String header = todo.task.name+'!';
-      String message = 'Only '+ delayInHours.toString()+(delayInHours == 1 ? ' hour' : ' hours')+' left till deadline. Don\'t forget!';
+      String header = 'Don\'t forget to '+todo.task.name+'!';
+      String message = 'Only '+ delayInHours.toString()+(delayInHours == 1 ? ' hour' : ' hours')+' left till the deadline. Don\'t give up!';
       await _flutterLocalNotificationsPlugin.schedule(
           todo.id,
           header,
