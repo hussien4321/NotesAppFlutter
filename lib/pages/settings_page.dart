@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:share/share.dart';
@@ -217,20 +218,14 @@ class _SettingsPageState extends State<SettingsPage> {
               settingsOption('Follow us on twitter  @TodoToday2', IconButton(
                 icon: Icon(FontAwesomeIcons.twitter),
                 iconSize: 20.0,
-                onPressed: () {
-                  Clipboard.setData(new ClipboardData(text: _twitterURL));
-                  Scaffold.of(context).hideCurrentSnackBar();
-                  Scaffold.of(context).showSnackBar(SnackBar(
-                    content: Text('Link copied to clipboard 📋'),
-                  ));
-                },
+                onPressed:_launchURL,
               )),
               settingsOption('Share this app with friends', IconButton(
                 icon: Icon(Icons.share),
                 iconSize: 20.0,
                 onPressed: () {
                     final RenderBox box = context.findRenderObject();
-                    Share.share('Check out this great app for completing daily tasks without any delays! Available now for android. Link: http://bit.ly/to-do_today',
+                    Share.share('Check out this great app for completing daily tasks without anymore delays! Available now for android. Link: http://bit.ly/to-do_today',
                         sharePositionOrigin:
                             box.localToGlobal(Offset.zero) &
                                 box.size);
@@ -242,7 +237,18 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  
+    
+  _launchURL() async {
+    if (await canLaunch(_twitterURL)) {
+      await launch(_twitterURL);
+    } else {
+      Clipboard.setData(new ClipboardData(text: _twitterURL));
+      Scaffold.of(context).hideCurrentSnackBar();
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text('Link copied to clipboard 📋'),
+      ));
+    }
+  }
 
   Widget settingsHeader(String headerText){
     return Container(
