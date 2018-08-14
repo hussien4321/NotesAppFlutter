@@ -150,21 +150,37 @@ class TasksPageState extends State<TasksPage> {
                 return TaskView(_tasks[i], _isEditMode, 
                   () {
                     if(!_isEditMode){
-                      _dbHelper.createToDo(ToDo(0, _tasks[i])).then((taskId) {
-                        if(taskId != null){
-                          if(notificationsEnabled){
-                            notificationService.createNotification(ToDo(taskId, _tasks[i]),notificationsDelayValue);
-                          }                      
-                          Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()),
-                            (Route route) => route == null
-                          );
-                        }else{
-                          _scaffoldKey.currentState.hideCurrentSnackBar();
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(
-                            content: Text('Task is already active'),
-                          ));
-                        }
-                      });
+                      showDialog(
+                        context: context,
+                        builder: (newContext) => YesNoDialog(
+                          title: 'Confirm',
+                          description: "Once started, you can not cancel this task.\n\nAre you ready to "+_tasks[i].name+"?",
+                          yesText: 'Start',
+                          noText: 'Cancel',
+                          icon: _tasks[i].icon,
+                          onYes: () {
+                            _dbHelper.createToDo(ToDo(0, _tasks[i])).then((taskId) {
+                              if(taskId != null){
+                                if(notificationsEnabled){
+                                  notificationService.createNotification(ToDo(taskId, _tasks[i]),notificationsDelayValue);
+                                }                      
+                                Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()),
+                                  (Route route) => route == null
+                                );
+                              }else{
+                                Navigator.pop(context);
+                                _scaffoldKey.currentState.hideCurrentSnackBar();
+                                _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                  content: Text('Task is already active'),
+                                ));
+                              }
+                            });
+                          },
+                          onNo: (){
+                            Navigator.pop(context);
+                          },
+                        ),                        
+                      );
                     }
                     else{
                       _newTaskDialog(_tasks[i]);
@@ -371,28 +387,44 @@ class TasksPageState extends State<TasksPage> {
                       onPressed: () async {
                         if(_formKey.currentState.validate()){
                           if(dialogTask == null){
+                            
                             Task newTask = new Task(0, taskNameController.text, iconText);
-
                             int newId = await _dbHelper.createTask(newTask);
                             newTask.setId(newId);
-                            _dbHelper.createToDo(new ToDo(0, newTask)).then((todoId){
-                              if(todoId != null){
-                                if(notificationsEnabled){
-                                  notificationService.createNotification(new ToDo(todoId, newTask), notificationsDelayValue);
-                                }
-                                Navigator.pop(context);
-                                Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => 
-                                  HomePage()),
-                                  (Route route) => route == null
-                                );
-                              }else{
-                                _scaffoldKey.currentState.hideCurrentSnackBar();
-                                _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                  content: Text('Task is already active'),
-                                ));
-                                Navigator.pop(context);
-                              }
-                            });
+                            showDialog(
+                              context: context,
+                              builder: (newContext) => YesNoDialog(
+                                title: 'Confirm',
+                                description: "Once started, you can not cancel this task.\n\nAre you ready to "+newTask.name+"?",
+                                yesText: 'Start',
+                                noText: 'Cancel',
+                                icon: newTask.icon,
+                                onYes: () {
+                                  _dbHelper.createToDo(new ToDo(0, newTask)).then((todoId){
+                                    if(todoId != null){
+                                      if(notificationsEnabled){
+                                        notificationService.createNotification(new ToDo(todoId, newTask), notificationsDelayValue);
+                                      }
+                                      Navigator.pop(context);
+                                      Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => 
+                                        HomePage()),
+                                        (Route route) => route == null
+                                      );
+                                    }else{
+                                      _scaffoldKey.currentState.hideCurrentSnackBar();
+                                      _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                        content: Text('Task is already active'),
+                                      ));
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                    }
+                                  });
+                                },
+                                onNo: (){
+                                  Navigator.pop(context);
+                                },
+                              ),                        
+                            );
                           }
                           else{
                             if(taskNameController.text != dialogTask.name || iconText != dialogTask.icon){

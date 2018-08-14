@@ -3,15 +3,29 @@ import 'package:flutter/material.dart';
 class YesNoDialog extends StatelessWidget {
   
 
-  String title, description, yesText, noText;
+  String title, description, yesText, noText, icon;
   VoidCallback onYes, onNo;
 
-  YesNoDialog({this.title, this.description, this.yesText, this.noText, this.onYes, this.onNo});
+  YesNoDialog({this.title, this.description, this.yesText, this.noText, this.onYes, this.onNo, this.icon});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: new Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 22.0),),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          new Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 22.0),),
+          icon==null ? Container() : Padding(
+            padding: EdgeInsets.only(left:5.0),
+            child: Image.asset(
+              icon,
+              width: 20.0,
+              height: 20.0,
+            ),
+          ),
+        ],
+      ),
       content: new SingleChildScrollView(
         child: new ListBody(
           children: <Widget>[
