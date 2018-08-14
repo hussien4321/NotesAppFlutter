@@ -115,15 +115,31 @@ class _SettingsPageState extends State<SettingsPage> {
                           yesText: 'Yes',
                           noText: 'No',
                           onYes: () {
-                            dbHelper.resetDb().then((res) {
-                              notificationService.cancelAllNotifications();
-                              loading = false;
-                              Scaffold.of(context).hideCurrentSnackBar();
-                              Scaffold.of(context).showSnackBar(SnackBar(
-                                content: Text('Data reset successfully ✨'),
-                              ));
-                            });
-                            Navigator.pop(context);
+                            showDialog(
+                              context: context,
+                              builder: (secondContext) => YesNoDialog(
+                                title: 'Confirmation',
+                                description: 'Are you sure?\nThis can not be undone.',
+                                yesText: 'Yes',
+                                noText: 'No',
+                                onYes: () {
+                                  dbHelper.resetDb().then((res) {
+                                    notificationService.cancelAllNotifications();
+                                    loading = false;
+                                    Scaffold.of(context).hideCurrentSnackBar();
+                                    Scaffold.of(context).showSnackBar(SnackBar(
+                                      content: Text('Data reset successfully ✨'),
+                                    ));
+                                  });
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                },
+                                onNo: () {
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            );
                           },
                           onNo: () {
                             Navigator.pop(context);
