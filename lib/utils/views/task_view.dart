@@ -35,7 +35,7 @@ class TaskView extends StatelessWidget{
                   padding: EdgeInsets.all(5.0),
                     child: Text(
                     _task.name,
-                    style: TextStyle(fontSize: 20.0,),
+                    style: TextStyle(fontSize: 18.0,),
                     textAlign: TextAlign.start,
                     ),
                   ),
@@ -82,7 +82,7 @@ class SimpleTaskView extends StatelessWidget{
                     padding: EdgeInsets.only(right: 5.0),
                     child: Text(
                       _task.name,
-                      style: TextStyle(fontSize: 17.0, color: color),
+                      style: TextStyle(fontSize: 15.0, color: color),
                       textAlign: TextAlign.end,
                     ),
                   ),

@@ -138,7 +138,7 @@ class _HistoryPageState extends State<HistoryPage> {
               children: <Widget>[
                 Container(
                   child: Text(todo.task.name, style: TextStyle(
-                      fontSize: 20.0,
+                      fontSize: 15.0,
                       color: todo.success ? Colors.green[800] : Colors.red[800]
                     ),
                   ),

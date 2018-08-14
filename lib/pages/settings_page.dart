@@ -230,7 +230,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 iconSize: 20.0,
                 onPressed: () {
                     final RenderBox box = context.findRenderObject();
-                    Share.share('Check out this great app for completing daily tasks! Available now on the play store and coming soon to iOS. Look up app name \"Todo-Today\"',
+                    Share.share('Check out this great app for completing daily tasks without any delays! Available now for android. Link: http://bit.ly/to-do_today',
                         sharePositionOrigin:
                             box.localToGlobal(Offset.zero) &
                                 box.size);
