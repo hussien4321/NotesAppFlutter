@@ -230,7 +230,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
               opacity: 0.8,
               child: Container(
                 alignment: Alignment.center,
-                padding: EdgeInsets.all(5.0),
+                padding: EdgeInsets.all(3.0),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.green,
@@ -238,7 +238,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
                 child: Center(
                   child: Text(
                   '👉',
-                  style: TextStyle(fontSize: 10.0,),
+                  style: TextStyle(fontSize: 12.0,),
                   ),
                 ),
               ),
@@ -296,7 +296,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
               opacity: 0.8,
               child: Container(
                 alignment: Alignment.center,
-                padding: EdgeInsets.all(5.0),
+                padding: EdgeInsets.all(3.0),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.redAccent,
@@ -304,7 +304,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
                 child: Center(
                   child: Text(
                   '👈',
-                  style: TextStyle(fontSize: 10.0, color: Colors.green),
+                  style: TextStyle(fontSize: 12.0, color: Colors.green),
                   ),
                 ),
               ),
