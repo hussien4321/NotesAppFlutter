@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     _lockOrientation();
     _initializeServices(context);
     return new MaterialApp(
-      title: '24h Tasks',
+      title: 'Todo-Today',
       debugShowCheckedModeBanner: false, 
       theme: new ThemeData(
         primarySwatch: Colors.orange,
@@ -46,6 +46,6 @@ class MyApp extends StatelessWidget {
     new NotificationService();
     new Preferences();
     new EmojiLoader(context);
-    FirebaseAdMob.instance.initialize(appId: AdmobTools.appId);
+    await FirebaseAdMob.instance.initialize(appId: AdmobTools.appId);
   }
 }

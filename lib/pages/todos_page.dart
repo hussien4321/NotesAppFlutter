@@ -24,6 +24,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
   List<AnimationController> _colorControllers = [];
 
   bool loading;  
+  bool adsPaidStatus;  
 
    GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -38,17 +39,20 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
   @override
   void initState() {
       super.initState();
-      initAds();
 
       loading = true;
       dbHelper = new DBHelper();
       notificationService = new NotificationService();
       preferences = new Preferences();
+      initAds();
       updatePage();
   }
 
   initAds() async {
-    _bannerAd = createBannerAd()..load();    
+    adsPaidStatus = await preferences.getAdsPaidStatus();
+    if(!adsPaidStatus){
+      _bannerAd = createBannerAd()..load();    
+    }
   }
 
   BannerAd createBannerAd() {

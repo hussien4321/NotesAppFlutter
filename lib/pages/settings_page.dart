@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_admob/firebase_admob.dart';
-import 'package:flutter_iap/flutter_iap.dart';
 import 'package:share/share.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 import '../services/preferences.dart';
 import '../utils/helpers/admob_tools.dart';
+import '../utils/helpers/iap_tools.dart';
 import '../utils/views/loading_screen.dart';
 import '../services/notifications.dart';
 import '../services/database.dart';
 import '../model/todo.dart';
 import '../utils/views/custom_dialogs.dart';
+import '../utils/helpers/custom_page_routes.dart';
+import '../pages/home_page.dart';
+import 'dart:async';
 import 'dart:io';
 
 class SettingsPage extends StatefulWidget {
@@ -37,25 +41,62 @@ class _SettingsPageState extends State<SettingsPage> {
 
   BannerAd _bannerAd;
 
-  List<String> _productIds = [];
-  List<String> _alreadyPurchased = [];
+  bool adsPaidStatus;
+  IAPItem iapItem;
+
 
   @override
   void initState() {
     super.initState();
     loading = true;
-    initAds();
-    initPage();
     initPurchases();
   }
 
 
   initPurchases() async {
-    
+    adsPaidStatus = await preferences.getAdsPaidStatus();
+    await FlutterInappPurchase.prepare;
+    if (!mounted) return;
+
+    List<IAPItem> purchasedItems = await FlutterInappPurchase.getAvailablePurchases();
+    List<String> purchasedIds = purchasedItems.map((purchased) => purchased.productId.toString()).toList();
+        
+    // refresh items for android
+    List<IAPItem> items = await FlutterInappPurchase.getProducts(IAPTOOLS.productLists);
+    for (var item in items) {
+      if(purchasedIds.contains(item.productId))
+      {
+        if(!adsPaidStatus){
+          adsPaidStatus = true;
+          preferences.updatePreference(Preferences.ADS_PAID_STATUS, true);
+          _resetPage();
+        }
+        print('ALREADY PURCHASED: ${item.productId}');
+      }else{
+        if(adsPaidStatus){
+          adsPaidStatus = false;
+          preferences.updatePreference(Preferences.ADS_PAID_STATUS, false);
+          _resetPage();
+        }
+        print('DIDNT PURCHASE: ${item.productId}');
+        iapItem = item;
+      }
+    }
+    initAds();
+  }
+
+  _resetPage(){
+    Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage(4)),
+      (Route route) => route == null
+    );
   }
 
   initAds() async {
-    _bannerAd = createBannerAd()..load();    
+    adsPaidStatus = await preferences.getAdsPaidStatus();
+    if(!adsPaidStatus){
+      _bannerAd = createBannerAd()..load();    
+    }
+    initPage();
   }
 
   BannerAd createBannerAd() {
@@ -88,9 +129,11 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   _updateValues() async {
+    bool newAdsPaidStatus = await preferences.getAdsPaidStatus();
     bool newIsNotificationsEnabled  = await preferences.isNotificationsEnabled();
     int newNotificationSliderValue = await preferences.getNotificationSliderValue();
     setState(() {
+      adsPaidStatus = newAdsPaidStatus;
       isNotificationsEnabled = newIsNotificationsEnabled;
       notificationSliderValue = newNotificationSliderValue;
     }); 
@@ -100,9 +143,18 @@ class _SettingsPageState extends State<SettingsPage> {
   void dispose() {
     _bannerAd?.dispose();
     _bannerAd = null;
+    closePurchases();
     super.dispose();
   }
 
+  closePurchases() async {
+    try{
+      await FlutterInappPurchase?.endConnection;
+    }
+    catch (error){
+      print(error);
+    }
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -169,14 +221,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               settingsHeader('In-app purchases'),
-              settingsOption('Disable ads', RaisedButton(
-                  onPressed: () async {
-                    // IAPResponse response = await FlutterIap.buy(_productIds.first);
-                    // print('RESPONSE : ');
-                    // print(response);
+              settingsOption('Remove ads', RaisedButton(
+                  onPressed: adsPaidStatus ? null : () async {
+                    _buyProduct(iapItem);
                   },
                   child: Text(
-                    'Buy',
+                    adsPaidStatus ? 'Purchased' : 'Buy',
                   ),
                   color: Colors.orange,
                 ),
@@ -261,6 +311,24 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
       ),
     );
+  }
+
+  removeAds(){
+    adsPaidStatus = true;
+    preferences.updatePreference(Preferences.ADS_PAID_STATUS, true);
+    _bannerAd?.dispose();
+    _bannerAd = null;
+    _resetPage();
+  }
+
+  Future<Null> _buyProduct(IAPItem item) async {
+    try {
+      PurchasedItem purchasedItem = await FlutterInappPurchase.buyProduct(item.productId);
+      print('completed with p id = ${purchasedItem.productId}');
+      removeAds();      
+    } catch (error) {
+      print('failed with error = $error');
+    }
   }
 
     

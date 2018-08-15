@@ -41,7 +41,6 @@ class AnalyticsPageState extends State<AnalyticsPage> {
   @override
   void initState() {
       super.initState();
-      initAds();
 
       loading = true;
       preferences = new Preferences();
@@ -52,13 +51,17 @@ class AnalyticsPageState extends State<AnalyticsPage> {
       avgTimeInSeconds = 0;
       mostSuccessfulTask = null;
       leastSuccessfulTask = null;
+      initAds();
       updateAnalytics();
       
   }
 
   
   initAds() async {
-    _bannerAd = createBannerAd()..load();    
+    bool adsPaidStatus = await preferences.getAdsPaidStatus();
+    if(!adsPaidStatus){
+      _bannerAd = createBannerAd()..load();    
+    }
   }
 
   BannerAd createBannerAd() {

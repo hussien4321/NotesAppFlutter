@@ -90,8 +90,8 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: buildScaffold(),
             ),
-            (index !=2) ? Material(
-              color: Colors.white,
+            (index !=2 && !adsPaidStatus) ? Material(
+              color: Colors.orange[100],
               child: Container(
                 decoration: BoxDecoration(
                   border: Border(
@@ -107,8 +107,8 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(fontSize: 10.0, color: Colors.orange[800], fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     )
-                    ),
-              )
+                  ),
+                )
               ), 
             ) : Container(),
           ],

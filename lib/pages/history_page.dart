@@ -34,18 +34,21 @@ class _HistoryPageState extends State<HistoryPage> {
   void initState() {
     super.initState();
     
-    initAds();
 
     loading = true;
     dbHelper = new DBHelper();
     notificationService = new NotificationService();
     preferences = new Preferences();
+    initAds();
     updatePage();
   }
 
   
   initAds() async {
-    _bannerAd = createBannerAd()..load();    
+    bool adsPaidStatus = await preferences.getAdsPaidStatus();
+    if(!adsPaidStatus){
+      _bannerAd = createBannerAd()..load();   
+    } 
   }
 
   BannerAd createBannerAd() {
