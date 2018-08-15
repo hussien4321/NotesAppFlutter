@@ -4,8 +4,8 @@ import 'dart:io' show Platform;
 class AdmobTools {
   
   static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
-    testDevices: <String>['B2AA47A5B61A62208DFAF5C4CD83EB0A'],
-    keywords: <String>['productivity', 'lifestyle', 'tasks', 'todo-lists', 'self improvement', 'goals', 'exercise', 'fitness', 'health'],
+    testDevices: <String>[],
+    keywords: <String>['productivity', 'lifestyle', 'tasks', 'todo-lists', 'self improvement', 'goals', 'exercise', 'fitness', 'health', 'discipline', 'organisation'],
   );
 
   static final String appId = 
