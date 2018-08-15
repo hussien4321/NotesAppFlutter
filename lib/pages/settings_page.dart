@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_admob/firebase_admob.dart';
+import 'package:flutter_iap/flutter_iap.dart';
 import 'package:share/share.dart';
 import 'package:flutter/services.dart';
 import '../services/preferences.dart';
@@ -32,6 +33,7 @@ class _SettingsPageState extends State<SettingsPage> {
   DBHelper dbHelper = new DBHelper();
 
   final String _twitterURL = 'https://twitter.com/TodoToday2';
+  final String _emailLink = 'mailto:progrs.software@outlook.com?subject=User%20Feedback&body=Hi%20there,%0D%0A%0D%0AI wanted to give some feedback on the app Todo-Today:%0D%0A%0D%0A';
 
   BannerAd _bannerAd;
 
@@ -44,6 +46,12 @@ class _SettingsPageState extends State<SettingsPage> {
     loading = true;
     initAds();
     initPage();
+    initPurchases();
+  }
+
+
+  initPurchases() async {
+    
   }
 
   initAds() async {
@@ -95,6 +103,7 @@ class _SettingsPageState extends State<SettingsPage> {
     super.dispose();
   }
 
+  
   @override
   Widget build(BuildContext context) {
     return  loading ? LoadingScreen() : SingleChildScrollView(
@@ -153,11 +162,25 @@ class _SettingsPageState extends State<SettingsPage> {
                   color: Colors.orange,
                 ),
               ),
-              // settingsOption('Change language', IconButton(
-              //     icon: Icon(FontAwesomeIcons.globe),
-              //     iconSize: 20.0,
-              //   ),
-              // ),
+              settingsOption('Send us feedback', IconButton(
+                  icon: Icon(Icons.email),
+                  iconSize: 20.0,
+                  onPressed: _launchEmail,
+                ),
+              ),
+              settingsHeader('In-app purchases'),
+              settingsOption('Disable ads', RaisedButton(
+                  onPressed: () async {
+                    // IAPResponse response = await FlutterIap.buy(_productIds.first);
+                    // print('RESPONSE : ');
+                    // print(response);
+                  },
+                  child: Text(
+                    'Buy',
+                  ),
+                  color: Colors.orange,
+                ),
+              ),
               settingsHeader('Notifications'),
               settingsOption('Enable notifications', Switch(
                 value: isNotificationsEnabled,
@@ -217,19 +240,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
                 
               ),
-              // settingsHeader('In-app purchases'),
-              // settingsOption('Disable ads', RaisedButton(
-              //     onPressed: () async {
-              //       IAPResponse response = await FlutterIap.buy(_productIds.first);
-              //       print('RESPONSE : ');
-              //       print(response);
-              //     },
-              //     child: Text(
-              //       'Buy',
-              //     ),
-              //     color: Colors.orange,
-              //   ),
-              // ),
               settingsHeader('Social media'),
               settingsOption('Follow us on twitter  @TodoToday2', IconButton(
                 icon: Icon(FontAwesomeIcons.twitter),
@@ -262,6 +272,17 @@ class _SettingsPageState extends State<SettingsPage> {
       Scaffold.of(context).hideCurrentSnackBar();
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('Link copied to clipboard 📋'),
+      ));
+    }
+  }
+  _launchEmail() async {
+    if (await canLaunch(_emailLink)) {
+      await launch(_emailLink);
+    } else {
+      Clipboard.setData(new ClipboardData(text: 'progrs.software@outlook.com'));
+      Scaffold.of(context).hideCurrentSnackBar();
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text('Email copied to clipboard 📋'),
       ));
     }
   }

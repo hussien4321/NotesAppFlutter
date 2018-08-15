@@ -8,12 +8,13 @@ Widget fadedBackground({Widget child}) {
   
   return Container(
     decoration: BoxDecoration(
-      gradient: new LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [_bottomColor, _topColor], 
-        tileMode: TileMode.repeated,
-      ),
+      color: _topColor,
+      // gradient: new LinearGradient(
+      //   begin: Alignment.topCenter,
+      //   end: Alignment.bottomCenter,
+      //   colors: [_bottomColor, _topColor], 
+      //   tileMode: TileMode.repeated,
+      // ),
     ),
     child: child, 
   );

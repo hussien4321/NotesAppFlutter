@@ -234,7 +234,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
                 child: Center(
                   child: Text(
                   '👉',
-                  style: TextStyle(fontSize: 15.0,),
+                  style: TextStyle(fontSize: 10.0,),
                   ),
                 ),
               ),
@@ -300,7 +300,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
                 child: Center(
                   child: Text(
                   '👈',
-                  style: TextStyle(fontSize: 15.0, color: Colors.green),
+                  style: TextStyle(fontSize: 10.0, color: Colors.green),
                   ),
                 ),
               ),

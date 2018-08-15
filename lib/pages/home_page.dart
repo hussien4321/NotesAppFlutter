@@ -73,12 +73,14 @@ class _HomePageState extends State<HomePage> {
                   opacity: index == 0 ? 1.0 : 0.0,
                   child: IconButton(
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (newContext) {
-                          return InfoDialog(onConfirm: () => Navigator.of(newContext).pop(),);
-                        },
-                      );
+                      if(index ==0 ){
+                        showDialog(
+                          context: context,
+                          builder: (newContext) {
+                            return InfoDialog(onConfirm: () => Navigator.of(newContext).pop(),);
+                          },
+                        );
+                      }
                     },
                     icon: Icon(Icons.info, size: 30.0,),
                   ),
