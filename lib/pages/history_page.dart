@@ -9,6 +9,7 @@ import '../services/preferences.dart';
 import '../utils/helpers/admob_tools.dart';
 import '../utils/helpers/time_functions.dart';
 import '../utils/helpers/custom_page_routes.dart';
+import '../utils/views/custom_dialogs.dart';
 
 class HistoryPage extends StatefulWidget {
   @override
@@ -157,21 +158,37 @@ class _HistoryPageState extends State<HistoryPage> {
             child: Text('Restart'),
             color: Colors.orange,
             onPressed: (){
-              //TODO: Add snackbar when new task is created
-              dbHelper.createToDo(ToDo(0, todo.task)).then((taskId) {
-                if(taskId != null){
-                  if(notificationsEnabled){
-                    notificationService.createNotification(ToDo(taskId, todo.task), notificationsDelayValue);
-                  }
-                  Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()),
-                    (Route route) => route == null
-                  );
-                }            
-                Scaffold.of(context).hideCurrentSnackBar();
-                Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text('Task is already active'),
-                ));
-              });                      
+            showDialog(
+              context: context,
+              builder: (newContext) => YesNoDialog(
+                title: 'Confirm',
+                description: "Once started, you can not cancel this task.\n\nAre you ready to "+todo.task.name+"?",
+                yesText: 'Start',
+                noText: 'Cancel',
+                icon: todo.task.icon,
+                onYes: () {
+                    dbHelper.createToDo(ToDo(0, todo.task)).then((taskId) {
+                      if(taskId != null){
+                        if(notificationsEnabled){
+                          notificationService.createNotification(ToDo(taskId, todo.task), notificationsDelayValue);
+                        }
+                        Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()),
+                          (Route route) => route == null
+                        );
+                      }else{            
+                        Navigator.pop(context);
+                        Scaffold.of(context).hideCurrentSnackBar();
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text('Task is already active'),
+                        ));
+                      }
+                    });                      
+                },
+                onNo: (){
+                  Navigator.pop(context);
+                },
+              ),                        
+            );
             },
           )
         ],

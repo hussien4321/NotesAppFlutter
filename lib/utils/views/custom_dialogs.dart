@@ -15,7 +15,7 @@ class YesNoDialog extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          new Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 22.0),),
+          new Text(title, textAlign: TextAlign.center, style: Theme.of(context).textTheme.display1),
           icon==null ? Container() : Padding(
             padding: EdgeInsets.only(left:5.0),
             child: Image.asset(

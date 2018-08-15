@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> {
 
   int index = 0;
 
-  bool adsPaidStatus = false;
+  bool adsPaidStatus = true;
   Preferences preferences;
 
   @override

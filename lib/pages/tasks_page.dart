@@ -343,7 +343,6 @@ class TasksPageState extends State<TasksPage> {
                       color: Colors.redAccent,
                       child: Text(dialogTask == null ? 'CANCEL' : 'DELETE', style: TextStyle(color: Colors.black),),
                       onPressed: () {
-                        //TODO: ADD YES/NO DIALOG TO CONFIRM 
                         if(dialogTask != null){
                           // Navigator.pop(context);
                           showDialog(
