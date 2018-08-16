@@ -14,6 +14,7 @@ import '../services/database.dart';
 import '../model/todo.dart';
 import '../utils/views/custom_dialogs.dart';
 import '../utils/helpers/custom_page_routes.dart';
+import '../utils/helpers/check_connection.dart';
 import '../pages/home_page.dart';
 import 'dart:async';
 import 'dart:io';
@@ -42,6 +43,8 @@ class _SettingsPageState extends State<SettingsPage> {
   BannerAd _bannerAd;
 
   bool adsPaidStatus;
+  bool loadingPurchases;
+  bool hasConnection;
   IAPItem iapItem;
 
 
@@ -50,39 +53,48 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     loading = true;
     initPurchases();
+    initAds();
   }
 
 
   initPurchases() async {
-    adsPaidStatus = await preferences.getAdsPaidStatus();
-    await FlutterInappPurchase.prepare;
-    if (!mounted) return;
+    loadingPurchases = true;
+    hasConnection = false;
+    hasConnection = await CheckConnection.checkConnection();
+    if(hasConnection){
+      adsPaidStatus = await preferences.getAdsPaidStatus();
+      await FlutterInappPurchase.prepare;
+      if (!mounted) return;
 
-    List<IAPItem> purchasedItems = await FlutterInappPurchase.getAvailablePurchases();
-    List<String> purchasedIds = purchasedItems.map((purchased) => purchased.productId.toString()).toList();
-        
-    // refresh items for android
-    List<IAPItem> items = await FlutterInappPurchase.getProducts(IAPTOOLS.productLists);
-    for (var item in items) {
-      if(purchasedIds.contains(item.productId))
-      {
-        if(!adsPaidStatus){
-          adsPaidStatus = true;
-          preferences.updatePreference(Preferences.ADS_PAID_STATUS, true);
-          _resetPage();
+      List<IAPItem> purchasedItems = await FlutterInappPurchase.getAvailablePurchases();
+      List<String> purchasedIds = purchasedItems.map((purchased) => purchased.productId.toString()).toList();
+          
+      // refresh items for android
+      List<IAPItem> items = await FlutterInappPurchase.getProducts(IAPTOOLS.productLists);
+      for (var item in items) {
+        if(purchasedIds.contains(item.productId))
+        {
+          if(!adsPaidStatus){
+            adsPaidStatus = true;
+            preferences.updatePreference(Preferences.ADS_PAID_STATUS, true);
+            _resetPage();
+          }
+          print('ALREADY PURCHASED: ${item.productId}');
+        }else{
+          if(adsPaidStatus){
+            adsPaidStatus = false;
+            preferences.updatePreference(Preferences.ADS_PAID_STATUS, false);
+            _resetPage();
+          }
+          print('DIDNT PURCHASE: ${item.productId}');
+          iapItem = item;
         }
-        print('ALREADY PURCHASED: ${item.productId}');
-      }else{
-        if(adsPaidStatus){
-          adsPaidStatus = false;
-          preferences.updatePreference(Preferences.ADS_PAID_STATUS, false);
-          _resetPage();
-        }
-        print('DIDNT PURCHASE: ${item.productId}');
-        iapItem = item;
       }
     }
-    initAds();
+    setState(() {
+      loadingPurchases = false;
+      hasConnection = hasConnection;
+    });
   }
 
   _resetPage(){
@@ -222,11 +234,11 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               settingsHeader('In-app purchases'),
               settingsOption('Remove ads', RaisedButton(
-                  onPressed: adsPaidStatus ? null : () async {
+                  onPressed: adsPaidStatus || !hasConnection || loadingPurchases ? null : () async {
                     _buyProduct(iapItem);
                   },
                   child: Text(
-                    adsPaidStatus ? 'Purchased' : 'Buy',
+                    loadingPurchases ? 'Connecting...' : (!hasConnection ? 'No connection' : (adsPaidStatus ? 'Purchased' : 'Buy')),
                   ),
                   color: Colors.orange,
                 ),
