@@ -210,7 +210,7 @@ class AnalyticsPageState extends State<AnalyticsPage> {
                   child: Row(
                     children: <Widget>[
                       Expanded(
-                        flex: 3,
+                        flex: 2,
                         child: header('Average completion time'),
                       ),
                       Expanded(
