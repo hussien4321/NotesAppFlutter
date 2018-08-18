@@ -11,6 +11,9 @@ class NotificationService {
 
   static final NotificationService _singleton = new NotificationService._internal();
 
+  static final int reminderId = -1;
+
+
   factory NotificationService() {
     return _singleton;
   }
@@ -30,12 +33,36 @@ class NotificationService {
       icon: 'timer',
       color: Colors.orange,
       playSound: false,
-      importance: Importance.Low, 
-      priority: Priority.Low);
+      importance: Importance.Default, 
+      priority: Priority.Default,
+      style: AndroidNotificationStyle.BigText
+      );
     var iOSPlatformChannelSpecifics =
         new IOSNotificationDetails();
     _platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+
+    createReminderNotification();
+  }
+
+
+  createReminderNotification() async {
+    await _flutterLocalNotificationsPlugin.cancel(reminderId);
+
+    var scheduledNotificationDateTime =
+      DateTime.now().add(new Duration(days: 7));
+
+    // print("scheduled new notification for "+scheduledNotificationDateTime.toString());
+
+      String header = 'Just a friendly reminder 👋';
+      String message = "It\'s been a week since you've last created tasks, we miss you 😢";
+      await _flutterLocalNotificationsPlugin.schedule(
+          reminderId,
+          header,
+          message,
+          scheduledNotificationDateTime,
+          _platformChannelSpecifics);
+
   }
 
   createNotification(ToDo todo, int delayInHours) async {

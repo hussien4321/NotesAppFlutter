@@ -57,7 +57,7 @@ class _ToDosPageState extends State<ToDosPage> with TickerProviderStateMixin {
 
   BannerAd createBannerAd() {
     return new BannerAd(
-      adUnitId: AdmobTools.adUnitId,
+      adUnitId: AdmobTools.homePageAdUnitId,
       size: AdSize.banner,
       targetingInfo: AdmobTools.targetingInfo,
       listener: (MobileAdEvent event) {

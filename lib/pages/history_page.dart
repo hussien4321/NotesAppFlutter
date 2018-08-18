@@ -54,7 +54,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   BannerAd createBannerAd() {
     return new BannerAd(
-      adUnitId: AdmobTools.adUnitId,
+      adUnitId: AdmobTools.historyPageAdUnitId,
       size: AdSize.banner,
       targetingInfo: AdmobTools.targetingInfo,
       listener: (MobileAdEvent event) {

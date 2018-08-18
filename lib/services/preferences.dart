@@ -19,8 +19,8 @@ class Preferences {
     'graphExpanded' : false,
     'graphRange' : 7,
     'language' : 'GB',
-    'notificationsEnabled' : false,
-    'notificationDelay' : 12,
+    'notificationsEnabled' : true,
+    'notificationDelay' : 4,
     'adsPaidStatus' : false,
   };
 

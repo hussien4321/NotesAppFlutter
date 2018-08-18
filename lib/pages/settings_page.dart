@@ -113,7 +113,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   BannerAd createBannerAd() {
     return new BannerAd(
-      adUnitId: AdmobTools.adUnitId,
+      adUnitId: AdmobTools.settingsPageAdUnitId,
       size: AdSize.banner,
       targetingInfo: AdmobTools.targetingInfo,
       listener: (MobileAdEvent event) {

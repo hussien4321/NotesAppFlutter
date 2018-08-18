@@ -66,7 +66,7 @@ class AnalyticsPageState extends State<AnalyticsPage> {
 
   BannerAd createBannerAd() {
     return new BannerAd(
-      adUnitId: AdmobTools.adUnitId,
+      adUnitId: AdmobTools.analyticsPageAdUnitId,
       size: AdSize.banner,
       targetingInfo: AdmobTools.targetingInfo,
       listener: (MobileAdEvent event) {
