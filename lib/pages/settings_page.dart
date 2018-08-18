@@ -17,7 +17,7 @@ import '../utils/helpers/custom_page_routes.dart';
 import '../utils/helpers/check_connection.dart';
 import '../pages/home_page.dart';
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' show Platform;
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -91,14 +91,19 @@ class _SettingsPageState extends State<SettingsPage> {
         }
       }
     }
-    setState(() {
-      loadingPurchases = false;
-      hasConnection = hasConnection;
-    });
+    if (mounted){
+      setState(() {
+        loadingPurchases = false;
+        hasConnection = hasConnection;
+      });
+    }
   }
 
   _resetPage(){
-    Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage(4)),
+    Navigator.of(context).pushAndRemoveUntil(
+      Platform.isAndroid ?
+      new NoAnimationPageRoute(builder: (BuildContext context) => HomePage(4)) :
+      new NoAnimationPageRouteIOS(builder: (BuildContext context) => HomePage(4)),
       (Route route) => route == null
     );
   }

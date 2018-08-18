@@ -10,6 +10,7 @@ import '../utils/helpers/admob_tools.dart';
 import '../utils/helpers/time_functions.dart';
 import '../utils/helpers/custom_page_routes.dart';
 import '../utils/views/custom_dialogs.dart';
+import 'dart:io' show Platform;
 
 class HistoryPage extends StatefulWidget {
   @override
@@ -172,7 +173,10 @@ class _HistoryPageState extends State<HistoryPage> {
                         if(notificationsEnabled){
                           notificationService.createNotification(ToDo(taskId, todo.task), notificationsDelayValue);
                         }
-                        Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()),
+                        Navigator.of(context).pushAndRemoveUntil(
+                          Platform.isAndroid ? 
+                          new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()) :
+                          new NoAnimationPageRouteIOS(builder: (BuildContext context) => HomePage()),
                           (Route route) => route == null
                         );
                       }else{            

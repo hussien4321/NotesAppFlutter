@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import '../services/database.dart';
 import '../model/task.dart';
 import '../model/todo.dart';
@@ -11,6 +12,8 @@ import '../services/preferences.dart';
 import '../utils/views/custom_dialogs.dart';
 import '../utils/helpers/custom_page_routes.dart';
 import './emoji_selector_page.dart';
+import 'dart:io' show Platform;
+
 
 class TasksPage extends StatefulWidget {
     @override
@@ -164,7 +167,10 @@ class TasksPageState extends State<TasksPage> {
                                 if(notificationsEnabled){
                                   notificationService.createNotification(ToDo(taskId, _tasks[i]),notificationsDelayValue);
                                 }                      
-                                Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()),
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  Platform.isAndroid ?
+                                  new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()) :
+                                  new NoAnimationPageRouteIOS(builder: (BuildContext context) => HomePage()),
                                   (Route route) => route == null
                                 );
                               }else{
@@ -302,8 +308,10 @@ class TasksPageState extends State<TasksPage> {
                   Expanded(
                     child: RaisedButton(
                       onPressed: () async {
-                        final result = await Navigator.push(context, CustomPageRoute(
-                          builder: (BuildContext context) => EmojiSelectorPage()),
+                        final result = await Navigator.push(context, 
+                          Platform.isAndroid ?
+                          CustomPageRoute(builder: (BuildContext context) => EmojiSelectorPage()) :
+                          CupertinoPageRoute(builder: (BuildContext context) => EmojiSelectorPage()),
                         );
                         if(result != null){
                           setState(() {
@@ -405,8 +413,10 @@ class TasksPageState extends State<TasksPage> {
                                         notificationService.createNotification(new ToDo(todoId, newTask), notificationsDelayValue);
                                       }
                                       Navigator.pop(context);
-                                      Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => 
-                                        HomePage()),
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                        Platform.isAndroid ?
+                                        new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()) :
+                                        new NoAnimationPageRouteIOS(builder: (BuildContext context) => HomePage()),
                                         (Route route) => route == null
                                       );
                                     }else{
