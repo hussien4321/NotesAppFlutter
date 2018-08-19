@@ -9,6 +9,8 @@ import '../utils/views/faded_background.dart';
 import '../utils/views/custom_bottom_bar.dart' as customBar;
 import '../utils/helpers/custom_page_routes.dart';
 import '../utils/views/custom_dialogs.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/cupertino.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -123,10 +125,15 @@ class _HomePageState extends State<HomePage> {
               setState(() {              
                 this.index = 2;
               });
-              await Navigator.push(context, CustomPageRoute(
-                builder: (BuildContext context) => TasksPage()),
+              await Navigator.push(context, 
+                Platform.isAndroid ?
+                CustomPageRoute(builder: (BuildContext context) => TasksPage()) :
+                NoAnimationPageRouteIOS(builder: (BuildContext context) => TasksPage()),
               );  
-              Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage(temp)),
+              Navigator.of(context).pushAndRemoveUntil(
+                Platform.isAndroid ?
+                new NoAnimationPageRoute(builder: (BuildContext context) => HomePage(temp)) :
+                new NoAnimationPageRouteIOS(builder: (BuildContext context) => HomePage(temp)),
                 (Route route) => route == null
               );
             }else{

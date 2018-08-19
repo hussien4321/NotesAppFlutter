@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import '../../services/emoji_loader.dart';
+import 'dart:io' show Platform;
 
 class CustomGridView extends StatefulWidget {
   
@@ -28,12 +30,14 @@ class _CustomGridViewState extends State<CustomGridView> {
   int startIndex;
   int endIndex;
 
+  bool isIOS;
   @override
   initState(){
     if(startIndex == null && endIndex == null){
       startIndex = 0;
       endIndex = 100;
     }
+    isIOS = Platform.isIOS;
     controller = new ScrollController()..addListener(_scrollListener);
     super.initState();
   }
@@ -88,7 +92,7 @@ class _CustomGridViewState extends State<CustomGridView> {
             crossAxisSpacing: 0.0,
             // Generate 100 Widgets that display their index in the List
             children: List.generate(widget._count, (index) {
-              return (index >= startIndex && index <= endIndex) ? Container(
+              return (isIOS || (index >= startIndex && index <= endIndex)) ? Container(
                 child: Material(
                   color: Colors.transparent,
                   child: new InkWell(

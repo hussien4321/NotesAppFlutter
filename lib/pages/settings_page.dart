@@ -17,7 +17,7 @@ import '../utils/helpers/custom_page_routes.dart';
 import '../utils/helpers/check_connection.dart';
 import '../pages/home_page.dart';
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' show Platform;
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -47,6 +47,14 @@ class _SettingsPageState extends State<SettingsPage> {
   bool hasConnection;
   IAPItem iapItem;
 
+  final List<String>_productLists = Platform.isAndroid
+      ? [
+    'android.test.purchased',
+    'point_1000',
+    '5000_point',
+    'android.test.canceled',
+  ]
+      : ['com.cooni.point1000','com.cooni.point5000', 'todo.today.remove.ads'];
 
   @override
   void initState() {
@@ -63,14 +71,15 @@ class _SettingsPageState extends State<SettingsPage> {
     hasConnection = await CheckConnection.checkConnection();
     if(hasConnection){
       adsPaidStatus = await preferences.getAdsPaidStatus();
-      await FlutterInappPurchase.prepare;
+      if(Platform.isAndroid){
+        await FlutterInappPurchase.prepare;
+      }
       if (!mounted) return;
 
       List<IAPItem> purchasedItems = await FlutterInappPurchase.getAvailablePurchases();
       List<String> purchasedIds = purchasedItems.map((purchased) => purchased.productId.toString()).toList();
-          
-      // refresh items for android
       List<IAPItem> items = await FlutterInappPurchase.getProducts(IAPTOOLS.productLists);
+      print('NUMBER OF ITEMS = ${items.length} / PURCHASES = ${purchasedIds.toString()} / LIST = ${IAPTOOLS.productLists}');
       for (var item in items) {
         if(purchasedIds.contains(item.productId))
         {
@@ -91,14 +100,19 @@ class _SettingsPageState extends State<SettingsPage> {
         }
       }
     }
-    setState(() {
-      loadingPurchases = false;
-      hasConnection = hasConnection;
-    });
+    if (mounted){
+      setState(() {
+        loadingPurchases = false;
+        hasConnection = hasConnection;
+      });
+    }
   }
 
   _resetPage(){
-    Navigator.of(context).pushAndRemoveUntil(new NoAnimationPageRoute(builder: (BuildContext context) => HomePage(4)),
+    Navigator.of(context).pushAndRemoveUntil(
+      Platform.isAndroid ?
+      new NoAnimationPageRoute(builder: (BuildContext context) => HomePage(4)) :
+      new NoAnimationPageRouteIOS(builder: (BuildContext context) => HomePage(4)),
       (Route route) => route == null
     );
   }
@@ -335,9 +349,16 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<Null> _buyProduct(IAPItem item) async {
     try {
-      PurchasedItem purchasedItem = await FlutterInappPurchase.buyProduct(item.productId);
-      print('completed with p id = ${purchasedItem.productId}');
-      removeAds();      
+      if(Platform.isAndroid){
+        PurchasedItem purchasedItem = await FlutterInappPurchase.buyProduct(item.productId);
+        print('completed with p id = ${purchasedItem.productId}');
+        removeAds();      
+      }
+      else{
+        PurchasedItem purchasedItem = await FlutterInappPurchase.buyProductWithoutFinishTransaction(item.productId);
+        print('completed with p id = ${purchasedItem.productId}');
+        removeAds();      
+      }
     } catch (error) {
       print('failed with error = $error');
     }
