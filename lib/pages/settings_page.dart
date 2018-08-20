@@ -96,7 +96,9 @@ class _SettingsPageState extends State<SettingsPage> {
             _resetPage();
           }
           print('DIDNT PURCHASE: ${item.productId}');
-          iapItem = item;
+          setState(() {
+            iapItem = item;
+          });
         }
       }
     }
@@ -248,11 +250,11 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               settingsHeader('In-app purchases'),
               settingsOption('Remove ads', RaisedButton(
-                  onPressed: adsPaidStatus || !hasConnection || loadingPurchases ? null : () async {
+                  onPressed: adsPaidStatus || !hasConnection || loadingPurchases || iapItem == null ? null : () async {
                     _buyProduct(iapItem);
                   },
                   child: Text(
-                    loadingPurchases ? 'Connecting...' : (!hasConnection ? 'No connection' : (adsPaidStatus ? 'Purchased' : 'Buy')),
+                    loadingPurchases ? 'Connecting...' : (!hasConnection ? 'No connection' : (adsPaidStatus ? 'Purchased' : (iapItem == null ? 'Not found' : 'Buy'))),
                   ),
                   color: Colors.orange,
                 ),
@@ -350,13 +352,13 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<Null> _buyProduct(IAPItem item) async {
     try {
       if(Platform.isAndroid){
-        PurchasedItem purchasedItem = await FlutterInappPurchase.buyProduct(item.productId);
-        print('completed with p id = ${purchasedItem.productId}');
+        await FlutterInappPurchase.buyProduct(item.productId);
+        // print('completed with p id = ${purchasedItem.productId}');
         removeAds();      
       }
       else{
-        PurchasedItem purchasedItem = await FlutterInappPurchase.buyProductWithoutFinishTransaction(item.productId);
-        print('completed with p id = ${purchasedItem.productId}');
+        await FlutterInappPurchase.buyProduct(item.productId);
+        // print('completed with p id = ${purchasedItem.productId}');
         removeAds();      
       }
     } catch (error) {
@@ -377,6 +379,7 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
   _launchEmail() async {
+      await launch(_emailLink);
     if (await canLaunch(_emailLink)) {
       await launch(_emailLink);
     } else {

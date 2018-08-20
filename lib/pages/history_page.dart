@@ -173,6 +173,8 @@ class _HistoryPageState extends State<HistoryPage> {
                         if(notificationsEnabled){
                           notificationService.createNotification(ToDo(taskId, todo.task), notificationsDelayValue);
                         }
+                        _bannerAd?.dispose();
+                        _bannerAd = null;
                         Navigator.of(context).pushAndRemoveUntil(
                           Platform.isAndroid ? 
                           new NoAnimationPageRoute(builder: (BuildContext context) => HomePage()) :

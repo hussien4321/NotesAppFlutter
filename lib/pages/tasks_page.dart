@@ -311,11 +311,7 @@ class TasksPageState extends State<TasksPage> {
                         final result = await Navigator.push(context, 
                           Platform.isAndroid ?
                           CustomPageRoute(builder: (BuildContext context) => EmojiSelectorPage()) :
-<<<<<<< HEAD
-                          NoAnimationPageRouteIOS(builder: (BuildContext context) => EmojiSelectorPage()),
-=======
                           CupertinoPageRoute(builder: (BuildContext context) => EmojiSelectorPage()),
->>>>>>> 69cfde99e9984087dab8a93f7eac4dffabc63548
                         );
                         if(result != null){
                           setState(() {
