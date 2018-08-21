@@ -66,8 +66,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
 
   initPurchases() async {
-    loadingPurchases = true;
-    hasConnection = false;
+    setState(() {
+      loadingPurchases = true;
+      hasConnection = false;
+    });
     hasConnection = await CheckConnection.checkConnection();
     if(hasConnection){
       adsPaidStatus = await preferences.getAdsPaidStatus();
@@ -108,6 +110,18 @@ class _SettingsPageState extends State<SettingsPage> {
         hasConnection = hasConnection;
       });
     }
+  }
+
+  restorePurchases() async {
+    Scaffold.of(context).hideCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text('Loading previous purchases'),
+    ));
+    await initPurchases();
+    Scaffold.of(context).hideCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text('Purchases restored'),
+    ));
   }
 
   _resetPage(){
@@ -259,6 +273,17 @@ class _SettingsPageState extends State<SettingsPage> {
                   color: Colors.orange,
                 ),
               ),
+              Platform.isIOS ? Padding(padding: EdgeInsets.only(top: 10.0)) : Container(),
+              Platform.isIOS ? settingsOption('Restore purchases', RaisedButton(
+                  onPressed: adsPaidStatus || !hasConnection || loadingPurchases ? null : () async {
+                    restorePurchases();
+                  },
+                  child: Text(
+                    loadingPurchases ? 'Connecting...' : (!hasConnection ? 'No connection' : 'Restore'),
+                  ),
+                  color: Colors.orange,
+                ),
+              ) : Container(),
               settingsHeader('Notifications'),
               settingsOption('Enable notifications', Switch(
                 value: isNotificationsEnabled,
@@ -341,6 +366,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  
   removeAds(){
     adsPaidStatus = true;
     preferences.updatePreference(Preferences.ADS_PAID_STATUS, true);
